@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wortstoff – das Periodensystem-Wortspiel</title>
+<style>
+  :root {
+    --ink: #1E3A4C; --grey: #7A8B94; --line: #C9D4D9;
+    --paper: #FAFBF8; --grid: #E4ECEF; --bad: #B5533C; --good: #2E7D6B;
+    --card: #FFFFFF;
+  }
+  body[data-theme="tafel"] {
+    --ink: #E8EDE9; --grey: #9DB0A6; --line: #3D5248;
+    --paper: #24332C; --grid: #2C3F36; --bad: #E08A76; --good: #7FC9A6;
+    --card: #2E4038;
+  }
+  body[data-theme="poster"] {
+    --ink: #4A3728; --grey: #97826E; --line: #D8C6AE;
+    --paper: #F6EEDF; --grid: #EDE0C8; --bad: #B5533C; --good: #5F7D4F;
+    --card: #FBF6EA;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, sans-serif; color: var(--ink); margin: 0;
+    min-height: 100vh; padding: 16px; background: var(--paper);
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px; max-width: 720px; margin: 0 auto 14px;
+    box-shadow: 0 3px 14px rgba(30,58,76,.10), 0 1px 3px rgba(30,58,76,.06); }
+  h1 { font-family: ui-monospace, monospace; font-weight: 800; letter-spacing: 3px;
+    margin: 0; font-size: 27px;
+    background: linear-gradient(120deg, var(--ink) 55%, var(--good));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { font-size: 13px; color: var(--grey); margin-top: 2px; }
+  button { padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 15px;
+    border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease; }
+  button:hover:not(:disabled) { transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(30,58,76,.15); }
+  button:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+  button.primary { background: linear-gradient(135deg, var(--ink), var(--good));
+    color: var(--paper); border: none; }
+  button.answer { display: block; width: 100%; text-align: left; margin-bottom: 8px; }
+  button.answer:hover:not(:disabled) { background: var(--grid); }
+  button.answer.correct { background: var(--good); color: #fff; border-color: var(--good); }
+  button.answer.wrong { background: var(--bad); color: #fff; border-color: var(--bad); }
+  button:disabled { opacity: .55; cursor: default; }
+  input[type=text] { padding: 10px 12px; font-size: 16px; border: 1.5px solid var(--line);
+    border-radius: 8px; font-family: ui-monospace, monospace; width: 100%;
+    background: var(--card); color: var(--ink); }
+  .avatare { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+  .avatar { width: 64px; padding: 6px 2px; border: 1.5px solid var(--line); border-radius: 8px;
+    text-align: center; cursor: pointer; user-select: none; background: var(--card); }
+  .avatar.gewaehlt { box-shadow: 0 0 0 2px var(--ink); transform: translateY(-2px); }
+  .avatar.vergeben { opacity: .35; cursor: default; }
+  .avatar .kreis { width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 4px;
+    display: flex; align-items: center; justify-content: center; font-size: 19px; }
+  .avatar .an { font-size: 9px; line-height: 1.15; color: var(--grey); }
+  .chip { display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%; font-size: 11px; margin-right: 4px;
+    vertical-align: -5px; }
+  .row { display: flex; gap: 8px; }
+  .modal-hintergrund { position: fixed; inset: 0; background: rgba(20,30,26,.55); backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center; z-index: 50; padding: 14px; }
+  .modal { background: var(--card); border: 1.5px solid var(--line); border-radius: 12px;
+    max-width: 440px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+  .modal .kopf { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .modal .zu { border: none; background: none; font-size: 22px; cursor: pointer; color: var(--grey); padding: 2px 8px; }
+  .tiles { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tile { width: 68px; height: 80px; background: var(--card); border: 1.5px solid var(--line);
+    border-radius: 9px; display: flex; flex-direction: column; padding: 3px 5px;
+    user-select: none; flex-shrink: 0; box-shadow: 0 2px 5px rgba(30,58,76,.14);
+    transition: transform .12s, box-shadow .12s; }
+  .tile.clickable { cursor: pointer; }
+  .tile.clickable:hover { transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 6px 14px rgba(30,58,76,.22); }
+  .tile.selected { transform: translateY(-3px); box-shadow: 0 0 0 2px var(--ink); }
+  .tile.small { width: 52px; height: 60px; opacity: .85; }
+  .tile.kauf { border-style: dashed; border-color: var(--bad); background: #FBF3F1; }
+  .tile.big { width: 92px; height: 108px; margin: 0 auto; }
+  .tile .top { display: flex; justify-content: space-between; font-size: 9px;
+    color: var(--grey); font-family: ui-monospace, monospace; }
+  .tile .sym { font-size: 25px; font-weight: 800; text-align: center; flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-family: ui-monospace, monospace; letter-spacing: -.5px; }
+  .tile.small .sym { font-size: 19px; }
+  .tile.big .sym { font-size: 34px; }
+  .tile .name { font-size: 8px; text-align: center; color: var(--grey);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.big .name { font-size: 10px; }
+  .hint { font-size: 12px; color: var(--grey); margin-top: 6px; }
+  .err { color: var(--bad); font-size: 14px; }
+  .log div { font-size: 13px; padding: 3px 0; font-family: ui-monospace, monospace; }
+  .scorebar { font-size: 13px; font-family: ui-monospace, monospace; }
+  .scorebar b { text-decoration: underline; }
+  .center { text-align: center; }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; }
+  .legend .sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block;
+    vertical-align: -2px; margin-right: 4px; }
+  #arena { position: relative; height: 320px; border: 1.5px dashed var(--line);
+    border-radius: 10px; overflow: hidden; background: rgba(250,251,248,.6); }
+  .bubble { position: absolute; animation: pop .25s ease-out; cursor: pointer; }
+  .bubble.weg { animation: schwund .3s ease-in forwards; pointer-events: none; }
+  @keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes schwund { to { transform: scale(.3); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .bubble, .bubble.weg { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="elementbilder.js"></script>
+<script>
+// ---------------- Elementdaten ----------------
+// [Symbol, Name, Ordnungszahl, Punktwert, Kategorie, Zustand]
+// Kategorie: ALK EAK UEB LAN ACT MET HME NME HAL EDG
+// Zustand bei Raumtemperatur: f=fest, fl=fluessig, g=gasfoermig, ?=unbekannt
+const ELEMENTS = [
+["H","Wasserstoff",1,2,"NME","g"],["He","Helium",2,4,"EDG","g"],
+["Li","Lithium",3,3,"ALK","f"],["Be","Beryllium",4,4,"EAK","f"],
+["B","Bor",5,2,"HME","f"],["C","Kohlenstoff",6,1,"NME","f"],
+["N","Stickstoff",7,1,"NME","g"],["O","Sauerstoff",8,1,"NME","g"],
+["F","Fluor",9,3,"HAL","g"],["Ne","Neon",10,3,"EDG","g"],
+["Na","Natrium",11,3,"ALK","f"],["Mg","Magnesium",12,9,"EAK","f"],
+["Al","Aluminium",13,3,"MET","f"],["Si","Silicium",14,3,"HME","f"],
+["P","Phosphor",15,2,"NME","f"],["S","Schwefel",16,1,"NME","f"],
+["Cl","Chlor",17,4,"HAL","g"],["Ar","Argon",18,3,"EDG","g"],
+["K","Kalium",19,2,"ALK","f"],["Ca","Calcium",20,3,"EAK","f"],
+["Sc","Scandium",21,4,"UEB","f"],["Ti","Titan",22,2,"UEB","f"],
+["V","Vanadium",23,3,"UEB","f"],["Cr","Chrom",24,4,"UEB","f"],
+["Mn","Mangan",25,6,"UEB","f"],["Fe","Eisen",26,5,"UEB","f"],
+["Co","Cobalt",27,3,"UEB","f"],["Ni","Nickel",28,3,"UEB","f"],
+["Cu","Kupfer",29,4,"UEB","f"],["Zn","Zink",30,9,"UEB","f"],
+["Ga","Gallium",31,4,"MET","f"],["Ge","Germanium",32,4,"HME","f"],
+["As","Arsen",33,3,"HME","f"],["Se","Selen",34,3,"NME","f"],
+["Br","Brom",35,4,"HAL","fl"],["Kr","Krypton",36,6,"EDG","g"],
+["Rb","Rubidium",37,5,"ALK","f"],["Sr","Strontium",38,7,"EAK","f"],
+["Y","Yttrium",39,2,"UEB","f"],["Zr","Zirconium",40,9,"UEB","f"],
+["Nb","Niob",41,6,"UEB","f"],["Mo","Molybdaen",42,4,"UEB","f"],
+["Tc","Technetium",43,5,"UEB","f"],["Ru","Ruthenium",44,4,"UEB","f"],
+["Rh","Rhodium",45,6,"UEB","f"],["Pd","Palladium",46,7,"UEB","f"],
+["Ag","Silber",47,4,"UEB","f"],["Cd","Cadmium",48,7,"UEB","f"],
+["In","Indium",49,3,"MET","f"],["Sn","Zinn",50,5,"MET","f"],
+["Sb","Antimon",51,6,"HME","f"],["Te","Tellur",52,3,"HME","f"],
+["I","Iod",53,1,"HAL","f"],["Xe","Xenon",54,6,"EDG","g"],
+["Cs","Caesium",55,6,"ALK","f"],["Ba","Barium",56,4,"EAK","f"],
+["La","Lanthan",57,3,"LAN","f"],["Ce","Cer",58,3,"LAN","f"],
+["Pr","Praseodym",59,4,"LAN","f"],["Nd","Neodym",60,3,"LAN","f"],
+["Pm","Promethium",61,8,"LAN","f"],["Sm","Samarium",62,4,"LAN","f"],
+["Eu","Europium",63,5,"LAN","f"],["Gd","Gadolinium",64,7,"LAN","f"],
+["Tb","Terbium",65,6,"LAN","f"],["Dy","Dysprosium",66,5,"LAN","f"],
+["Ho","Holmium",67,3,"LAN","f"],["Er","Erbium",68,2,"LAN","f"],
+["Tm","Thulium",69,7,"LAN","f"],["Yb","Ytterbium",70,6,"LAN","f"],
+["Lu","Lutetium",71,4,"LAN","f"],["Hf","Hafnium",72,7,"UEB","f"],
+["Ta","Tantal",73,3,"UEB","f"],["W","Wolfram",74,3,"UEB","f"],
+["Re","Rhenium",75,3,"UEB","f"],["Os","Osmium",76,4,"UEB","f"],
+["Ir","Iridium",77,4,"UEB","f"],["Pt","Platin",78,5,"UEB","f"],
+["Au","Gold",79,4,"UEB","f"],["Hg","Quecksilber",80,8,"UEB","fl"],
+["Tl","Thallium",81,5,"MET","f"],["Pb","Blei",82,8,"MET","f"],
+["Bi","Bismut",83,4,"MET","f"],["Po","Polonium",84,4,"MET","f"],
+["At","Astat",85,3,"HAL","f"],["Rn","Radon",86,4,"EDG","g"],
+["Fr","Francium",87,5,"ALK","f"],["Ra","Radium",88,3,"EAK","f"],
+["Ac","Actinium",89,4,"ACT","f"],["Th","Thorium",90,3,"ACT","f"],
+["Pa","Protactinium",91,4,"ACT","f"],["U","Uran",92,2,"ACT","f"],
+["Np","Neptunium",93,6,"ACT","f"],["Pu","Plutonium",94,5,"ACT","f"],
+["Am","Americium",95,4,"ACT","f"],["Cm","Curium",96,9,"ACT","f"],
+["Bk","Berkelium",97,9,"ACT","f"],["Cf","Californium",98,8,"ACT","f"],
+["Es","Einsteinium",99,3,"ACT","f"],["Fm","Fermium",100,9,"ACT","?"],
+["Md","Mendelevium",101,8,"ACT","?"],["No","Nobelium",102,4,"ACT","?"],
+["Lr","Lawrencium",103,8,"ACT","?"],["Rf","Rutherfordium",104,6,"UEB","?"],
+["Db","Dubnium",105,7,"UEB","?"],["Sg","Seaborgium",106,9,"UEB","?"],
+["Bh","Bohrium",107,8,"UEB","?"],["Hs","Hassium",108,6,"UEB","?"],
+["Mt","Meitnerium",109,7,"UEB","?"],["Ds","Darmstadtium",110,6,"UEB","?"],
+["Rg","Roentgenium",111,5,"UEB","?"],["Cn","Copernicium",112,8,"UEB","?"],
+["Nh","Nihonium",113,7,"MET","?"],["Fl","Flerovium",114,5,"MET","?"],
+["Mc","Moscovium",115,7,"MET","?"],["Lv","Livermorium",116,6,"MET","?"],
+["Ts","Tenness",117,6,"HAL","?"],["Og","Oganesson",118,4,"EDG","?"]];
+
+const KAT_NAMEN = {
+  ALK:"Alkalimetall", EAK:"Erdalkalimetall", UEB:"Uebergangsmetall",
+  LAN:"Lanthanoid", ACT:"Actinoid", MET:"Metall", HME:"Halbmetall",
+  NME:"Nichtmetall", HAL:"Halogen", EDG:"Edelgas"
+};
+const ZUSTAND_NAMEN = { f:"fest", fl:"fluessig", g:"gasfoermig" };
+
+function istRadioaktiv(sym){
+  const z = BY_SYMBOL[sym][2];
+  return z >= 84 || sym === "Tc" || sym === "Pm";
+}
+
+// Flammenfaerbung (klassische Schulchemie)
+const FLAMME = {
+  Li:"karminrot", Na:"gelb-orange", K:"violett", Rb:"rotviolett",
+  Cs:"blauviolett", Ca:"ziegelrot", Sr:"karminrot", Ba:"fahlgruen",
+  Cu:"blaugruen", B:"gruen"
+};
+const FLAMMEN_FARBEN = ["karminrot","gelb-orange","violett","rotviolett",
+  "blauviolett","ziegelrot","fahlgruen","blaugruen","gruen"];
+
+// Dichte in g/cm3 (Feststoffe/Fluessigkeiten, gerundet)
+const DICHTE = {
+  Li:0.53, Be:1.85, B:2.34, C:2.26, Na:0.97, Mg:1.74, Al:2.70, Si:2.33,
+  P:1.82, S:2.07, K:0.86, Ca:1.55, Sc:2.99, Ti:4.51, V:6.11, Cr:7.15,
+  Mn:7.44, Fe:7.87, Co:8.86, Ni:8.91, Cu:8.96, Zn:7.13, Ga:5.91, Ge:5.32,
+  As:5.73, Se:4.81, Br:3.12, Rb:1.53, Sr:2.64, Y:4.47, Zr:6.51, Nb:8.57,
+  Mo:10.28, Tc:11.5, Ru:12.37, Rh:12.41, Pd:12.02, Ag:10.49, Cd:8.69,
+  In:7.31, Sn:7.29, Sb:6.69, Te:6.23, I:4.93, Cs:1.87, Ba:3.62, La:6.15,
+  Ce:6.77, Pr:6.77, Nd:7.01, Pm:7.26, Sm:7.52, Eu:5.24, Gd:7.90, Tb:8.23,
+  Dy:8.55, Ho:8.80, Er:9.07, Tm:9.32, Yb:6.90, Lu:9.84, Hf:13.31, Ta:16.65,
+  W:19.25, Re:21.02, Os:22.59, Ir:22.56, Pt:21.45, Au:19.28, Hg:13.53,
+  Tl:11.85, Pb:11.34, Bi:9.79, Po:9.20, Ra:5.5, Ac:10.07, Th:11.72,
+  Pa:15.37, U:19.05, Np:20.45, Pu:19.85, Am:13.69, Cm:13.51, Bk:14.79, Cf:15.1
+};
+
+// Reaktivitaetsreihenfolge der Halogene (hoeher = reaktiver)
+const HALOGEN_RANG = { F:5, Cl:4, Br:3, I:2, At:1 };
+const EDELMETALLE = new Set(["Au","Pt","Ir","Rh","Pd"]);
+
+// ---- Elektronenkonfiguration (Aufbauprinzip + Ausnahmen) ----
+const ORBITALE = ["1s","2s","2p","3s","3p","4s","3d","4p","5s","4d","5p",
+                  "6s","4f","5d","6p","7s","5f","6d","7p"];
+const KAPAZITAET = { s:2, p:6, d:10, f:14 };
+// Ausnahmen vom Aufbauprinzip: [von, nach, Anzahl Elektronen]
+const KONFIG_AUSNAHMEN = {
+  Cr:["4s","3d",1], Cu:["4s","3d",1], Nb:["5s","4d",1], Mo:["5s","4d",1],
+  Ru:["5s","4d",1], Rh:["5s","4d",1], Pd:["5s","4d",2], Ag:["5s","4d",1],
+  La:["4f","5d",1], Ce:["4f","5d",1], Gd:["4f","5d",1],
+  Pt:["6s","5d",1], Au:["6s","5d",1],
+  Ac:["5f","6d",1], Th:["5f","6d",2], Pa:["5f","6d",1], U:["5f","6d",1],
+  Np:["5f","6d",1], Cm:["5f","6d",1], Lr:["6d","7p",1],
+};
+const EDELGASE_Z = [[86,"Rn"],[54,"Xe"],[36,"Kr"],[18,"Ar"],[10,"Ne"],[2,"He"]];
+const HOCH = {0:"\u2070",1:"\u00b9",2:"\u00b2",3:"\u00b3",4:"\u2074",
+              5:"\u2075",6:"\u2076",7:"\u2077",8:"\u2078",9:"\u2079"};
+function hoch(n){ return String(n).split("").map(d=>HOCH[d]).join(""); }
+
+function konfiguration(z, sym){
+  const belegung = {};
+  let rest = z;
+  for (const orb of ORBITALE){
+    if (rest<=0) break;
+    const kap = KAPAZITAET[orb[orb.length-1]];
+    const n = Math.min(kap, rest);
+    belegung[orb] = n; rest -= n;
+  }
+  const aus = KONFIG_AUSNAHMEN[sym];
+  if (aus){
+    const [von, nach, anz] = aus;
+    belegung[von] = (belegung[von]||0) - anz;
+    belegung[nach] = (belegung[nach]||0) + anz;
+    if (belegung[von]<=0) delete belegung[von];
+  }
+  return belegung;
+}
+
+function konfigText(z, sym){
+  const belegung = konfiguration(z, sym);
+  // Edelgas-Kurzschreibweise
+  let kern = null;
+  for (const [gz, gs] of EDELGASE_Z){
+    if (z > gz){ kern = [gz, gs]; break; }
+  }
+  let uebrig = {...belegung};
+  if (kern){
+    const kernBelegung = konfiguration(kern[0], kern[1]);
+    for (const orb in kernBelegung){
+      uebrig[orb] -= kernBelegung[orb];
+      if (uebrig[orb]<=0) delete uebrig[orb];
+    }
+  }
+  const teile = Object.keys(uebrig)
+    .sort((a,b)=> a[0]-b[0] || "spdf".indexOf(a[1])-"spdf".indexOf(b[1]))
+    .map(orb => orb + hoch(uebrig[orb]));
+  return (kern ? `[${kern[1]}] ` : "") + teile.join(" ");
+}
+
+function valenzelektronen(z, sym){
+  const belegung = konfiguration(z, sym);
+  const maxN = Math.max(...Object.keys(belegung).map(o=>+o[0]));
+  let summe = 0;
+  for (const orb in belegung) if (+orb[0]===maxN) summe += belegung[orb];
+  return summe;
+}
+const HAUPTGRUPPEN = new Set(["ALK","EAK","MET","HME","NME","HAL","EDG"]);
+
+// ---- Lehrplan-Helfer (Rahmenlehrplan Berlin-Brandenburg, Kl. 7-9) ----
+// Schalenmodell (K, L, M, N) - im Unterricht sauber bis Calcium (Z=20)
+function schalen(z){
+  const kap = [2,8,8,2];
+  const out = [];
+  let rest = z;
+  for (const k of kap){
+    if (rest<=0) break;
+    const n = Math.min(k, rest);
+    out.push(n); rest -= n;
+  }
+  return out.join(", ");
+}
+// Hauptgruppe (roemisch), Helium zaehlt zu den Edelgasen (VIII)
+const ROEMISCH = ["I","II","III","IV","V","VI","VII","VIII"];
+function hauptgruppeVon(sym){
+  if (sym==="He") return "VIII";
+  const [,,z] = BY_SYMBOL[sym];
+  return ROEMISCH[valenzelektronen(z, sym)-1];
+}
+function periodeVon(z, sym){
+  const belegung = konfiguration(z, sym);
+  return Math.max(...Object.keys(belegung).map(o=>+o[0]));
+}
+// Typische Ionen der Hauptgruppenelemente (Schulchemie Kl. 9)
+const ION = { H:1, Li:1, Na:1, K:1, Rb:1, Cs:1, Be:2, Mg:2, Ca:2, Sr:2, Ba:2,
+              Al:3, N:-3, P:-3, O:-2, S:-2, Se:-2, F:-1, Cl:-1, Br:-1, I:-1 };
+function ionText(sym, ladung){
+  const betrag = Math.abs(ladung);
+  return sym + (betrag>1 ? hoch(betrag) : "") + (ladung>0 ? "\u207a" : "\u207b");
+}
+// Grobe Stoffklasse fuer Kl. 7/8
+function metallart(kat){
+  if (kat==="HME") return "Halbmetall";
+  if (kat==="NME"||kat==="HAL"||kat==="EDG") return "Nichtmetall";
+  return "Metall";
+}
+
+// Wertigkeit der Hauptgruppenelemente (klassisch, z.B. gegenueber Wasserstoff)
+function wertigkeit(z, sym){
+  const kat = BY_SYMBOL[sym][4];
+  if (kat==="EDG") return 0;
+  const v = valenzelektronen(z, sym);
+  return Math.min(v, 8-v);
+}
+
+// Typische binaere Verbindungen der Hauptgruppenelemente
+// sym: [Partnername, [[Element, Anzahl], ...]]
+const VERBINDUNG = {
+  H:["Sauerstoff",[["H",2],["O",1]]],  Li:["Sauerstoff",[["Li",2],["O",1]]],
+  Be:["Chlor",[["Be",1],["Cl",2]]],    B:["Fluor",[["B",1],["F",3]]],
+  C:["Wasserstoff",[["C",1],["H",4]]], N:["Wasserstoff",[["N",1],["H",3]]],
+  O:["Wasserstoff",[["H",2],["O",1]]], F:["Wasserstoff",[["H",1],["F",1]]],
+  Na:["Chlor",[["Na",1],["Cl",1]]],    Mg:["Sauerstoff",[["Mg",1],["O",1]]],
+  Al:["Sauerstoff",[["Al",2],["O",3]]],Si:["Sauerstoff",[["Si",1],["O",2]]],
+  P:["Wasserstoff",[["P",1],["H",3]]], S:["Wasserstoff",[["H",2],["S",1]]],
+  Cl:["Wasserstoff",[["H",1],["Cl",1]]],K:["Chlor",[["K",1],["Cl",1]]],
+  Ca:["Sauerstoff",[["Ca",1],["O",1]]],Ga:["Sauerstoff",[["Ga",2],["O",3]]],
+  Ge:["Sauerstoff",[["Ge",1],["O",2]]],As:["Wasserstoff",[["As",1],["H",3]]],
+  Se:["Wasserstoff",[["H",2],["Se",1]]],Br:["Wasserstoff",[["H",1],["Br",1]]],
+  Rb:["Chlor",[["Rb",1],["Cl",1]]],    Sr:["Sauerstoff",[["Sr",1],["O",1]]],
+  In:["Sauerstoff",[["In",2],["O",3]]],Sn:["Sauerstoff",[["Sn",1],["O",2]]],
+  Sb:["Wasserstoff",[["Sb",1],["H",3]]],Te:["Wasserstoff",[["H",2],["Te",1]]],
+  I:["Wasserstoff",[["H",1],["I",1]]], Cs:["Chlor",[["Cs",1],["Cl",1]]],
+  Ba:["Sauerstoff",[["Ba",1],["O",1]]],Tl:["Chlor",[["Tl",1],["Cl",1]]],
+  Pb:["Sauerstoff",[["Pb",1],["O",1]]],Bi:["Sauerstoff",[["Bi",2],["O",3]]],
+  Fe:["Sauerstoff",[["Fe",2],["O",3]]],Cu:["Sauerstoff",[["Cu",1],["O",1]]],
+  Zn:["Sauerstoff",[["Zn",1],["O",1]]],Ti:["Sauerstoff",[["Ti",1],["O",2]]],
+  Ag:["Chlor",[["Ag",1],["Cl",1]]],   Mn:["Sauerstoff",[["Mn",1],["O",2]]],
+};
+// Alltagsnamen bekannter Verbindungen (fuer den Steckbrief)
+const VERBINDUNG_NAME = {
+  H:"Wasser", O:"Wasser", Na:"Kochsalz", C:"Methan (Erdgas)", N:"Ammoniak",
+  Cl:"Chlorwasserstoff (Salzsaeure)", S:"Schwefelwasserstoff (Faule-Eier-Geruch)",
+  Si:"Quarz (Sand)", Ca:"Branntkalk", Fe:"Rost", Ti:"Weisspigment in Farben",
+  Mn:"Braunstein", Al:"Korund/Tonerde", Mg:"Magnesia", K:"Kaliumchlorid (Duengersalz)",
+};
+const TIEF = {1:"",2:"\u2082",3:"\u2083",4:"\u2084",5:"\u2085",6:"\u2086",7:"\u2087"};
+function formel(teile){
+  return teile.map(([e,n]) => e + (TIEF[n] ?? n)).join("");
+}
+function formelVarianten(teile){
+  // plausible falsche Formeln durch veraenderte Indizes
+  const [[e1,n1],[e2,n2]] = teile;
+  const kandidaten = [
+    [[e1,n2],[e2,n1]], [[e1,n1+1],[e2,n2]], [[e1,n1],[e2,n2+1]],
+    [[e1,1],[e2,n2+2]], [[e1,n1+1],[e2,n2+1]], [[e1,n1],[e2,Math.max(1,n2-1)]],
+  ];
+  const richtig = formel(teile);
+  const out = [];
+  for (const k of kandidaten){
+    const f = formel(k);
+    if (f!==richtig && !out.includes(f)) out.push(f);
+    if (out.length===3) break;
+  }
+  return out;
+}
+
+const BY_SYMBOL = {}, BY_LOWER = {}, BY_NAME = {};
+for (const e of ELEMENTS) { BY_SYMBOL[e[0]] = e; BY_LOWER[e[0].toLowerCase()] = e[0]; BY_NAME[e[1]] = e; }
+
+const HAND_SIZE = 10;
+
+// Beruehmte Chemikerinnen und Chemiker als Avatare
+const CHEMIKER = [
+  { name:"Marie Curie",        gebiet:"Radioaktivitaet",     icon:"\u2622\ufe0f", farbe:"#7B4B94" },
+  { name:"Dmitri Mendelejew",  gebiet:"Periodensystem",      icon:"\ud83d\udcdc", farbe:"#5B7C8D" },
+  { name:"Justus von Liebig",  gebiet:"Agrikulturchemie",    icon:"\ud83c\udf3e", farbe:"#5F7D4F" },
+  { name:"Linus Pauling",      gebiet:"Chemische Bindung",   icon:"\ud83d\udd17", farbe:"#2E7D6B" },
+  { name:"Lise Meitner",       gebiet:"Kernphysik",          icon:"\u269b\ufe0f", farbe:"#B5533C" },
+  { name:"Robert Bunsen",      gebiet:"Spektroskopie",       icon:"\ud83d\udd25", farbe:"#C98A2D" },
+  { name:"Antoine Lavoisier",  gebiet:"Verbrennungslehre",   icon:"\u2696\ufe0f", farbe:"#1E3A4C" },
+  { name:"Dorothy Hodgkin",    gebiet:"Kristallographie",    icon:"\ud83d\udc8e", farbe:"#4B6E94" },
+  { name:"James Watson",       gebiet:"DNA-Doppelhelix",     icon:"\ud83e\uddec", farbe:"#2F6DA4" },
+  { name:"Francis Crick",      gebiet:"DNA-Doppelhelix",     icon:"\ud83c\udf00", farbe:"#946B4B" },
+  { name:"Manfred Eigen",      gebiet:"Blitzschnelle Reaktionen", icon:"\u26a1", farbe:"#3D8B8B" },
+];
+function avatarKreis(idx, gross){
+  const c = CHEMIKER[idx];
+  const s = gross ? "width:56px;height:56px;font-size:28px" : "";
+  return `<span class="kreis" style="background:${c.farbe}22;border:2px solid ${c.farbe};${s}">${c.icon}</span>`;
+}
+function chip(idx){
+  const c = CHEMIKER[idx];
+  return `<span class="chip" style="background:${c.farbe}22;border:1.5px solid ${c.farbe}">${c.icon}</span>`;
+}
+
+const THEMES = [["papier","Laborpapier"],["tafel","Tafel"],["poster","Vintage"]];
+
+// ---------------- Klaenge (Web Audio, keine Dateien noetig) ----------------
+let audioCtx = null;
+function ton(freq, wann, dauer, typ, lautstaerke){
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = typ || "sine"; o.frequency.value = freq;
+    const t = audioCtx.currentTime + (wann || 0);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(lautstaerke || 0.15, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dauer);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t); o.stop(t + dauer + 0.05);
+  } catch(e){ /* kein Audio verfuegbar */ }
+}
+function klangRichtig(){ if(!state.klangAn) return; ton(523,0,.15); ton(784,.12,.2); }
+function klangFalsch(){ if(!state.klangAn) return; ton(220,0,.2,"sawtooth",.08); ton(165,.15,.25,"sawtooth",.08); }
+function klangWort(){
+  if(!state.klangAn) return;
+  // aufsteigendes Arpeggio ...
+  [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=>ton(f, i*.09, .22));
+  // ... dann voller Dur-Akkord mit Bass als Abschluss
+  [523.25, 659.25, 783.99, 1046.5].forEach(f=>ton(f, .42, .7, "sine", .1));
+  ton(130.81, .42, .8, "triangle", .12);
+  ton(261.63, .42, .8, "triangle", .08);
+}
+
+// Anspornende Kommentare des eigenen Chemiker-Avatars nach gelegtem Wort
+const LOB = [
+  n => `${n} ist stolz auf dich!`,
+  n => `${n} applaudiert begeistert!`,
+  n => `Ausgezeichnet \u2013 ${n} haette es nicht besser gekonnt!`,
+  n => `${n} nickt anerkennend: Ein Wort wie aus dem Lehrbuch!`,
+  n => `Bravo! ${n} notiert dein Wort im Laborjournal.`,
+  n => `${n} hebt den Erlenmeyerkolben auf dich!`,
+  n => `Nobelpreisverdaechtig \u2013 findet zumindest ${n}!`,
+  n => `${n} staunt: Elemente elegant kombiniert!`,
+];
+function lobText(){
+  const chemiker = CHEMIKER[state.avatare[state.current]].name;
+  return zufall(LOB)(chemiker);
+}
+
+// Abwechslungsreiche Kommentare fuer die Zusatzfragen (c = Chemiker, e = Element)
+const BONUS_RICHTIG = [
+  (c,e) => `Volltreffer! +1 Punkt \u2013 ${c} zwinkert dir zu.`,
+  (c,e) => `Genau! Du kennst dein ${e} \u2013 +1 Punkt.`,
+  (c,e) => `Wie aus der Formelsammlung \u2013 +1 Punkt!`,
+  (c,e) => `${c} murmelt: Exzellent! +1 Punkt.`,
+  (c,e) => `Dein Periodensystem sitzt! +1 Punkt.`,
+  (c,e) => `Stark! +1 Punkt fuer die Laborkasse.`,
+  (c,e) => `Chapeau! ${e} haelt keine Geheimnisse vor dir. +1 Punkt.`,
+  (c,e) => `Richtig! ${c} klopft dir anerkennend auf die Schulter. +1 Punkt.`,
+];
+const BONUS_FALSCH = [
+  (c,e) => `Knapp daneben \u2013 kein Extrapunkt. Die richtige Antwort leuchtet gruen.`,
+  (c,e) => `Leider falsch. ${c} blaettert schon im Lehrbuch nach.`,
+  (c,e) => `${e} bleibt diesmal raetselhaft \u2013 kein Punkt.`,
+  (c,e) => `Nicht ganz \u2013 auch ${c} musste so etwas erst nachschlagen.`,
+  (c,e) => `Kein Punkt diesmal \u2013 die naechste Frage kommt bestimmt!`,
+];
+function bonusFeedback(sym, richtig){
+  const c = CHEMIKER[state.avatare[state.current]].name;
+  const e = BY_SYMBOL[sym][1];
+  return zufall(richtig ? BONUS_RICHTIG : BONUS_FALSCH)(c, e);
+}
+
+// ---------------------------------------------------------------
+// Reaktionsfragen fuer die Startfrage, gestaffelt nach Jahrgangsstufe
+// (orientiert am Rahmenlehrplan Berlin-Brandenburg)
+// t = Frage, r = richtige Antwort, f = falsche Antworten, h = Hinweis
+// ---------------------------------------------------------------
+const REAKTIONSFRAGEN = {
+k78: [
+ {t:"Was entsteht bei der vollstaendigen Verbrennung von Kohlenstoff?", r:"Kohlenstoffdioxid (CO\u2082)",
+  f:["Kohlenstoffmonoxid (CO)","Wasserstoff","Russ und Wasser"], h:"Vollstaendig heisst: genug Sauerstoff."},
+ {t:"Welches Gas wird bei jeder Verbrennung verbraucht?", r:"Sauerstoff",
+  f:["Stickstoff","Kohlenstoffdioxid","Wasserstoff"]},
+ {t:"Wie nennt man die chemische Reaktion eines Stoffes mit Sauerstoff?", r:"Oxidation",
+  f:["Reduktion","Destillation","Filtration"]},
+ {t:"Magnesium + Sauerstoff \u2192 ?", r:"Magnesiumoxid",
+  f:["Magnesiumchlorid","Magnesiumsulfid","Magnesiumhydroxid"], h:"Metall + Sauerstoff = Metalloxid"},
+ {t:"Was entsteht, wenn Eisen an feuchter Luft langsam oxidiert?", r:"Rost (Eisenoxid)",
+  f:["Eisensulfid","Eisenchlorid","Edelrost (Patina)"]},
+ {t:"Wie heisst die Umkehrung der Oxidation, also der Entzug von Sauerstoff?", r:"Reduktion",
+  f:["Neutralisation","Kondensation","Sublimation"]},
+ {t:"Was entsteht bei der Knallgasreaktion (Wasserstoff + Sauerstoff)?", r:"Wasser",
+  f:["Wasserstoffperoxid","Kohlenstoffdioxid","Salzsaeure"]},
+ {t:"Mit welcher Probe weist man Wasserstoff nach?", r:"Knallgasprobe (ploppt)",
+  f:["Glimmspanprobe","Kalkwasserprobe","Flammenfaerbung"]},
+ {t:"Mit welcher Probe weist man Sauerstoff nach?", r:"Glimmspanprobe (Span glueht auf)",
+  f:["Knallgasprobe","Kalkwasserprobe","Lackmusprobe"]},
+ {t:"Wie weist man Kohlenstoffdioxid nach?", r:"Kalkwasser wird trueb",
+  f:["Glimmspan glueht auf","es ploppt","Indikator wird blau"]},
+ {t:"Wie nennt man die Ausgangsstoffe einer chemischen Reaktion?", r:"Edukte",
+  f:["Produkte","Katalysatoren","Indikatoren"]},
+ {t:"Eine Reaktion, die Waerme an die Umgebung abgibt, heisst ...", r:"exotherm",
+  f:["endotherm","isotherm","katalytisch"]},
+ {t:"Kupfer + Sauerstoff \u2192 ?", r:"Kupferoxid (schwarz)",
+  f:["Kupferchlorid","Kupfersulfat","Kupferhydroxid"]},
+ {t:"Woran erkennt man eine chemische Reaktion (statt eines physikalischen Vorgangs)?",
+  r:"Es entstehen neue Stoffe mit neuen Eigenschaften",
+  f:["Der Stoff aendert nur seinen Zustand","Der Stoff wird nur zerkleinert","Der Stoff loest sich nur"]},
+ {t:"Ein Element ist ...", r:"ein Stoff, der nicht weiter in zwei oder mehr Stoffe zerlegt werden kann",
+  f:["ein Stoff, der auch ohne Reaktionspartner umgewandelt werden kann",
+     "ein Stoff, aus dem man mit einem Reaktionspartner einen anderen Stoff herstellen kann",
+     "ein Stoff, der noch weiter zerlegt werden kann"]},
+ {t:"Welches Metall war im Altertum (bei Roemern und Griechen) noch NICHT bekannt?", r:"Platin",
+  f:["Quecksilber","Zinn","Gold"]},
+ {t:"Gesucht: Eine Modifikation ist einer der haertesten Stoffe (begehrter Edelstein), eine andere einer der weichsten (Bleistiftmine). Welches Element?",
+  r:"Kohlenstoff", f:["Wolfram","Platin","Blei"], h:"Diamant und Graphit \u2013 beides reiner Kohlenstoff."},
+ {t:"Wie stellt man Knallgas her?", r:"Wasserstoff und Sauerstoff im Verhaeltnis 2:1 mischen",
+  f:["Wasserstoff und Sauerstoff im Verhaeltnis 1:1 mischen",
+     "Stickstoff und Sauerstoff im Verhaeltnis 2:1 mischen",
+     "Stickstoff und Sauerstoff im Verhaeltnis 1:1 mischen"]},
+],
+k9: [
+ {t:"Natrium + Wasser \u2192 ?", r:"Natronlauge + Wasserstoff",
+  f:["Natriumoxid + Sauerstoff","Kochsalz + Wasserstoff","Natronlauge + Sauerstoff"],
+  h:"Alkalimetalle reagieren heftig mit Wasser \u2013 das Gas laesst sich entzuenden."},
+ {t:"Natrium + Chlor \u2192 ?", r:"Natriumchlorid (Kochsalz)",
+  f:["Natronlauge","Natriumoxid","Salzsaeure"]},
+ {t:"Saeure + Lauge \u2192 ?", r:"Salz + Wasser",
+  f:["Salz + Wasserstoff","Oxid + Wasser","Lauge + Salz"], h:"Diese Reaktion heisst Neutralisation."},
+ {t:"Wie heisst die Reaktion von Saeure mit Lauge?", r:"Neutralisation",
+  f:["Oxidation","Elektrolyse","Synthese"]},
+ {t:"Magnesium + Salzsaeure \u2192 ?", r:"Magnesiumchlorid + Wasserstoff",
+  f:["Magnesiumoxid + Wasser","Magnesiumchlorid + Sauerstoff","Magnesiumhydroxid + Chlor"],
+  h:"Unedles Metall + Saeure = Salz + Wasserstoff"},
+ {t:"Zink + Schwefelsaeure \u2192 ?", r:"Zinksulfat + Wasserstoff",
+  f:["Zinkoxid + Wasser","Zinksulfid + Sauerstoff","Zinkchlorid + Wasserstoff"]},
+ {t:"Unedles Metall + Saeure \u2192 Salz + ... ?", r:"Wasserstoff",
+  f:["Sauerstoff","Wasser","Kohlenstoffdioxid"]},
+ {t:"Welche Farbe zeigt Universalindikator in einer Saeure?", r:"rot",
+  f:["blau","gruen","gelb"]},
+ {t:"Chlorwasserstoffgas in Wasser geloest ergibt ...", r:"Salzsaeure",
+  f:["Chlorlauge","Salpetersaeure","Chlorwasser"]},
+ {t:"Bei der Elektrolyse von Wasser entstehen ...", r:"Wasserstoff und Sauerstoff (2:1)",
+  f:["Wasserstoff und Stickstoff","nur Wasserstoff","Sauerstoff und Ozon"]},
+ {t:"Was entsteht, wenn ein Natriumatom ein Elektron abgibt?", r:"ein Na\u207a-Ion (Kation)",
+  f:["ein Na\u207b-Ion (Anion)","ein Natriummolekuel","ein Isotop"]},
+ {t:"Kalk (Calciumcarbonat) + Salzsaeure \u2192 es schaeumt. Welches Gas entsteht?",
+  r:"Kohlenstoffdioxid", f:["Wasserstoff","Sauerstoff","Chlor"]},
+ {t:"Silbernitrat-Loesung + Kochsalz-Loesung \u2192 ?", r:"weisser Niederschlag (Silberchlorid)",
+  f:["gelbe Loesung","Gasblasen","schwarzer Niederschlag"], h:"Nachweis fuer Chlorid-Ionen."},
+ {t:"Wasserstoff + Kupferoxid \u2192 Kupfer + Wasser. Was passiert mit dem Kupferoxid?",
+  r:"Es wird reduziert", f:["Es wird oxidiert","Es wird neutralisiert","Es wird elektrolysiert"]},
+ {t:"Wer stellte als Erster ein Periodensystem auf, wie wir es heute kennen?", r:"Mendelejew",
+  f:["Demokrit","Dalton","Bohr"]},
+ {t:"Welche gemeinsame Eigenschaft besitzen alle Alkalimetalle?",
+  r:"Sie reagieren heftig mit Wasser unter Wasserstoff- und Laugenbildung",
+  f:["Sie sind reaktionstraege und stabil","Sie reagieren heftig mit Metallen und bilden Salze",
+     "Sie explodieren bei Beruehrung mit der Luft"]},
+ {t:"Was passiert, wenn man Kalium und Helium zusammengibt?", r:"Gar nichts",
+  f:["Es gibt eine Explosion","Das Kalium loest sich auf","Das Kalium beginnt zu brennen"],
+  h:"Helium ist ein Edelgas und geht praktisch keine Reaktionen ein."},
+ {t:"Alle Elemente einer Gruppe haben aehnliche Eigenschaften. Das liegt an ...",
+  r:"der Elektronenverteilung in der aeussersten Schale (Valenzschale)",
+  f:["der gleichen Anzahl an Protonen","der gleichen Anzahl an Neutronen",
+     "der Elektronenverteilung in der innersten Schale"]},
+ {t:"Die aufsteigende Ordnungszahl der Elemente ...",
+  r:"gibt an, wie viele Protonen (und beim neutralen Atom Elektronen) enthalten sind",
+  f:["gibt die Reihenfolge der Entdeckung an","ist nur eine Nummer zum Sortieren",
+     "gibt die Anzahl der Neutronen an"]},
+ {t:"Ein C-12-Atom wiegt 12u. Welches Element wiegt pro Atom nur etwa ein Zwoelftel davon?",
+  r:"Wasserstoff", f:["Sauerstoff","Helium","Stickstoff"]},
+ {t:"Ein Kohlenstoff-Atom des Isotops C-12 hat ...",
+  r:"6 Protonen, 6 Neutronen und 6 Elektronen",
+  f:["12 Protonen, 6 Elektronen und 6 Neutronen","6 Protonen, 6 Neutronen und 12 Elektronen",
+     "6 Elektronen, 6 Neutronen und 12 Protonen"]},
+ {t:"Fluor, Chlor, Brom und Iod gehoeren zur Familie der ...", r:"Halogene",
+  f:["Edelgase","Alkalimetalle","Erdalkalimetalle"]},
+ {t:"Gesucht: radioaktiv, ein Erdalkalimetall, entdeckt von Marie und Pierre Curie.", r:"Radium",
+  f:["Uran","Polonium","Plutonium"],
+  h:"Polonium entdeckten die Curies auch \u2013 es ist aber kein Erdalkalimetall."},
+ {t:"Iod-131 hat eine Halbwertszeit von ca. 8 Tagen. Wie viel von 100 g sind nach 24 Tagen noch uebrig?",
+  r:"12,5 Gramm", f:["25 Gramm","33,33 Gramm (gerundet)","100 Gramm"],
+  h:"24 Tage = 3 Halbwertszeiten: 100 \u2192 50 \u2192 25 \u2192 12,5"},
+],
+ober: [
+ {t:"Was bedeutet Oxidation im erweiterten (Elektronen-)Sinn?", r:"Abgabe von Elektronen",
+  f:["Aufnahme von Elektronen","Aufnahme von Protonen","Abgabe von Neutronen"]},
+ {t:"Was bedeutet Reduktion im erweiterten (Elektronen-)Sinn?", r:"Aufnahme von Elektronen",
+  f:["Abgabe von Elektronen","Abgabe von Protonen","Aufnahme von Sauerstoff"]},
+ {t:"Thermitreaktion: Aluminium + Eisenoxid \u2192 ?", r:"Eisen + Aluminiumoxid",
+  f:["Eisenaluminid","Aluminiumeisenoxid","Eisen + Aluminiumchlorid"],
+  h:"So werden Bahnschienen verschweisst \u2013 fluessiges Eisen entsteht."},
+ {t:"Haber-Bosch-Verfahren: Stickstoff + Wasserstoff \u2192 ?", r:"Ammoniak",
+  f:["Salpetersaeure","Lachgas","Hydrazin"], h:"Grundlage der Duengerproduktion."},
+ {t:"Vollstaendige Verbrennung von Methan (CH\u2084) ergibt ...", r:"CO\u2082 und H\u2082O",
+  f:["CO und H\u2082","C und H\u2082O","CO\u2082 und H\u2082"]},
+ {t:"Alkohol + Carbonsaeure \u2192 ? (mit Schwefelsaeure als Katalysator)", r:"Ester + Wasser",
+  f:["Ether + Wasser","Aldehyd + Wasserstoff","Keton + Wasser"], h:"Viele Fruchtaromen sind Ester."},
+ {t:"In der Zink-Kupfer-Zelle (Daniell-Element): Welches Metall wird oxidiert?", r:"Zink",
+  f:["Kupfer","beide","keines"], h:"Das unedlere Metall gibt Elektronen ab."},
+ {t:"Katalysatoren beschleunigen Reaktionen, indem sie ...", r:"die Aktivierungsenergie senken",
+  f:["die Reaktionsenthalpie erhoehen","Edukte verbrauchen","die Temperatur senken"]},
+],
+};
+
+function macheReaktionsfrage(){
+  const niveau = state.niveau || "k9";
+  let pool;
+  if (niveau === "k78") pool = REAKTIONSFRAGEN.k78;
+  else if (niveau === "k9") pool = [...REAKTIONSFRAGEN.k78, ...REAKTIONSFRAGEN.k9, ...REAKTIONSFRAGEN.k9];
+  else pool = [...REAKTIONSFRAGEN.k78, ...REAKTIONSFRAGEN.k9, ...REAKTIONSFRAGEN.k9,
+               ...REAKTIONSFRAGEN.ober, ...REAKTIONSFRAGEN.ober];
+  const q = zufall(pool);
+  const optionen = mischen([q.r, ...q.f]);
+  return { text: q.t, optionen, richtig: optionen.indexOf(q.r), hinweis: q.h };
+}
+function klangGefunden(){ if(!state.klangAn) return; ton(659,0,.12); ton(880,.1,.18); }
+
+// ---------------- Hintergrundwissen zu jedem Element ----------------
+// Format: "Entdeckung \u00b7 Verwendung"
+const INFO = {
+H:"1766 von Henry Cavendish entdeckt \u00b7 Raketentreibstoff, Ammoniaksynthese",
+He:"1868 im Sonnenspektrum entdeckt (Janssen/Lockyer) \u00b7 Ballons, Kuehlmittel fuer MRT",
+Li:"1817 von Johan Arfwedson entdeckt \u00b7 Akkus fuer Handys und E-Autos",
+Be:"1798 von Louis Vauquelin entdeckt \u00b7 leichte Legierungen, Roentgenfenster",
+B:"1808 von Gay-Lussac, Th\u00e9nard und Davy isoliert \u00b7 Borosilikatglas, Halbleiter",
+C:"seit der Antike bekannt \u00b7 Grundlage allen Lebens; Stahl, Graphit, Diamant",
+N:"1772 von Daniel Rutherford entdeckt \u00b7 Duenger, Schutzgas, Tiefkuehlung",
+O:"1774 von Priestley und Scheele entdeckt \u00b7 Atmung, Verbrennung, Medizin",
+F:"1886 von Henri Moissan isoliert \u00b7 Zahnpasta (Fluorid), Teflon",
+Ne:"1898 von Ramsay und Travers entdeckt \u00b7 rote Leuchtreklame",
+Na:"1807 von Humphry Davy isoliert \u00b7 Kochsalz, gelbe Strassenlampen",
+Mg:"1808 von Humphry Davy isoliert \u00b7 Leichtbau, Blitzlicht, Chlorophyll",
+Al:"1825 von Hans Christian \u00d8rsted dargestellt \u00b7 Flugzeugbau, Verpackungen",
+Si:"1824 von J\u00f6ns Berzelius isoliert \u00b7 Computerchips, Solarzellen",
+P:"1669 von Hennig Brand entdeckt (aus Urin!) \u00b7 Duenger, Streichhoelzer",
+S:"seit der Antike bekannt \u00b7 Schwefelsaeure, Gummi-Vulkanisation",
+Cl:"1774 von Carl Wilhelm Scheele entdeckt \u00b7 Desinfektion, PVC",
+Ar:"1894 von Rayleigh und Ramsay entdeckt \u00b7 Schutzgas beim Schweissen",
+K:"1807 von Humphry Davy isoliert \u00b7 Duenger, Nervenfunktion",
+Ca:"1808 von Humphry Davy isoliert \u00b7 Knochen und Zaehne, Zement",
+Sc:"1879 von Lars Nilson entdeckt \u00b7 leichte Legierungen fuer Sportgeraete",
+Ti:"1791 von William Gregor entdeckt \u00b7 Flugzeuge, Implantate, weisse Farbe",
+V:"1801/1830 entdeckt (del R\u00edo, Sefstr\u00f6m) \u00b7 Werkzeugstahl",
+Cr:"1797 von Louis Vauquelin entdeckt \u00b7 Verchromung, Edelstahl",
+Mn:"1774 von Johan Gahn isoliert \u00b7 Stahlhaertung",
+Fe:"seit der Antike bekannt \u00b7 Stahl; Haemoglobin im Blut",
+Co:"1735 von Georg Brandt entdeckt \u00b7 blaue Farben, starke Magnete",
+Ni:"1751 von Axel Cronstedt entdeckt \u00b7 Muenzen, Edelstahl, Akkus",
+Cu:"seit der Antike bekannt \u00b7 Stromkabel, Muenzen, Bronze",
+Zn:"1746 von Andreas Marggraf rein dargestellt \u00b7 Verzinkung als Rostschutz",
+Ga:"1875 von Lecoq de Boisbaudran entdeckt \u00b7 LEDs, Halbleiter; schmilzt in der Hand",
+Ge:"1886 von Clemens Winkler entdeckt \u00b7 Glasfaseroptik, Halbleiter",
+As:"um 1250 von Albertus Magnus beschrieben \u00b7 Halbleiter (frueher beruechtigtes Gift)",
+Se:"1817 von J\u00f6ns Berzelius entdeckt \u00b7 Kopierer, Solarzellen",
+Br:"1826 von Antoine Balard entdeckt \u00b7 Flammschutzmittel",
+Kr:"1898 von Ramsay und Travers entdeckt \u00b7 Blitzlampen",
+Rb:"1861 von Bunsen und Kirchhoff entdeckt (Spektralanalyse) \u00b7 Atomuhren",
+Sr:"1790 erkannt, 1808 von Davy isoliert \u00b7 rotes Feuerwerk",
+Y:"1794 von Johan Gadolin entdeckt \u00b7 LEDs, Laser",
+Zr:"1789 von Martin Klaproth entdeckt \u00b7 Huellen von Brennstaeben, Zirkonia-Schmuck",
+Nb:"1801 von Charles Hatchett entdeckt \u00b7 Supraleiter, Spezialstahl",
+Mo:"1778 von Carl Wilhelm Scheele erkannt \u00b7 Werkzeugstahl, Enzyme",
+Tc:"1937 von Perrier und Segr\u00e8 erzeugt \u2013 erstes kuenstliches Element! \u00b7 Nuklearmedizin",
+Ru:"1844 von Karl Claus entdeckt \u00b7 Elektronik, Katalysatoren",
+Rh:"1803 von William Wollaston entdeckt \u00b7 Autokatalysatoren",
+Pd:"1803 von William Wollaston entdeckt \u00b7 Katalysatoren, Zahnersatz",
+Ag:"seit der Antike bekannt \u00b7 Schmuck, Elektronik, frueher Fotografie",
+Cd:"1817 von Friedrich Stromeyer entdeckt \u00b7 frueher Akkus und Pigmente (giftig)",
+In:"1863 von Reich und Richter entdeckt \u00b7 Touchscreens (Indiumzinnoxid)",
+Sn:"seit der Antike bekannt \u00b7 Bronze, Loetzinn, Konservendosen",
+Sb:"seit der Antike bekannt \u00b7 Flammschutz, Legierungen",
+Te:"1782 von M\u00fcller von Reichenstein entdeckt \u00b7 Legierungen, Solarzellen",
+I:"1811 von Bernard Courtois entdeckt \u00b7 Desinfektion, Schilddruesenhormone",
+Xe:"1898 von Ramsay und Travers entdeckt \u00b7 Autoscheinwerfer, Narkosemittel",
+Cs:"1860 von Bunsen und Kirchhoff entdeckt \u00b7 Atomuhren \u2013 definiert die Sekunde!",
+Ba:"1808 von Humphry Davy isoliert \u00b7 Roentgen-Kontrastmittel, gruenes Feuerwerk",
+La:"1839 von Carl Mosander entdeckt \u00b7 Kameralinsen, Akkus",
+Ce:"1803 entdeckt (Berzelius/Klaproth) \u00b7 Feuerzeug-Zuendsteine",
+Pr:"1885 von Auer von Welsbach entdeckt \u00b7 Magnete, gelbes Glas",
+Nd:"1885 von Auer von Welsbach entdeckt \u00b7 Supermagnete in Kopfhoerern und Windraedern",
+Pm:"1945 in Oak Ridge nachgewiesen \u00b7 radioaktive Leuchtfarben",
+Sm:"1879 von Lecoq de Boisbaudran entdeckt \u00b7 hitzefeste Magnete",
+Eu:"1901 von Eug\u00e8ne Demar\u00e7ay entdeckt \u00b7 rote Leuchtstoffe \u2013 auch in Euro-Scheinen!",
+Gd:"1880 von de Marignac entdeckt \u00b7 MRT-Kontrastmittel",
+Tb:"1843 von Carl Mosander entdeckt \u00b7 gruene Leuchtstoffe",
+Dy:"1886 von Lecoq de Boisbaudran entdeckt \u00b7 Hochleistungsmagnete",
+Ho:"1878 entdeckt (Soret/Delafontaine) \u00b7 Laser",
+Er:"1843 von Carl Mosander entdeckt \u00b7 Verstaerker in Glasfaserkabeln",
+Tm:"1879 von Per Teodor Cleve entdeckt \u00b7 tragbare Roentgengeraete",
+Yb:"1878 von de Marignac entdeckt \u00b7 Atomuhren, Laser",
+Lu:"1907 entdeckt (Urbain / Auer von Welsbach) \u00b7 PET-Scanner in der Medizin",
+Hf:"1923 von Coster und Hevesy entdeckt \u00b7 Steuerstaebe in Kernreaktoren",
+Ta:"1802 von Anders Ekeberg entdeckt \u00b7 Kondensatoren in jedem Handy",
+W:"1783 von den Bruedern Elhuyar isoliert \u00b7 Gluehwendeln, haerteste Werkzeuge",
+Re:"1925 entdeckt (Noddack, Tacke, Berg) \u00b7 Turbinenschaufeln",
+Os:"1803 von Smithson Tennant entdeckt \u00b7 dichtestes Element; Fuellfederspitzen",
+Ir:"1803 von Smithson Tennant entdeckt \u00b7 Zuendkerzen; Beleg fuer den Dino-Asteroiden",
+Pt:"1748 von Antonio de Ulloa beschrieben \u00b7 Katalysatoren, Schmuck",
+Au:"seit der Antike bekannt \u00b7 Schmuck, Elektronik, Waehrungsreserven",
+Hg:"seit der Antike bekannt \u00b7 frueher Thermometer; einziges fluessiges Metall",
+Tl:"1861 von William Crookes entdeckt \u00b7 Infrarot-Optik (sehr giftig)",
+Pb:"seit der Antike bekannt \u00b7 Autobatterien, Strahlenschutz",
+Bi:"1753 von Claude Geoffroy unterschieden \u00b7 Magenmedizin, schmelzbare Legierungen",
+Po:"1898 von Marie und Pierre Curie entdeckt \u2013 nach Polen benannt \u00b7 stark radioaktiv",
+At:"1940 an der Universitaet Berkeley erzeugt \u00b7 seltenstes natuerliches Element",
+Rn:"1900 von Friedrich Dorn entdeckt \u00b7 radioaktives Gas aus dem Erdboden",
+Fr:"1939 von Marguerite Perey entdeckt \u00b7 extrem selten, nur Forschung",
+Ra:"1898 von Marie und Pierre Curie entdeckt \u00b7 frueher Leuchtziffern (gefaehrlich!)",
+Ac:"1899 von Andr\u00e9 Debierne entdeckt \u00b7 Forschung, Krebstherapie-Studien",
+Th:"1829 von J\u00f6ns Berzelius entdeckt \u00b7 Gasgluehstruempfe, moeglicher Kernbrennstoff",
+Pa:"1917 von Hahn und Meitner entdeckt \u00b7 Forschung",
+U:"1789 von Martin Klaproth entdeckt \u00b7 Brennstoff fuer Kernkraftwerke",
+Np:"1940 erzeugt (McMillan/Abelson) \u00b7 erstes Transuran",
+Pu:"1940 von Seaborg und Team erzeugt \u00b7 Reaktoren, Batterien fuer Raumsonden",
+Am:"1944 von Seaborg und Team erzeugt \u00b7 steckt in vielen Rauchmeldern!",
+Cm:"1944 erzeugt \u2013 nach Marie und Pierre Curie benannt \u00b7 Energiequelle fuer Raumsonden",
+Bk:"1949 in Berkeley erzeugt \u00b7 nur Forschung",
+Cf:"1950 in Berkeley erzeugt \u00b7 Neutronenquellen fuer Materialpruefung",
+Es:"1952 im Fallout der ersten Wasserstoffbombe entdeckt \u00b7 nur Forschung",
+Fm:"1952 ebenfalls im H-Bomben-Fallout entdeckt \u00b7 nur Forschung",
+Md:"1955 erzeugt \u2013 nach Mendelejew benannt \u00b7 nur Forschung",
+No:"1958 erzeugt \u2013 nach Alfred Nobel benannt \u00b7 nur Forschung",
+Lr:"1961 erzeugt \u2013 nach Ernest Lawrence benannt \u00b7 nur Forschung",
+Rf:"um 1969 erzeugt (Dubna/Berkeley) \u00b7 nur Forschung",
+Db:"um 1970 erzeugt \u2013 nach dem Forschungsort Dubna benannt \u00b7 nur Forschung",
+Sg:"1974 erzeugt \u2013 nach Glenn Seaborg benannt, noch zu dessen Lebzeiten \u00b7 nur Forschung",
+Bh:"1981 an der GSI Darmstadt erzeugt \u2013 nach Niels Bohr benannt \u00b7 nur Forschung",
+Hs:"1984 an der GSI Darmstadt erzeugt \u2013 nach Hessen benannt \u00b7 nur Forschung",
+Mt:"1982 an der GSI Darmstadt erzeugt \u2013 nach Lise Meitner benannt \u00b7 nur Forschung",
+Ds:"1994 an der GSI Darmstadt erzeugt \u2013 nach Darmstadt benannt \u00b7 nur Forschung",
+Rg:"1994 an der GSI Darmstadt erzeugt \u2013 nach R\u00f6ntgen benannt \u00b7 nur Forschung",
+Cn:"1996 an der GSI Darmstadt erzeugt \u2013 nach Kopernikus benannt \u00b7 nur Forschung",
+Nh:"2004 am RIKEN in Japan erzeugt \u2013 nach Nihon (Japan) benannt \u00b7 nur Forschung",
+Fl:"1998 in Dubna erzeugt \u2013 nach Georgi Fljorow benannt \u00b7 nur Forschung",
+Mc:"2003 in Dubna erzeugt \u2013 nach Moskau benannt \u00b7 nur Forschung",
+Lv:"2000 in Dubna erzeugt \u2013 nach dem Livermore-Labor benannt \u00b7 nur Forschung",
+Ts:"2010 erzeugt (Dubna/Oak Ridge) \u2013 nach Tennessee benannt \u00b7 nur Forschung",
+Og:"2002 in Dubna erzeugt \u2013 nach Juri Oganessian benannt, der noch lebt! \u00b7 nur Forschung",
+};
+
+// Kuenstliche Elemente: aus welchen Atomen wurden sie erzeugt?
+// sym: [Zielatom, Geschoss (null = Neutronen), Reaktionstext]
+const SYNTHESE = {
+  Tc:["Mo","H","Molybdaen-96 + Deuteronen (schwerer Wasserstoff)"],
+  Pm:["U",null,"Spaltprodukt von Uran (Kernspaltung)"],
+  At:["Bi","He","Bismut-209 + Helium-Kerne (Alphateilchen)"],
+  Np:["U",null,"Uran-238 + Neutronen"],
+  Pu:["U","H","Uran-238 + Deuteronen"],
+  Am:["Pu",null,"Plutonium-239 + Neutronen"],
+  Cm:["Pu","He","Plutonium-239 + Helium-Kerne"],
+  Bk:["Am","He","Americium-241 + Helium-Kerne"],
+  Cf:["Cm","He","Curium-242 + Helium-Kerne"],
+  Es:["U",null,"Uran + viele Neutronen (Fallout der ersten H-Bombe)"],
+  Fm:["U",null,"Uran + viele Neutronen (Fallout der ersten H-Bombe)"],
+  Md:["Es","He","Einsteinium-253 + Helium-Kerne"],
+  No:["Cm","C","Curium-246 + Kohlenstoff-12"],
+  Lr:["Cf","B","Californium-252 + Bor-Kerne"],
+  Rf:["Cf","C","Californium-249 + Kohlenstoff-12"],
+  Db:["Cf","N","Californium-249 + Stickstoff-15"],
+  Sg:["Cf","O","Californium-249 + Sauerstoff-18"],
+  Bh:["Bi","Cr","Bismut-209 + Chrom-54"],
+  Hs:["Pb","Fe","Blei-208 + Eisen-58"],
+  Mt:["Bi","Fe","Bismut-209 + Eisen-58"],
+  Ds:["Pb","Ni","Blei-208 + Nickel-62"],
+  Rg:["Bi","Ni","Bismut-209 + Nickel-64"],
+  Cn:["Pb","Zn","Blei-208 + Zink-70"],
+  Nh:["Bi","Zn","Bismut-209 + Zink-70"],
+  Fl:["Pu","Ca","Plutonium-244 + Calcium-48"],
+  Mc:["Am","Ca","Americium-243 + Calcium-48"],
+  Lv:["Cm","Ca","Curium-248 + Calcium-48"],
+  Ts:["Bk","Ca","Berkelium-249 + Calcium-48"],
+  Og:["Cf","Ca","Californium-249 + Calcium-48"],
+};
+
+// Elektronen pro Schale (aus der echten Konfiguration)
+function schalenBelegung(sym){
+  const [,,z] = BY_SYMBOL[sym];
+  const belegung = konfiguration(z, sym);
+  const s = {};
+  for (const orb in belegung){ const n = +orb[0]; s[n] = (s[n]||0) + belegung[orb]; }
+  return Object.keys(s).sort((a,b)=>a-b).map(n=>s[n]);
+}
+
+// SVG: Bohrsches Atommodell
+function zeichneAtom(sym){
+  const [,name,z,val] = [BY_SYMBOL[sym][0], BY_SYMBOL[sym][1], BY_SYMBOL[sym][2], BY_SYMBOL[sym][3]];
+  const schalenListe = schalenBelegung(sym);
+  const c = tierColor(BY_SYMBOL[sym][3]);
+  const mitte = 150, maxR = 138;
+  let svg = `<svg viewBox="0 0 300 300" style="width:100%;max-width:320px">`;
+  svg += `<circle cx="${mitte}" cy="${mitte}" r="22" fill="${c}" opacity="0.9"/>`;
+  svg += `<text x="${mitte}" y="${mitte-2}" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff" font-family="monospace">${sym}</text>`;
+  svg += `<text x="${mitte}" y="${mitte+12}" text-anchor="middle" font-size="9" fill="#fff" font-family="monospace">${z}p\u207a</text>`;
+  const abstand = Math.min(16, (maxR-30)/Math.max(1,schalenListe.length));
+  schalenListe.forEach((anzahl, i) => {
+    const r = 34 + (i+1)*abstand;
+    svg += `<circle cx="${mitte}" cy="${mitte}" r="${r}" fill="none" stroke="${c}" stroke-width="1" opacity="0.45"/>`;
+    const punkte = Math.min(anzahl, 18);
+    for (let e=0; e<punkte; e++){
+      const w = (2*Math.PI*e)/punkte - Math.PI/2;
+      svg += `<circle cx="${mitte + r*Math.cos(w)}" cy="${mitte + r*Math.sin(w)}" r="3.2" fill="${c}"/>`;
+    }
+    svg += `<text x="${mitte + r + 4}" y="${mitte - 3}" font-size="8" fill="${c}" font-family="monospace">${anzahl}e\u207b</text>`;
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
+// SVG: Teilchenbeschleuniger-Schema fuer kuenstliche Elemente
+function zeichneSynthese(sym){
+  const [ziel, geschoss] = SYNTHESE[sym];
+  const cZ = tierColor(BY_SYMBOL[ziel][3]);
+  const cP = tierColor(BY_SYMBOL[sym][3]);
+  const cG = geschoss ? tierColor(BY_SYMBOL[geschoss][3]) : "#7A8B94";
+  let svg = `<svg viewBox="0 0 340 190" style="width:100%;max-width:360px">`;
+  // Beschleunigerrohr mit Spulen
+  svg += `<rect x="16" y="62" width="180" height="36" rx="8" fill="none" stroke="#7A8B94" stroke-width="2"/>`;
+  for (let i=0;i<5;i++) svg += `<rect x="${30+i*32}" y="56" width="10" height="48" rx="3" fill="#7A8B94" opacity="0.5"/>`;
+  svg += `<text x="105" y="50" text-anchor="middle" font-size="10" fill="#7A8B94">Teilchenbeschleuniger</text>`;
+  // Geschoss (oder Neutronen) im Rohr
+  if (geschoss){
+    svg += `<circle cx="60" cy="80" r="13" fill="${cG}"/>`;
+    svg += `<text x="60" y="84" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff" font-family="monospace">${geschoss}</text>`;
+  } else {
+    for (let i=0;i<3;i++) svg += `<circle cx="${50+i*16}" cy="80" r="4" fill="#7A8B94"/>`;
+    svg += `<text x="66" y="102" text-anchor="middle" font-size="9" fill="#7A8B94">Neutronen</text>`;
+  }
+  // Flugrichtung
+  svg += `<line x1="118" y1="80" x2="192" y2="80" stroke="${cG}" stroke-width="2" stroke-dasharray="5,4"/>`;
+  svg += `<polygon points="196,80 186,74 186,86" fill="${cG}"/>`;
+  // Zielatom
+  svg += `<circle cx="228" cy="80" r="20" fill="${cZ}"/>`;
+  svg += `<text x="228" y="85" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff" font-family="monospace">${ziel}</text>`;
+  svg += `<text x="228" y="116" text-anchor="middle" font-size="9" fill="#7A8B94">Zielatom</text>`;
+  // Kollisionsblitz
+  svg += `<g stroke="${cP}" stroke-width="2">`;
+  for (let i=0;i<8;i++){ const w=i*Math.PI/4; svg += `<line x1="${256+10*Math.cos(w)}" y1="${80+10*Math.sin(w)}" x2="${256+19*Math.cos(w)}" y2="${80+19*Math.sin(w)}"/>`; }
+  svg += `</g>`;
+  // neues Element
+  svg += `<line x1="272" y1="80" x2="292" y2="80" stroke="${cP}" stroke-width="2"/>`;
+  svg += `<polygon points="298,80 289,74 289,86" fill="${cP}"/>`;
+  svg += `<circle cx="316" cy="80" r="17" fill="${cP}"/>`;
+  svg += `<text x="316" y="85" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff" font-family="monospace">${sym}</text>`;
+  svg += `<text x="170" y="160" text-anchor="middle" font-size="11" fill="currentColor" font-family="monospace">${geschoss?geschoss+" \u2192 "+ziel:"n \u2192 "+ziel}  \u21d2  ${sym}</text>`;
+  svg += `</svg>`;
+  return svg;
+}
+
+// ------------------------------------------------------------------
+// Rundenwoerter fuer den aufsteigenden Modus (mit elemente.py erzeugt
+// und verifiziert: Stufe = minimale Symbolanzahl). Eigene Woerter:
+// entweder hier direkt ergaenzen ODER im Startbildschirm eine
+// Textdatei laden (ein Wort pro Zeile, # = Kommentar).
+// ------------------------------------------------------------------
+const RUNDENWOERTER = {
+3: [
+    "Bank","Bahn","Garage","Banane","Kino","Tasche","Blase","Besen","Feuer","Reis",
+    "Salat","Erbse","Birne","Senf","Ofen","Tisch","Hefte","Tinte","Schere","Pause"],
+4: [
+    "Hausbau","Nashorn","Fisch","Flasche","Bauch","Wasser","Bohne","Kirsche","Nuss","Buch",
+    "Papier","Klasse","Fluss","Teich","Scheune","Huhn","Fuchs","Hirsch","Fische","Krebs",
+    "lustlos","ruflaute"],
+5: [
+    "Hofhund","Nachbar","Kuchen","Koffer","Knochen","Wissen","K\u00fcrbis","Klavier","Kulisse","Bahnhof",
+    "Bergbahn","Gasthaus","Gasthof","Bauhaus","Hofpause","Springen","Suchen","Fl\u00fcstern","Hochbau","Bauschein",
+    "bereisen"],
+6: [
+    "Laufmasche","Rucksack","Bauernhof","Kinokasse","Kaufhaus","Rennbahn","Laufbahn","Nachtbus","Fischauge","Waschb\u00e4r",
+    "Hausbank","Baukasten","Besucher","Hausgarten","Fischerei","Bierflasche","Ofenbank","Fuchsbau","Hosentasche","Pausenhof",
+    "bereinigen","Brautschau","kragenbaer","Tierkreis"],
+7: [
+    "Wischmopp","Flugdrachen","Seeungeheuer","Hosenknopf","Bauchtasche","Schlafsack","Scheinwerfer","Hausschuh","Hefekuchen","Fachbuch",
+    "Waschsalon","Waschpulver","Kassenbuch","Laufschuh","Taschenbuch","Flaschenhals","Sauerkirsche","Thunfisch","Tintenfass","Wasserfloh",
+    "Pausenbrote","Boxengasse","Listenpreis","Krauskopf"],
+8: [
+    "Pustekuchen","Hausaufgaben","Bausparkasse","Sonnenschein","Sonnenbank","Fachwissen","Fischteich","Schuhkasten","Klassenkasse","Klassenbuch",
+    "Kirschwasser","Busbahnhof","Reiskuchen","Mohnkuchen","Napfkuchen","Fischreiher","Tintenfisch","Wasserrutsche","Bankkauffrau","Bucheckern"],
+};
+// vom Nutzer per Datei geladene Zusatzwoerter
+const ZUSATZ = {3:[],4:[],5:[],6:[],7:[],8:[]};
+
+// minimale Symbolanzahl einer Zerlegung (fuer die Stufen-Einordnung)
+function minSymbole(w){
+  const INF = 1e9, n = w.length;
+  const dp = Array(n+1).fill(INF); dp[0]=0;
+  for (let i=0;i<n;i++){
+    if (dp[i]===INF) continue;
+    for (const L of [1,2])
+      if (i+L<=n && BY_LOWER[w.slice(i,i+L)]) dp[i+L] = Math.min(dp[i+L], dp[i]+1);
+  }
+  return dp[n]===INF ? null : dp[n];
+}
+
+function ladeWortdatei(input){
+  const datei = input.files && input.files[0];
+  if (!datei) return;
+  const leser = new FileReader();
+  leser.onload = () => {
+    let neu = 0, abgelehnt = 0;
+    // vorhandene Woerter normalisiert erfassen (Gross-/Kleinschreibung egal)
+    const vorhanden = new Set();
+    for (let k=3;k<=8;k++)
+      for (const w of [...RUNDENWOERTER[k], ...ZUSATZ[k]]) vorhanden.add(normalize(w));
+    for (const zeile of String(leser.result).split(/\r?\n/)){
+      const wort = zeile.trim();
+      if (!wort || wort.startsWith("#")) continue;
+      const norm = normalize(wort);
+      const m = minSymbole(norm);
+      if (m && m>=3 && m<=8 && !vorhanden.has(norm)){
+        ZUSATZ[m].push(wort); vorhanden.add(norm); neu++;
+      } else abgelehnt++;
+    }
+    state.ladeInfo = `${neu} Woerter uebernommen` + (abgelehnt?`, ${abgelehnt} nicht zerlegbar/doppelt/ausserhalb Stufe 3-8`:"") + ` [${datei.name}]`;
+    render();
+  };
+  leser.readAsText(datei);
+}
+
+function copiesFor(v){ return v<=1?7 : v===2?5 : v===3?4 : v===4?3 : v<=6?2 : 1; }
+
+function buildDrum(){
+  const d = [];
+  for (const [sym,,,val] of ELEMENTS)
+    for (let i=0;i<copiesFor(val);i++) d.push(sym);
+  for (let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [d[i],d[j]]=[d[j],d[i]]; }
+  return d;
+}
+
+function normalize(word){
+  let w = word.trim().toLowerCase()
+    .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss");
+  return w.replace(/[^a-z]/g,"");
+}
+
+function bestDecomposition(word, hand){
+  const counts = {};
+  for (const s of hand) counts[s]=(counts[s]||0)+1;
+  let best=null, bestScore=-1; const path=[];
+  (function go(i, score){
+    if (i===word.length){ if(score>bestScore){bestScore=score;best=[...path];} return; }
+    for (const L of [2,1]){
+      if (i+L>word.length) continue;
+      const sym = BY_LOWER[word.slice(i,i+L)];
+      if (sym && counts[sym]>0){
+        counts[sym]--; path.push(sym);
+        go(i+L, score+BY_SYMBOL[sym][3]);
+        path.pop(); counts[sym]++;
+      }
+    }
+  })(0,0);
+  return best ? {symbols:best, score:bestScore} : null;
+}
+
+// Zerlegung mit Zukauf: bis zu maxKauf fehlende Symbole duerfen
+// gegen Punkte "gekauft" werden (Kosten = Punktwert des Elements)
+function bestDecompositionMitKauf(word, hand, maxKauf, budget){
+  const counts = {};
+  for (const s of hand) counts[s]=(counts[s]||0)+1;
+  let best=null, bestNetto=-Infinity;
+  const path=[]; // Eintraege: {sym, gekauft}
+  (function go(i, score, kosten, kaeufe){
+    if (i===word.length){
+      const netto = score - kosten;
+      if (netto > bestNetto || (netto===bestNetto && best && kaeufe < best.gekauft.length)){
+        bestNetto = netto;
+        best = { symbols: path.map(p=>p.sym),
+                 gekauft: path.filter(p=>p.gekauft).map(p=>p.sym),
+                 score, kosten };
+      }
+      return;
+    }
+    for (const L of [2,1]){
+      if (i+L>word.length) continue;
+      const sym = BY_LOWER[word.slice(i,i+L)];
+      if (!sym) continue;
+      const wert = BY_SYMBOL[sym][3];
+      if (counts[sym]>0){
+        counts[sym]--; path.push({sym, gekauft:false});
+        go(i+L, score+wert, kosten, kaeufe);
+        path.pop(); counts[sym]++;
+      } else if (kaeufe < maxKauf && kosten + wert <= budget){
+        path.push({sym, gekauft:true});
+        go(i+L, score+wert, kosten+wert, kaeufe+1);
+        path.pop();
+      }
+    }
+  })(0,0,0,0);
+  return best;
+}
+
+function tierColor(v){
+  return v<=2 ? "#5B7C8D" : v<=4 ? "#2E7D6B" : v<=6 ? "#C98A2D" : v<=8 ? "#B5533C" : "#7B4B94";
+}
+
+// ---------------- Quizfragen ----------------
+function zufall(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function mischen(arr){
+  const a=[...arr];
+  for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function macheFrage(sym, schwer){
+  const [symbol,name,z,,kat,zustand] = BY_SYMBOL[sym];
+  const istHG = HAUPTGRUPPEN.has(kat);
+  const niveau = state.niveau || "k9";
+
+  // verfuegbare Typen nach Lehrplan-Niveau sammeln
+  const t78 = ["name","metallart"];
+  if (zustand !== "?") t78.push("zustand");
+  if (DICHTE[sym] !== undefined) t78.push("dichte");
+  if (kat==="EDG" || EDELMETALLE.has(sym)) t78.push("reaktiv");
+
+  const t9 = ["ordnungszahl","kategorie","radioaktiv"];
+  if (z <= 20) t9.push("schalen","schalen");
+  if (istHG && z <= 86) t9.push("valenz","wertigkeit","hauptgruppe","periode");
+  if (ION[sym] !== undefined) t9.push("ion","ion");
+  if (VERBINDUNG[sym]) t9.push("verbindung","verbindung");
+  if (FLAMME[sym]) t9.push("flamme","flamme");
+  if (kat==="ALK" || HALOGEN_RANG[sym]) t9.push("reaktiv");
+
+  const tOber = (z <= 103) ? ["konfig"] : [];
+
+  let typen;
+  if (niveau==="k78") typen = [...t78];
+  else if (niveau==="k9") typen = [...t78, ...t9];
+  else typen = [...t78, ...t9, ...tOber];
+
+  if (schwer){
+    const hart = new Set(["schalen","wertigkeit","verbindung","ion","hauptgruppe",
+      "flamme","dichte","konfig","reaktiv","periode"]);
+    const schwere = typen.filter(t=>hart.has(t));
+    if (schwere.length) typen = schwere;
+  }
+  if (!typen.length) typen = ["name","ordnungszahl"];
+  const typ = zufall(typen);
+
+  if (typ==="metallart"){
+    const richtig = metallart(kat);
+    const optionen = mischen(["Metall","Halbmetall","Nichtmetall"]);
+    return { text:`Ist ${name} ein Metall, ein Halbmetall oder ein Nichtmetall?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="schalen"){
+    const richtig = schalen(z);
+    const falsch = [];
+    for (const off of mischen([-2,-1,1,2,3,-3])){
+      const nz = z + off;
+      if (nz<1 || nz>20) continue;
+      const s = schalen(nz);
+      if (s!==richtig && !falsch.includes(s)) falsch.push(s);
+      if (falsch.length===3) break;
+    }
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`Wie verteilen sich die Elektronen von ${name} auf die Schalen (K, L, M, \u2026)?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="hauptgruppe"){
+    const richtig = hauptgruppeVon(sym);
+    const falsch = mischen(ROEMISCH.filter(r=>r!==richtig)).slice(0,3);
+    const optionen = mischen([richtig, ...falsch]).map(r=>r+". Hauptgruppe");
+    return { text:`In welcher Hauptgruppe des Periodensystems steht ${name}?`,
+      optionen, richtig: optionen.indexOf(richtig+". Hauptgruppe") };
+  }
+
+  if (typ==="periode"){
+    const richtig = periodeVon(z, sym);
+    const falsch = mischen([1,2,3,4,5,6,7].filter(p=>p!==richtig)).slice(0,3);
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`In welcher Periode des Periodensystems steht ${name}?`,
+      optionen: optionen.map(String), richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="ion"){
+    const ladung = ION[sym];
+    const richtig = ionText(sym, ladung);
+    const falsch = mischen([1,2,3,-1,-2,-3].filter(l=>l!==ladung)).slice(0,3)
+      .map(l=>ionText(sym, l));
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`Welches Ion bildet ${name} typischerweise?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="wertigkeit"){
+    const richtig = wertigkeit(z, sym);
+    const falsch = mischen([0,1,2,3,4].filter(v=>v!==richtig)).slice(0,3);
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`Welche Wertigkeit hat ${name} ueblicherweise in Verbindungen (z.B. gegenueber Wasserstoff)?`,
+      optionen: optionen.map(String), richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="verbindung"){
+    const [partner, teile] = VERBINDUNG[sym];
+    const richtig = formel(teile);
+    const optionen = mischen([richtig, ...formelVarianten(teile)]);
+    return { text:`Welche Formel hat die typische Verbindung von ${name} mit ${partner}?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="konfig"){
+    const richtig = konfigText(z, sym);
+    // Distraktoren: Konfigurationen der Nachbarelemente
+    const falsch = [];
+    for (const off of mischen([-2,-1,1,2,3,-3])){
+      const nz = z + off;
+      if (nz<1 || nz>103) continue;
+      const nsym = ELEMENTS[nz-1][0];
+      const k = konfigText(nz, nsym);
+      if (k!==richtig && !falsch.includes(k)) falsch.push(k);
+      if (falsch.length===3) break;
+    }
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`Wie lautet die Elektronenkonfiguration von ${name}?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="valenz"){
+    const richtig = valenzelektronen(z, sym);
+    const falsch = mischen([1,2,3,4,5,6,7,8].filter(v=>v!==richtig)).slice(0,3);
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`Wie viele Valenzelektronen (Aussenelektronen) hat ${name}?`,
+      optionen: optionen.map(String), richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="flamme"){
+    const richtig = FLAMME[sym];
+    const falsch = mischen(FLAMMEN_FARBEN.filter(f=>f!==richtig)).slice(0,3);
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`Welche Flammenfaerbung zeigt ${name}?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="dichte"){
+    const d = DICHTE[sym];
+    // Distraktoren: echte Dichten anderer Elemente, deutlich verschieden
+    const kandidaten = mischen(Object.values(DICHTE)
+      .filter(x => Math.abs(Math.log(x/d)) > 0.45));
+    const falsch = [];
+    for (const k of kandidaten){
+      if (falsch.every(f => Math.abs(Math.log(k/f)) > 0.3)) falsch.push(k);
+      if (falsch.length===3) break;
+    }
+    while (falsch.length<3) falsch.push(d * [0.3,2.5,6][falsch.length]);
+    const fmt = x => x.toFixed(x<3?2:1).replace(".",",");
+    const optionen = mischen([d, ...falsch]);
+    return { text:`Welche Dichte hat ${name} ungefaehr (in g/cm\u00b3)?`,
+      optionen: optionen.map(fmt), richtig: optionen.indexOf(d) };
+  }
+
+  if (typ==="reaktiv"){
+    if (kat==="ALK"){
+      const richtig = "Es reagiert heftig, dabei entsteht Wasserstoff";
+      const optionen = mischen([richtig,
+        "Nichts \u2013 es sinkt einfach zu Boden",
+        "Es loest sich langsam ohne Gasbildung",
+        "Es reagiert nur mit heissem Wasserdampf"]);
+      return { text:`Was passiert, wenn man ${name} in Wasser gibt?`,
+        optionen, richtig: optionen.indexOf(richtig) };
+    }
+    if (kat==="EDG"){
+      const richtig = "Praktisch gar nicht \u2013 es geht kaum Verbindungen ein";
+      const optionen = mischen([richtig,
+        "Es reagiert heftig mit Wasser",
+        "Es verbrennt an der Luft",
+        "Es reagiert stark mit Metallen"]);
+      return { text:`Wie reaktionsfreudig ist das Edelgas ${name}?`,
+        optionen, richtig: optionen.indexOf(richtig) };
+    }
+    if (HALOGEN_RANG[sym]){
+      const andere = zufall(Object.keys(HALOGEN_RANG).filter(h=>h!==sym));
+      const richtig = HALOGEN_RANG[sym] > HALOGEN_RANG[andere] ? "Ja" : "Nein";
+      const optionen = ["Ja","Nein"];
+      return { text:`Ist ${name} reaktionsfreudiger als ${BY_SYMBOL[andere][1]}?`,
+        optionen, richtig: optionen.indexOf(richtig),
+        hinweis:"Bei den Halogenen nimmt die Reaktivitaet von Fluor zu Astat ab." };
+    }
+    // Edelmetall
+    const richtig = `Sehr gering \u2013 ${name} gilt als Edelmetall`;
+    const optionen = mischen([richtig,
+      "Sehr hoch \u2013 es reagiert schon mit Luftfeuchtigkeit",
+      "Es reagiert heftig mit Wasser",
+      "Es entzuendet sich von selbst an der Luft"]);
+    return { text:`Wie reaktionsfreudig ist ${name}?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+
+  if (typ==="kategorie"){
+    const richtig = KAT_NAMEN[kat];
+    const falsch = mischen(Object.values(KAT_NAMEN).filter(k=>k!==richtig)).slice(0,3);
+    const optionen = mischen([richtig, ...falsch]);
+    return { text:`Zu welcher Kategorie gehoert ${name}?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+  if (typ==="zustand"){
+    const richtig = ZUSTAND_NAMEN[zustand];
+    const optionen = mischen(Object.values(ZUSTAND_NAMEN));
+    return { text:`Welchen Aggregatzustand hat ${name} bei Raumtemperatur?`,
+      optionen, richtig: optionen.indexOf(richtig) };
+  }
+  if (typ==="ordnungszahl"){
+    const falsch = new Set();
+    while (falsch.size<3){
+      const off = (Math.floor(Math.random()*8)+1) * (Math.random()<0.5?-1:1);
+      const kand = z+off;
+      if (kand>=1 && kand<=118 && kand!==z) falsch.add(kand);
+    }
+    const optionen = mischen([z, ...falsch]);
+    const text = zufall([`Welche Ordnungszahl hat ${name}?`,
+      `Wie viele Protonen enthaelt der Atomkern von ${name}?`]);
+    return { text, optionen: optionen.map(String), richtig: optionen.indexOf(z), zahlVerdeckt:true };
+  }
+  if (typ==="name"){
+    const falsch = mischen(ELEMENTS.filter(e=>e[0]!==symbol)).slice(0,3).map(e=>e[1]);
+    const optionen = mischen([name, ...falsch]);
+    return { text:`Wie heisst das Element mit dem Symbol ${symbol}?`,
+      optionen, richtig: optionen.indexOf(name), verdeckt:true };
+  }
+  // radioaktiv
+  const richtig = istRadioaktiv(sym) ? "Ja" : "Nein";
+  const optionen = ["Ja","Nein"];
+  return { text:`Ist ${name} radioaktiv (kein stabiles Isotop)?`,
+    optionen, richtig: optionen.indexOf(richtig) };
+}
+
+// ---------------- Zustand ----------------
+let state = {
+  phase: "setup", names: ["Spieler 1","Spieler 2"], target: 75,
+  avatare: [0, 1], theme: "papier", niveau: "k9",
+  modus: "runden", zugNr: 0, zielwort: null, rundenWoerter: null, ladeInfo: "",
+  drum: [], hands: [], scores: [], current: 0,
+  word: "", swapSel: [], log: [], message: "", winner: null,
+  quiz: null, // { sym, frage, gewaehlt, art }
+  draw: null, // { needed, maxPick, picked, swapBack, logEntry }
+  doubler: false, // Startfrage richtig -> Wortpunkte x2
+  hatGelegt: false, // im Rundenmodus: Zielwort in diesem Zug gelegt?
+  hinweise: 0, aufgeloest: false,
+  klangAn: true, klangFuer: "", lob: "", bildFenster: null,
+  wortWahl: [], steckbrief: null,
+  bonus: null, // { symbols, idx, extra, needed, entryBase }
+};
+
+// ---------------- Aktionen ----------------
+function startGame(){
+  const d = buildDrum();
+  state.hands = state.names.map(()=>d.splice(0,HAND_SIZE));
+  state.drum = d;
+  state.scores = state.names.map(()=> state.modus==="runden" ? 10 : 0);
+  state.current = 0; state.log = []; state.winner = null;
+  state.word=""; state.swapSel=[]; state.message=""; state.quiz=null;
+  state.wortWahl=[]; state.steckbrief=null;
+  state.zugNr = 0; state.zielwort = null;
+  state.rundenWoerter = {};
+  state.rundenGewichtet = {};
+  for (let k=3;k<=8;k++){
+    state.rundenWoerter[k] = [...RUNDENWOERTER[k], ...ZUSATZ[k]];
+    // eigene Woerter doppelt im Lostopf -> doppelte Ziehungschance
+    state.rundenGewichtet[k] = [...RUNDENWOERTER[k], ...ZUSATZ[k], ...ZUSATZ[k]];
+  }
+  state.naechstesZiel = state.names.map(()=>({ wort: zufall(state.rundenGewichtet[3]), stufe: 3 }));
+  state.phase = "handoff"; render();
+}
+
+function nextPlayer(entry){
+  if (entry) state.log = [entry, ...state.log].slice(0,12);
+  const w = state.scores.findIndex(s=>s>=state.target);
+  if (w>=0){ state.winner=w; state.phase="won"; render(); return; }
+  const vorheriger = state.current;
+  state.zugNr++;
+  if (state.modus==="runden" && state.rundenWoerter && state.hatGelegt){
+    // neues Zielwort erst, wenn das alte gelegt wurde
+    const naechsteZugNr = state.zugNr + state.names.length - 1;
+    const stufe = stufeFuer(naechsteZugNr);
+    state.naechstesZiel[vorheriger] = { wort: zufall(state.rundenGewichtet[stufe]), stufe };
+  }
+  state.hatGelegt = false;
+  state.current = (state.current+1)%state.names.length;
+  state.word=""; state.swapSel=[]; state.message=""; state.quiz=null;
+  state.doubler=false; state.bonus=null; state.zielwort=null;
+  state.wortWahl=[]; state.steckbrief=null; state.klangFuer=""; state.lob=""; state.bildFenster=null;
+  state.phase="handoff"; render();
+}
+
+function listenStufe(norm){
+  for (let k=3;k<=8;k++)
+    if ((state.rundenWoerter[k]||[]).some(w => normalize(w) === norm)) return k;
+  return null;
+}
+function istRundenwort(norm){
+  const stufe = state.zielwort ? state.zielwort.stufe : aktuelleStufe();
+  return listenStufe(norm) === stufe;
+}
+
+function playWord(){
+  if (state.aufgeloest) return;
+  const norm = normalize(state.word);
+  if (norm.length < 2) return;
+  let nebenfund = null;
+  if (state.modus==="runden"){
+    const ls = listenStufe(norm);
+    if (ls === null){
+      // gar kein Listenwort: freundlich ablehnen, Auswahl leeren
+      klangFalsch();
+      state.wortWahl = [];
+      state.word = "";
+      state.message = "Dieses Wort wird nicht gesucht \u2013 es steht nicht in der Rundenliste. Auswahl geleert, such weiter!";
+      render();
+      return;
+    }
+    if (ls !== state.zielwort.stufe) nebenfund = ls;
+    state.message = "";
+  }
+  const hand = state.hands[state.current];
+  let res = bestDecomposition(norm, hand);
+  let gekauft = [], kosten = 0;
+  if (!res){
+    const k = bestDecompositionMitKauf(norm, hand, 3, state.scores[state.current]);
+    if (!k) return;
+    res = { symbols: k.symbols, score: k.score };
+    gekauft = [...k.gekauft]; kosten = k.kosten;
+  }
+  // nur Handkarten aus der Hand entfernen, gekaufte nicht
+  const kaufRest = [...gekauft];
+  for (const s of res.symbols){
+    const kIdx = kaufRest.indexOf(s);
+    if (kIdx >= 0){ kaufRest.splice(kIdx,1); continue; }
+    hand.splice(hand.indexOf(s),1);
+  }
+  let pts = res.score, teile=[];
+  if (res.symbols.length>=8){ pts+=15; teile.push("+15 Langwort-Bonus"); }
+  if (state.doubler){ pts*=2; teile.push("x2 Startfrage"); }
+  if (kosten){ teile.push(`Zukauf ${gekauft.join(",")} = -${kosten}`); }
+  state.scores[state.current] += pts - kosten;
+  state.hatGelegt = true;
+  state.lob = lobText();
+  klangWort();
+  const entryBase = `${state.names[state.current]}: ${res.symbols.join("")} = ${pts - kosten} Punkte${teile.length?" ("+teile.join(", ")+")":""} [${state.word.trim()}]`
+    + (nebenfund ? ` (Nebenfund Stufe ${nebenfund} \u2013 gesucht war: ${state.zielwort.wort})` : "");
+  // Zusatzfragen: pro (verschiedenem) Element im Wort eine Frage, je +1 Punkt
+  const einzigartig = [...new Set(res.symbols)];
+  state.bonus = { symbols: einzigartig, idx: 0, extra: 0,
+    needed: HAND_SIZE - hand.length, entryBase };
+  naechsteBonusFrage();
+}
+
+function naechsteBonusFrage(){
+  const b = state.bonus;
+  if (b.idx >= b.symbols.length){
+    state.scores[state.current] += b.extra;
+    const entry = b.entryBase + ` Zusatzfragen: ${b.extra}/${b.symbols.length} (+${b.extra})`;
+    const needed = b.needed;
+    state.bonus = null;
+    if (state.scores[state.current] >= state.target){ nextPlayer(entry); return; }
+    if (state.modus === "runden"){ nextPlayer(entry); return; }
+    startDraw(needed, [], entry);
+    return;
+  }
+  const sym = b.symbols[b.idx];
+  state.quiz = { sym, frage: macheFrage(sym), gewaehlt: null, art: "bonus" };
+  state.phase = "quiz"; render();
+}
+
+function beginStartQuiz(){
+  if (state.modus === "runden") waehleZielwort();
+  // ueberwiegend Reaktionsfragen (Lehrplan-gestaffelt), gelegentlich
+  // eine schwere Elementfrage zu einem Hauptgruppenelement aus der Hand
+  if (Math.random() < 0.7){
+    state.quiz = { sym: null, frage: macheReaktionsfrage(), gewaehlt: null, art: "start" };
+    state.phase = "quiz"; render();
+    return;
+  }
+  const hand = state.hands[state.current];
+  // bevorzugt Hauptgruppenelemente aus der Hand
+  const hg = hand.filter(s => HAUPTGRUPPEN.has(BY_SYMBOL[s][4]));
+  const pool = hg.length ? hg : hand;
+  const sym = pool[Math.floor(Math.random()*pool.length)];
+  state.quiz = { sym, frage: macheFrage(sym, true), gewaehlt: null, art: "start" };
+  state.phase = "quiz"; render();
+}
+
+function swapTiles(){
+  if (!state.swapSel.length){ state.message="Waehle 1-3 Kaertchen zum Tauschen aus."; render(); return; }
+  const normS = normalize(state.word);
+  const res = normS.length >= 2 ? bestDecomposition(normS, state.hands[state.current]) : null;
+  const resK = (!res && normS.length >= 2)
+    ? bestDecompositionMitKauf(normS, state.hands[state.current], 3, state.scores[state.current]) : null;
+  if (res || resK){
+    state.message="Du kannst ein Wort legen \u2013 Tauschen ist nur erlaubt, wenn kein Wort moeglich ist.";
+    render(); return;
+  }
+  if (!confirm("Tauschen ist nur erlaubt, wenn du wirklich KEIN Wort legen kannst.\nDeine Mitspieler duerfen das anzweifeln. Trotzdem tauschen?")) return;
+  const hand = state.hands[state.current];
+  const back = [];
+  for (const idx of [...state.swapSel].sort((a,b)=>b-a)) back.push(hand.splice(idx,1)[0]);
+  startDraw(back.length, back, `${state.names[state.current]} tauscht ${back.length} Kaertchen (kein Wort moeglich).`);
+}
+
+// ---------------- Ziehung (lebende Lostrommel) ----------------
+let bubbleTimer = null;
+
+function startDraw(needed, swapBack, logEntry){
+  if (needed<=0 || !state.drum.length){
+    state.drum.unshift(...swapBack);
+    nextPlayer(logEntry); return;
+  }
+  state.draw = { needed, maxPick: Math.min(needed, 8, state.drum.length),
+    picked: [], swapBack, logEntry };
+  state.phase = "draw"; render();
+  if (typeof window !== "undefined") beginBubbles();
+}
+
+function beginBubbles(){
+  stopBubbles();
+  bubbleTimer = setInterval(spawnBubble, 450);
+  spawnBubble(); spawnBubble();
+}
+function stopBubbles(){
+  if (bubbleTimer){ clearInterval(bubbleTimer); bubbleTimer = null; }
+}
+
+function spawnBubble(){
+  const arena = document.getElementById("arena");
+  if (!arena || state.phase!=="draw" || !state.drum.length) return;
+  if (arena.querySelectorAll(".bubble:not(.weg)").length >= 6) return;
+  let sym = null;
+  // Rundenmodus: mit 40% Wahrscheinlichkeit ein Symbol zeigen, das fuer
+  // das naechste Rundenwort gebraucht wird (sofern in der Trommel)
+  if (state.modus==="runden" && Math.random() < 0.4){
+    const ziel = state.naechstesZiel[state.current];
+    const noetig = minZerlegung(normalize(ziel.wort)) || [];
+    const kandidaten = noetig.filter(s => state.drum.includes(s));
+    if (kandidaten.length) sym = zufall(kandidaten);
+  }
+  if (!sym) sym = state.drum[Math.floor(Math.random()*state.drum.length)];
+  const el = document.createElement("div");
+  el.className = "bubble";
+  el.innerHTML = tileHtml(sym, {});
+  const b = arena.getBoundingClientRect();
+  el.style.left = Math.random() * Math.max(10, b.width - 80) + "px";
+  el.style.top  = Math.random() * Math.max(10, b.height - 92) + "px";
+  el.onclick = () => grabSymbol(sym, el);
+  arena.appendChild(el);
+  setTimeout(() => {
+    if (el.parentNode && !el.dataset.genommen){
+      el.classList.add("weg");
+      setTimeout(()=>el.remove(), 320);
+    }
+  }, 1500 + Math.random()*1300);
+}
+
+function grabSymbol(sym, el){
+  const d = state.draw;
+  if (!d || d.picked.length >= d.maxPick) return;
+  const idx = state.drum.indexOf(sym);
+  if (idx < 0) return;
+  state.drum.splice(idx, 1);
+  d.picked.push(sym);
+  if (el){ el.dataset.genommen = "1"; el.remove(); }
+  const anzeige = document.getElementById("pickstand");
+  if (anzeige) anzeige.innerHTML =
+    d.picked.map(s=>tileHtml(s,{small:true})).join("") +
+    `<span class="hint" style="align-self:center;margin-left:8px">${d.picked.length} / ${d.maxPick}</span>`;
+  if (d.picked.length >= d.maxPick) finishDraw();
+}
+
+function finishDraw(){
+  if (!state.draw) return;
+  stopBubbles();
+  const d = state.draw;
+  const hand = state.hands[state.current];
+  hand.push(...d.picked);
+  // Rest automatisch auffuellen (falls mehr als 5 gebraucht oder abgebrochen)
+  let auto = 0;
+  let nochNoetig = d.needed - d.picked.length;
+  while (nochNoetig > 0 && state.drum.length){ hand.push(state.drum.pop()); nochNoetig--; auto++; }
+  state.drum.unshift(...d.swapBack);
+  const zusatz = auto ? ` (+${auto} automatisch)` : "";
+  const entry = d.logEntry + (d.picked.length ? ` Gezogen: ${d.picked.join(", ")}${zusatz}` : zusatz);
+  state.draw = null;
+  nextPlayer(entry);
+}
+
+function quizAntwort(idx){
+  if (state.quiz.gewaehlt !== null) return;
+  state.quiz.gewaehlt = idx;
+  const richtig = idx === state.quiz.frage.richtig;
+  if (state.quiz.art === "bonus")
+    state.quiz.feedback = bonusFeedback(state.quiz.sym, richtig);
+  if (richtig) klangRichtig(); else klangFalsch();
+  render();
+}
+
+function stufeFuer(zugNr){
+  return Math.min(3 + Math.floor(zugNr / state.names.length), 8);
+}
+function aktuelleStufe(){
+  return stufeFuer(state.zugNr);
+}
+
+// eine Zerlegung mit minimal vielen Symbolen (fuer die Ziehungs-Hilfe)
+function minZerlegung(w){
+  const INF = 1e9, n = w.length;
+  const dp = Array(n+1).fill(INF), her = Array(n+1).fill(null);
+  dp[0] = 0;
+  for (let i=0;i<n;i++){
+    if (dp[i]===INF) continue;
+    for (const L of [1,2]){
+      const sym = i+L<=n ? BY_LOWER[w.slice(i,i+L)] : null;
+      if (sym && dp[i]+1 < dp[i+L]){ dp[i+L]=dp[i]+1; her[i+L]=[i,sym]; }
+    }
+  }
+  if (dp[n]===INF) return null;
+  const syms = [];
+  for (let i=n; i>0; i=her[i][0]) syms.unshift(her[i][1]);
+  return syms;
+}
+
+function waehleZielwort(){
+  // Rundenmodus: geheimes Wort waehlen und seine Symbole vollstaendig
+  // in der Hand verstecken (Rest mit Zufallskaertchen auffuellen)
+  const ziel = state.naechstesZiel[state.current];
+  const hand = state.hands[state.current];
+  // alte Hand zurueck in die Trommel
+  state.drum.unshift(...hand.splice(0, hand.length));
+  // Symbole des geheimen Worts einpflanzen (aus der Trommel nehmen, wo moeglich)
+  const noetig = minZerlegung(normalize(ziel.wort)) || [];
+  for (const s of noetig){
+    const i = state.drum.indexOf(s);
+    if (i >= 0) state.drum.splice(i, 1);
+    hand.push(s);
+  }
+  while (hand.length < HAND_SIZE && state.drum.length) hand.push(state.drum.pop());
+  // mischen, damit die gesuchten Symbole nicht vorn stehen
+  for (let i=hand.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [hand[i],hand[j]]=[hand[j],hand[i]]; }
+  state.zielwort = { wort: ziel.wort, stufe: ziel.stufe, legbar: true };
+  state.word = "";
+  state.wortWahl = [];
+  state.hinweise = 0;
+  state.aufgeloest = false;
+}
+
+function aufloesen(){
+  // Wort direkt in der Eingabemaske zeigen; Zug endet erst mit "Weiter"
+  state.word = state.zielwort.wort;
+  state.aufgeloest = true;
+  render();
+}
+
+function weiterNachAufloesen(){
+  state.hatGelegt = true; // naechste Runde gibt es ein neues Wort
+  nextPlayer(`${state.names[state.current]} loest auf \u2013 gesucht war: ${state.zielwort.wort} (0 Punkte)`);
+}
+
+// Hinweiskosten steigen pro Tipp: 1. Tipp -2, 2. Tipp -4, 3. Tipp -6 usw.
+function naechsteHinweisKosten(){
+  return (state.hinweise + 1) * 2;
+}
+function hinweisGeben(){
+  if (state.hinweise >= state.zielwort.wort.length) return;
+  const kosten = naechsteHinweisKosten();
+  if (state.scores[state.current] < kosten){
+    state.message = `Nicht genug Punkte \u2013 der ${state.hinweise+1}. Hinweis kostet ${kosten} Punkte.`;
+    render(); return;
+  }
+  state.scores[state.current] -= kosten;
+  state.hinweise++;
+  render();
+}
+
+function quizWeiter(){
+  const { frage, gewaehlt, art } = state.quiz;
+  const richtig = gewaehlt === frage.richtig;
+  if (art === "start"){
+    state.doubler = richtig;
+    state.quiz = null;
+    state.phase = "turn"; render();
+  } else { // bonus
+    if (richtig) state.bonus.extra++;
+    state.bonus.idx++;
+    state.quiz = null;
+    naechsteBonusFrage();
+  }
+}
+
+// ---------------- Darstellung ----------------
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function tileHtml(sym, opts={}){
+  const [,name,num,val] = BY_SYMBOL[sym];
+  const cls = "tile" + (opts.small?" small":"") + (opts.big?" big":"")
+    + (opts.selected?" selected":"") + (opts.onclick?" clickable":"") + (opts.kauf?" kauf":"");
+  const click = opts.onclick ? ` onclick="${opts.onclick}"` : "";
+  const zeigName = opts.verdeckt ? "???" : name;
+  const badge = opts.ordnung ? `<div style="position:absolute;top:-7px;right:-7px;width:18px;height:18px;
+    border-radius:50%;background:var(--ink);color:var(--paper);font-size:10px;font-weight:700;
+    display:flex;align-items:center;justify-content:center">${opts.ordnung}</div>` : "";
+  return `<div class="${cls}" style="border-top:5px solid ${tierColor(val)};position:relative"${click}>${badge}
+    <div class="top"><span>${opts.verdeckt||opts.zahlVerdeckt?"?":num}</span><span style="font-weight:700;color:${tierColor(val)}">${val}P</span></div>
+    <div class="sym">${sym}</div>
+    ${opts.small ? "" : `<div class="name">${zeigName}</div>`}
+  </div>`;
+}
+
+function scorebarHtml(){
+  const pillen = state.scores.map((s,i)=>{
+    const anteil = Math.max(0, Math.min(100, Math.round(100*s/state.target)));
+    const aktiv = i===state.current;
+    return `<span style="display:inline-block;margin:2px 6px 2px 0;padding:3px 10px 5px;
+      border-radius:999px;border:1.5px solid ${aktiv?"var(--ink)":"var(--line)"};
+      background:var(--card);${aktiv?"box-shadow:0 2px 6px rgba(30,58,76,.18);":""}">
+      ${chip(state.avatare[i])}${aktiv?"<b>":""}${esc(state.names[i])}: ${s}${aktiv?"</b>":""}
+      <span style="display:block;height:4px;border-radius:2px;background:var(--grid);margin-top:3px">
+        <span style="display:block;height:4px;border-radius:2px;width:${anteil}%;
+          background:${CHEMIKER[state.avatare[i]].farbe}"></span></span></span>`;
+  }).join("");
+  return pillen
+    + (state.modus==="runden"?`<span style="margin-left:8px;color:var(--grey)">Stufe: ${aktuelleStufe()}</span>`:"")
+    + `<span style="margin-left:8px;color:var(--grey)">Trommel: ${state.drum.length}</span>`;
+}
+
+function logHtml(){
+  if (!state.log.length) return "";
+  return `<div class="card log"><div style="font-weight:700;margin-bottom:6px">Spielverlauf</div>` +
+    state.log.map(l=>`<div>${esc(l)}</div>`).join("") + `</div>`;
+}
+
+function steckbriefHtml(){
+  if (!state.steckbrief) return bildFensterHtml();
+  const sym = state.steckbrief;
+  const [,name,z,val,kat] = BY_SYMBOL[sym];
+  const kuenstlich = SYNTHESE[sym];
+  return `<div class="modal-hintergrund" onclick="if(event.target===this){state.steckbrief=null;render();}">
+    <div class="modal">
+      <div class="kopf">
+        <div><span style="font-family:ui-monospace,monospace;font-weight:800;font-size:22px">${sym}</span>
+          <b style="margin-left:8px">${esc(name)}</b>
+          <span style="color:var(--grey);margin-left:8px">Ordnungszahl ${z} \u00b7 ${esc(KAT_NAMEN[kat])}</span></div>
+        <button class="zu" onclick="state.steckbrief=null;render()">\u00d7</button>
+      </div>
+      <div style="text-align:center;margin:6px 0">
+        ${kuenstlich ? zeichneSynthese(sym) : zeichneAtom(sym)}
+      </div>
+      ${kuenstlich ? `<div class="hint" style="text-align:center;margin-bottom:8px">
+        Kuenstlich erzeugt: ${esc(kuenstlich[2])}</div>`
+      : `<div class="hint" style="text-align:center;margin-bottom:8px">
+        Atommodell: ${z} Protonen im Kern, Elektronen auf ${schalenBelegung(sym).length} Schalen
+        (${schalenBelegung(sym).join(", ")})</div>`}
+      <div style="font-size:14px;line-height:1.5;padding:8px;border:1.5px dashed var(--line);border-radius:8px">
+        &#128161; ${esc(INFO[sym])}</div>
+      ${z<=103 ? `<div class="hint" style="margin-top:6px">Elektronenkonfiguration:
+        <span style="font-family:ui-monospace,monospace">${konfigText(z, sym)}</span></div>`:""}
+      ${VERBINDUNG[sym] ? `<div class="hint">Wichtige Verbindung:
+        <span style="font-family:ui-monospace,monospace">${formel(VERBINDUNG[sym][1])}</span>
+        (mit ${esc(VERBINDUNG[sym][0])})${VERBINDUNG_NAME[sym]?` \u2013 ${esc(VERBINDUNG_NAME[sym])}`:""}</div>`:""}
+      ${DICHTE[sym]!==undefined?`<div class="hint" style="margin-top:6px">Dichte: ${String(DICHTE[sym]).replace(".",",")} g/cm\u00b3</div>`:""}
+      ${istRadioaktiv(sym)?`<div class="hint">\u2622\ufe0f radioaktiv \u2013 kein stabiles Isotop</div>`:""}
+      <div class="row" style="margin-top:10px">
+        <button style="flex:2" onclick="ladeBild('${sym}')">&#128247; Foto anzeigen (Wikipedia)</button>
+        <button style="flex:1" onclick="window.open('https://de.wikipedia.org/wiki/'+encodeURIComponent('${esc(name)}'))">Artikel \u2197</button>
+      </div>
+    </div>
+  </div>` + bildFensterHtml();
+}
+
+// ---------------- Zweites Fenster: Elementfoto von Wikipedia ----------------
+const WIKI_API = "https://de.wikipedia.org/w/api.php?action=query&format=json&origin=*";
+const WIKI_PARSE = "https://de.wikipedia.org/w/api.php?action=parse&format=json&origin=*&prop=text&formatversion=2&page=Bildtafel_der_chemischen_Elemente";
+// unbrauchbare Dateien (Icons, Logos, Diagramme) aussortieren
+const BILD_MUELL = /(logo|icon|nuvola|disambig|qsicon|loudspeaker|sound|wiktionary|commons-|electron.?shell|oxidation|spektrum|spectrum|flagge?|wappen|karte|map|diagramm?|graph|chart|animation|\.svg$|\.gif$|\.ogg$|\.ogv$|\.webm$)/i;
+
+// Bildtafel der chemischen Elemente: eine Wikipedia-Seite mit je einem
+// Foto pro Element -> einmal laden, dann alle Fotos sofort verfuegbar
+let BILDTAFEL = null; // { Elementname: {gross, klein} }
+
+function parseBildtafel(html){
+  const tafel = {};
+  for (const kasten of html.split(/gallerybox|<li\b/).slice(1)){
+    // Bildquelle: src oder srcset
+    let quelle = kasten.match(/src="(\/\/upload\.wikimedia\.org[^"]+)"/);
+    if (!quelle){
+      const ss = kasten.match(/srcset="(\/\/upload\.wikimedia\.org[^"\s]+)/);
+      if (ss) quelle = ss;
+    }
+    if (!quelle) continue;
+    const klein = "https:" + quelle[1];
+    const gross = klein.replace(/\/(\d+)px-/, "/480px-");
+    // Elementname: ueber Artikel-Links (href oder title)
+    const namen = new Set();
+    for (const m of kasten.matchAll(/href="\/wiki\/([^"#?]+)"/g)){
+      try { namen.add(decodeURIComponent(m[1]).replace(/_/g," ")); } catch(e){}
+    }
+    for (const m of kasten.matchAll(/title="([^"]+)"/g)) namen.add(m[1]);
+    for (const name of namen){
+      if (BY_NAME[name] && !tafel[name]) tafel[name] = { gross, klein };
+    }
+  }
+  return tafel;
+}
+
+function wikiFetch(url){
+  return fetch(url).then(r => {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  });
+}
+
+function ladeBild(sym){
+  const name = BY_SYMBOL[sym][1];
+  const seite = "https://de.wikipedia.org/wiki/" + encodeURIComponent(name);
+  // 1. Lokale Bilddatei (elementbilder.js neben der Spieldatei)? -> sofort, offline
+  if (typeof ELEMENT_BILDER !== "undefined" && ELEMENT_BILDER[sym]){
+    state.bildFenster = { sym, status:"ok", url: ELEMENT_BILDER[sym], seite,
+      quelle:"lokale Bilddatei (Original: Wikipedia)" };
+    render(); return;
+  }
+  state.bildFenster = { sym, status: "laedt" };
+  render();
+  const fertig = (ergebnis) => {
+    if (!state.bildFenster || state.bildFenster.sym !== sym) return;
+    state.bildFenster = ergebnis; render();
+  };
+  const ausTafel = () => {
+    if (BILDTAFEL[name]){
+      fertig({ sym, status:"ok", url: BILDTAFEL[name].gross, urlKlein: BILDTAFEL[name].klein,
+        seite, quelle:"Bildtafel der chemischen Elemente" });
+    } else {
+      fertig({ sym, status:"fehler", grund: SYNTHESE[sym]
+        ? "Von diesem kuenstlichen Element existiert kein Foto \u2013 es zerfaellt zu schnell, es entstehen nur einzelne Atome."
+        : "In der Bildtafel der Elemente ist kein Foto hinterlegt." });
+    }
+  };
+  if (BILDTAFEL){ ausTafel(); return; }
+  wikiFetch(WIKI_PARSE)
+    .then(daten => {
+      const html = daten.parse && daten.parse.text ? daten.parse.text : "";
+      const tafel = parseBildtafel(html);
+      if (!Object.keys(tafel).length) throw new Error("Bildtafel konnte nicht gelesen werden");
+      BILDTAFEL = tafel;
+      ausTafel();
+    })
+    .catch(err => fertig({ sym, status:"fehler", grund: String((err && err.message) || err) }));
+}
+
+function bildFensterHtml(){
+  const b = state.bildFenster;
+  if (!b) return "";
+  const name = BY_SYMBOL[b.sym][1];
+  let inhalt = "";
+  if (b.status === "laedt")
+    inhalt = `<div class="hint" style="padding:30px;text-align:center">Foto wird von Wikipedia geladen \u2026</div>`;
+  else if (b.status === "ok")
+    inhalt = `<img src="${b.url}" alt="${esc(name)}" style="width:100%;border-radius:8px"
+      ${b.urlKlein?`onerror="this.onerror=null;this.src='${b.urlKlein}'"`:""}>
+      <div class="hint" style="margin-top:6px;text-align:center">Bildquelle: ${b.quelle?esc(b.quelle)+", ":""}Wikipedia (frei lizenziert; Details beim
+      ${b.seite?`<a href="${b.seite}" target="_blank">Artikel</a>`:"Artikel"})</div>`;
+  else
+    inhalt = `<div class="err" style="padding:20px;text-align:center">Foto konnte nicht geladen werden.
+      ${b.grund?`<br><span class="hint">Grund: ${esc(b.grund)}</span>`:""}
+      <br><span class="hint">Alternativ den Artikel-Knopf nutzen \u2013 dort ist das Foto zu sehen.</span></div>`;
+  return `<div class="modal-hintergrund" style="z-index:60" onclick="if(event.target===this){state.bildFenster=null;render();}">
+    <div class="modal" style="max-width:380px">
+      <div class="kopf">
+        <b>${esc(name)} \u2013 Foto</b>
+        <button class="zu" onclick="state.bildFenster=null;render()">\u00d7</button>
+      </div>
+      ${inhalt}
+    </div>
+  </div>`;
+}
+
+function render(){
+  const app = document.getElementById("app");
+
+  if (state.phase==="setup"){
+    app.innerHTML = `
+    <div class="card">
+      <h1>WORTSTOFF</h1>
+      <div class="sub">Das Periodensystem-Wortspiel &middot; Version 28</div>
+      <p style="font-size:14px;line-height:1.5">Jeder Zug beginnt mit einer <b>Startfrage</b> zu
+      einem deiner Elemente — richtig beantwortet zaehlen deine Wortpunkte diese Runde doppelt.
+      Dann legst du ein Wort, das sich vollstaendig aus deinen Elementkaertchen zusammensetzt
+      (wie PoSiTiVISmUS); seltene Symbole bringen mehr Punkte. Fehlen dir Elemente, kannst du
+      <b>bis zu 3 zukaufen</b> — der Punktwert wird vom Konto abgezogen, sofern es reicht.
+      Zu jedem Element im gelegten Wort folgt eine <b>Zusatzfrage</b> fuer je einen Extrapunkt.
+      Tauschen ist nur erlaubt, wenn du kein Wort legen kannst. Ob ein Wort wirklich existiert,
+      entscheiden die Mitspieler. Wer zuerst die Zielpunktzahl erreicht, gewinnt.</p>
+      <div style="font-weight:700;margin-bottom:6px">Spieler &amp; Avatare</div>
+      <div id="players">${state.names.map((n,i)=>`
+        <div style="margin-bottom:12px;padding:10px;border:1.5px solid var(--line);border-radius:8px">
+          <div class="row" style="margin-bottom:6px;align-items:center">
+            ${avatarKreis(state.avatare[i])}
+            <input type="text" value="${esc(n)}" onchange="state.names[${i}]=this.value">
+            ${state.names.length>2?`<button onclick="state.names.splice(${i},1);state.avatare.splice(${i},1);render()">–</button>`:""}
+          </div>
+          <div class="avatare">${CHEMIKER.map((c,ci)=>{
+            const vergeben = state.avatare.includes(ci) && state.avatare[i]!==ci;
+            return `<div class="avatar ${state.avatare[i]===ci?'gewaehlt':''} ${vergeben?'vergeben':''}"
+              ${vergeben?"":`onclick="state.avatare[${i}]=${ci};render()"`}>
+              ${avatarKreis(ci)}<div class="an"><b>${esc(c.name)}</b><br>${esc(c.gebiet)}</div>
+            </div>`;
+          }).join("")}</div>
+        </div>`).join("")}
+      </div>
+      ${state.names.length<4?`<button onclick="state.names.push('Spieler '+(state.names.length+1));state.avatare.push(CHEMIKER.findIndex((c,ci)=>!state.avatare.includes(ci)));render()">+ Spieler hinzufuegen</button>`:""}
+      <div style="font-weight:700;margin:16px 0 6px">Aussehen &amp; Ton</div>
+      <div class="row">${THEMES.map(([id,label])=>
+        `<button style="flex:1" class="${state.theme===id?'primary':''}"
+          onclick="state.theme='${id}';document.body.dataset.theme='${id}';render()">${label}</button>`).join("")}
+        <button style="flex:1" class="${state.klangAn?'primary':''}"
+          onclick="state.klangAn=!state.klangAn;render()">Ton: ${state.klangAn?"an":"aus"}</button>
+      </div>
+      <div style="font-weight:700;margin:16px 0 6px">Spielmodus</div>
+      <div class="row">${[["runden","Rundenwoerter (3 \u2192 8, aufsteigend)"],["frei","Freies Spiel"]].map(([id,label])=>
+        `<button style="flex:1" class="${state.modus===id?'primary':''}"
+          onclick="state.modus='${id}';render()">${label}</button>`).join("")}
+      </div>
+      <div class="hint">Rundenwoerter: Das Spiel versteckt ein geheimes Wort aus der Wortliste
+      vollstaendig in deinen Kaertchen \u2013 erst 3 Symbole, dann pro Runde eines mehr bis 8.
+      Finde es! Jeder startet mit 10 Punkten Kapital. Freies Spiel: eigene Woerter eintippen wie bisher.</div>
+      <div style="margin-top:10px">
+        <label style="font-size:13px;font-weight:700">Eigene Wortliste laden (.txt, ein Wort pro Zeile):</label><br>
+        <input type="file" accept=".txt,.dic,text/plain" onchange="ladeWortdatei(this)" style="margin-top:4px;font-size:13px">
+        ${state.ladeInfo?`<div class="hint" style="color:var(--good)">${esc(state.ladeInfo)}</div>`:""}
+      </div>
+      <div style="font-weight:700;margin:16px 0 6px">Fragenniveau (Rahmenlehrplan Berlin, Chemie am Gymnasium)</div>
+      <div class="row">${[["k78","Klasse 7/8"],["k9","Klasse 9"],["alles","Mit Oberstufe"]].map(([id,label])=>
+        `<button style="flex:1" class="${state.niveau===id?'primary':''}"
+          onclick="state.niveau='${id}';render()">${label}</button>`).join("")}
+      </div>
+      <div class="hint">7/8: Stoffeigenschaften (Aggregatzustand, Dichte, Metall/Nichtmetall).
+      Klasse 9 zusaetzlich: Atombau &amp; Schalenmodell, Periodensystem, Ionen, Wertigkeit,
+      Verbindungsformeln, Flammenfaerbung. Oberstufe: auch s/p/d-Elektronenkonfiguration.</div>
+      <div style="font-weight:700;margin:16px 0 6px">Zielpunktzahl</div>
+      <div class="row">${[50,75,100].map(t=>
+        `<button style="flex:1" class="${state.target===t?'primary':''}" onclick="state.target=${t};render()">${t}</button>`).join("")}
+      </div>
+      <button class="primary" style="width:100%;margin-top:18px;font-size:17px" onclick="startGame()">
+        Lostrommel fuellen und starten</button>
+    </div>
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:8px">Punktwerte (nach Seltenheit)</div>
+      <div class="legend">
+        ${[[1,"C I N O S u.a."],[3,"Al Na Se Te u.a."],[5,"Fe Pt Pu u.a."],[7,"Gd Pd Nh u.a."],[9,"Zn Zr Fm Mg u.a."]]
+          .map(([v,ex])=>`<div><span class="sw" style="background:${tierColor(v)}"></span><b>${v}P</b> <span style="color:var(--grey)">${ex}</span></div>`).join("")}
+      </div>
+    </div>`;
+    return;
+  }
+
+  if (state.phase==="handoff"){
+    app.innerHTML = `
+    <div class="card center" style="margin-top:80px">
+      <div style="font-size:13px;color:var(--grey);letter-spacing:1px">GERAET WEITERGEBEN AN</div>
+      <div style="margin:14px 0 4px;display:flex;justify-content:center">${avatarKreis(state.avatare[state.current], true)}</div>
+      <h1 style="font-size:32px;margin:6px 0 2px">${esc(state.names[state.current])}</h1>
+      <div style="font-size:13px;color:var(--grey);margin-bottom:10px">
+        spielt als ${esc(CHEMIKER[state.avatare[state.current]].name)}</div>
+      <div style="font-size:14px;color:var(--grey);margin-bottom:16px">
+        ${state.scores.map((s,i)=>`${esc(state.names[i])}: ${s}`).join(" &middot; ")} — Ziel: ${state.target}
+      </div>
+      <button class="primary" style="font-size:17px" onclick="state.phase='turn';beginStartQuiz()">Meine Kaertchen zeigen</button>
+    </div>`;
+    return;
+  }
+
+  if (state.phase==="draw"){
+    const d = state.draw;
+    app.innerHTML = `
+    <div class="card">
+      <div style="font-weight:700">${esc(state.names[state.current])}, waehle deine neuen Kaertchen!</div>
+      <div class="hint" style="margin-bottom:10px">Symbole tauchen auf und verschwinden wieder —
+        tippe schnell die an, die du haben willst (${d.maxPick} Stueck${d.needed>d.maxPick?`, der Rest kommt automatisch`:""}).</div>
+      ${state.modus==="runden" ? `<div style="text-align:center;margin-bottom:8px;padding:6px;border:1.5px dashed var(--line);border-radius:8px">
+        Dein naechstes Rundenwort (Stufe ${state.naechstesZiel[state.current].stufe}):
+        <b style="font-family:ui-monospace,monospace">${esc(state.naechstesZiel[state.current].wort)}</b>
+        <span class="hint"> — sammle passende Symbole!</span></div>` : ""}
+      <div id="arena"></div>
+      <div id="pickstand" class="tiles" style="min-height:64px;margin-top:10px"></div>
+      <button style="width:100%;margin-top:6px" onclick="finishDraw()">Rest automatisch ziehen</button>
+    </div>` + logHtml() + steckbriefHtml();
+    return;
+  }
+
+  if (state.phase==="quiz"){
+    const { sym, frage, gewaehlt, art } = state.quiz;
+    const fertig = gewaehlt !== null;
+    const richtig = fertig && gewaehlt === frage.richtig;
+    const kopf = art==="start"
+      ? "STARTFRAGE — richtig beantwortet: Wortpunkte dieser Runde x2"
+      : `ZUSATZFRAGE ${state.bonus.idx+1} von ${state.bonus.symbols.length} — je +1 Punkt`;
+    let feedback = "";
+    if (fertig){
+      if (art==="start")
+        feedback = richtig ? "Richtig! Deine Wortpunkte zaehlen diese Runde doppelt."
+                           : "Leider falsch — keine Verdopplung diese Runde.";
+      else
+        feedback = state.quiz.feedback ||
+          (richtig ? "Richtig! +1 Extrapunkt." : "Leider falsch — kein Extrapunkt.");
+    }
+    app.innerHTML = `
+    <div class="card center">
+      ${state.lob && art==="bonus" && state.bonus.idx===0 ? `<div style="font-weight:700;color:var(--good);margin-bottom:8px;font-size:15px">&#10024; ${esc(state.lob)}</div>` : ""}
+      <div style="font-size:13px;color:var(--grey);letter-spacing:1px">${kopf}</div>
+      <div style="margin:14px 0">${sym
+        ? tileHtml(sym,{big:true, verdeckt: !!frage.verdeckt && !fertig, zahlVerdeckt: !fertig})
+        : '<div style="font-size:54px">\u2697\ufe0f</div><div class="hint">Reaktionsfrage</div>'}</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:14px">${esc(frage.text)}</div>
+      <div style="max-width:420px;margin:0 auto;text-align:left">
+        ${frage.optionen.map((o,i)=>{
+          let cls = "answer";
+          if (fertig && i===frage.richtig) cls += " correct";
+          else if (fertig && i===gewaehlt) cls += " wrong";
+          return `<button class="${cls}" ${fertig?"disabled":""} onclick="quizAntwort(${i})">${esc(o)}</button>`;
+        }).join("")}
+      </div>
+      ${fertig ? `
+        <div style="margin:10px 0;font-weight:700;color:${richtig?"var(--good)":"var(--bad)"}">${feedback}</div>
+        ${frage.hinweis?`<div class="hint" style="margin-bottom:10px">${esc(frage.hinweis)}</div>`:""}
+        ${INFO[sym] ? `<div class="hint" style="max-width:440px;margin:0 auto 10px;text-align:left;
+          padding:8px;border:1.5px dashed var(--line);border-radius:8px">
+          &#128161; <b>${esc(BY_SYMBOL[sym][1])}:</b> ${esc(INFO[sym])}
+          <button style="display:block;margin-top:6px;padding:4px 10px;font-size:12px"
+            onclick="state.steckbrief='${sym}';render()">Steckbrief mit Bild anzeigen</button></div>` : ""}
+        <button class="primary" onclick="quizWeiter()">Weiter</button>
+      ` : `<div class="hint">Antippen zum Antworten.</div>`}
+    </div>` + logHtml() + steckbriefHtml();
+    return;
+  }
+
+  if (state.phase==="won"){
+    app.innerHTML = `
+    <div class="card center" style="margin-top:80px">
+      <div style="display:flex;justify-content:center;margin-bottom:6px">${avatarKreis(state.avatare[state.winner], true)}</div>
+      <h1>${esc(state.names[state.winner])} gewinnt!</h1>
+      <div style="font-size:13px;color:var(--grey)">als ${esc(CHEMIKER[state.avatare[state.winner]].name)}</div>
+      <div style="margin:12px 0;font-size:15px">
+        ${state.scores.map((s,i)=>`<div>${chip(state.avatare[i])}${esc(state.names[i])}: <b>${s} Punkte</b></div>`).join("")}
+      </div>
+      <button class="primary" onclick="state.phase='setup';render()">Neue Runde</button>
+    </div>` + logHtml() + steckbriefHtml();
+    return;
+  }
+
+  // ---- Spielzug ----
+  const hand = state.hands[state.current];
+  const norm = normalize(state.word);
+  const ls = (state.modus==="runden" && norm.length>=2) ? listenStufe(norm) : null;
+  const wortOk = state.modus!=="runden" || (norm.length>=2 && ls !== null);
+  const res = (norm.length>=2 && wortOk) ? bestDecomposition(norm, hand) : null;
+  const resKauf = (!res && wortOk && norm.length>=2)
+    ? bestDecompositionMitKauf(norm, hand, 3, state.scores[state.current]) : null;
+
+  let resultHtml = "";
+  if (norm.length>=2 && !wortOk){
+    resultHtml = `<div class="err">Dieses Wort wird nicht gesucht \u2013 es steht nicht in der Rundenliste. Weitersuchen!</div>`;
+  }
+  const nebenfundHinweis = (wortOk && ls !== null && state.zielwort && ls !== state.zielwort.stufe)
+    ? `<div class="hint" style="color:var(--bad)">Nebenfund (Stufe ${ls}) \u2013 nicht das gesuchte Wort, zaehlt aber mit seinen Punkten!</div>` : "";
+  if (norm.length>=2 && wortOk && !res && !resKauf){
+    // pruefen, ob es NUR am Budget/Kauflimit scheitert
+    const theoretisch = bestDecompositionMitKauf(norm, hand, 3, Infinity);
+    resultHtml = theoretisch
+      ? `<div class="err">Legbar mit Zukauf von ${theoretisch.gekauft.join(", ")} (${theoretisch.kosten} Punkte) \u2013 dafuer reicht dein Konto (${state.scores[state.current]}) nicht.</div>`
+      : `<div class="err">Laesst sich nicht legen \u2013 auch nicht mit bis zu 3 zugekauften Elementen.</div>`;
+  }
+  if (res){
+    const bonus = res.symbols.length>=8;
+    resultHtml = `
+      <div class="tiles" style="margin-bottom:8px">${res.symbols.map(s=>tileHtml(s,{small:true})).join("")}</div>
+      <div style="font-size:15px"><b>${res.symbols.join("")}</b> — ${res.score} Punkte
+      ${bonus?'<span style="color:var(--good)"> +15 Bonus (8+ Symbole)</span>':""}</div>`;
+  }
+  if (resKauf){
+    const kaufRest = [...resKauf.gekauft];
+    const kacheln = resKauf.symbols.map(s=>{
+      const i = kaufRest.indexOf(s);
+      if (i>=0){ kaufRest.splice(i,1); return tileHtml(s,{small:true, kauf:true}); }
+      return tileHtml(s,{small:true});
+    }).join("");
+    const bonus = resKauf.symbols.length>=8;
+    resultHtml = `
+      <div class="tiles" style="margin-bottom:8px">${kacheln}</div>
+      <div style="font-size:15px"><b>${resKauf.symbols.join("")}</b> — ${resKauf.score} Punkte
+      ${bonus?'<span style="color:var(--good)"> +15 Bonus (8+ Symbole)</span>':""}<br>
+      <span style="color:var(--bad)">Zukauf noetig: ${resKauf.gekauft.join(", ")} = \u2212${resKauf.kosten} Punkte</span>
+      <span class="hint"> (gestrichelte Kaertchen, max. 3, wird vom Konto abgezogen)</span></div>`;
+  }
+  const aktiv = res || resKauf;
+  if (aktiv && norm !== state.klangFuer){ klangGefunden(); state.klangFuer = norm; }
+  const basis = aktiv ? (aktiv.score + (aktiv.symbols.length>=8?15:0)) * (state.doubler?2:1) : 0;
+  const total = aktiv ? basis - (resKauf ? resKauf.kosten : 0) : 0;
+
+  app.innerHTML = `
+  <div class="card row" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
+    <h1 style="font-size:20px">WORTSTOFF</h1>
+    <div class="scorebar">${scorebarHtml()}</div>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;margin-bottom:8px">${esc(state.names[state.current])}, deine Kaertchen (${hand.length}):
+      ${state.doubler?'<span style="color:var(--good);margin-left:8px">&#10024; Verdoppler aktiv!</span>':""}</div>
+    <div class="tiles">${hand.map((s,i)=>{
+      const gewaehlt = state.modus==="runden" ? state.wortWahl.includes(i) : state.swapSel.includes(i);
+      const ordnung = state.modus==="runden" && gewaehlt ? state.wortWahl.indexOf(i)+1 : null;
+      return tileHtml(s,{selected:gewaehlt, ordnung, onclick:`toggleSwap(${i})`});
+    }).join("")}</div>
+    <div class="hint">${state.modus==="runden"
+      ? "Das geheime Rundenwort steckt vollstaendig in diesen Kaertchen \u2013 tippe die Symbole in der richtigen Reihenfolge an! Nochmal antippen entfernt ein Symbol."
+      : "Lege ein Wort. Nur wenn wirklich keins moeglich ist, darfst du bis zu 3 Kaertchen antippen und tauschen."}</div>
+  </div>
+  <div class="card">
+    <div style="font-weight:700;margin-bottom:8px">${chip(state.avatare[state.current])} ${state.modus==="runden"?`Rundenwort finden (Stufe ${state.zielwort.stufe})`:"Wort legen"}</div>
+    ${state.modus==="runden" ? `
+      <div class="hint" style="margin-bottom:8px">In deinen Kaertchen steckt ein geheimes Wort aus
+        <b>${state.zielwort.stufe} Elementsymbolen</b> \u2013 vollstaendig! Finde und tippe es.</div>
+      ${state.hinweise>0 && !state.aufgeloest ? `<div style="text-align:center;font-family:ui-monospace,monospace;
+        font-size:20px;letter-spacing:4px;margin-bottom:8px">${esc(state.zielwort.wort.slice(0,state.hinweise))}${"\u2022".repeat(Math.max(0,state.zielwort.wort.length-state.hinweise))}</div>` : ""}
+      ${state.aufgeloest ? `<div style="text-align:center;color:var(--bad);font-weight:700;margin-bottom:6px">Aufgeloest \u2013 das gesuchte Wort war:</div>` : ""}
+    ` : ""}
+    <input type="text" id="wordinput" ${state.aufgeloest||state.modus==="runden"?"readonly":""}
+      placeholder="${state.modus==="runden"?"Symbole antippen \u2026":"Wort eintippen \u2026 z.B. Scheibenwischer"}"
+      style="font-size:20px;text-align:center;letter-spacing:1px" value="${esc(state.word)}"
+      oninput="state.word=this.value;renderKeepFocus()">
+    ${state.modus==="runden" && !state.aufgeloest ? `
+      <div class="row" style="margin-top:6px">
+        <button style="flex:1;padding:6px" onclick="wahlZurueck()">\u232b Letztes entfernen</button>
+        <button style="flex:1;padding:6px" onclick="wahlLeeren()">Leeren</button>
+      </div>` : ""}
+    <div style="min-height:90px;margin-top:10px">${resultHtml}${nebenfundHinweis}</div>
+    ${state.message?`<div class="err" style="font-size:13px;margin-bottom:6px">${esc(state.message)}</div>`:""}
+    <div class="row" style="flex-wrap:wrap">
+      ${state.aufgeloest ? `
+        <button class="primary" style="flex:1" onclick="weiterNachAufloesen()">Weiter (0 Punkte)</button>
+      ` : `
+        <button class="primary" style="flex:2;min-width:150px" ${aktiv?"":"disabled"} onclick="playWord()">
+          Wort legen${aktiv?` (${total>=0?"+":""}${total})`:""}</button>
+        ${state.modus==="runden"
+          ? `<button style="flex:1;min-width:120px" onclick="hinweisGeben()">Hinweis (\u2212${naechsteHinweisKosten()} P.)</button>
+             <button style="flex:1;min-width:110px" onclick="aufloesen()">Aufloesen</button>`
+          : `<button style="flex:1;min-width:110px" ${aktiv?"disabled":""} onclick="swapTiles()">Tauschen (${state.swapSel.length})</button>`}
+      `}
+    </div>
+  </div>` + logHtml() + steckbriefHtml();
+}
+
+function toggleSwap(i){
+  if (state.modus === "runden"){ waehleSymbol(i); return; }
+  const sel = state.swapSel;
+  const pos = sel.indexOf(i);
+  if (pos>=0) sel.splice(pos,1);
+  else if (sel.length<3) sel.push(i);
+  render();
+}
+
+// Rundenmodus: Wort durch Antippen der Kaertchen zusammensetzen
+function waehleSymbol(i){
+  if (state.aufgeloest) return;
+  const pos = state.wortWahl.indexOf(i);
+  if (pos >= 0) state.wortWahl.splice(pos, 1);   // nochmal antippen = entfernen
+  else state.wortWahl.push(i);
+  const hand = state.hands[state.current];
+  state.word = state.wortWahl.map(idx => hand[idx]).join("");
+  render();
+}
+
+function wahlLeeren(){
+  state.wortWahl = [];
+  state.word = "";
+  render();
+}
+
+function wahlZurueck(){
+  state.wortWahl.pop();
+  const hand = state.hands[state.current];
+  state.word = state.wortWahl.map(idx => hand[idx]).join("");
+  render();
+}
+
+function renderKeepFocus(){
+  const el = document.getElementById("wordinput");
+  const pos = el ? el.selectionStart : 0;
+  render();
+  const neu = document.getElementById("wordinput");
+  if (neu){ neu.focus(); neu.setSelectionRange(pos,pos); }
+}
+
+render();
+</script>
+</body>
+</html>

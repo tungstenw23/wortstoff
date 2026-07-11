@@ -1,0 +1,121 @@
+# Alle 118 Elemente mit Wikipedia-Links (Artikel enthaelt jeweils das Elementfoto)
+# Die Fotos dort sind frei lizenziert; Lizenzdetails stehen auf der jeweiligen Bildseite.
+
+  1  H   Wasserstoff     https://de.wikipedia.org/wiki/Wasserstoff
+  2  He  Helium          https://de.wikipedia.org/wiki/Helium
+  3  Li  Lithium         https://de.wikipedia.org/wiki/Lithium
+  4  Be  Beryllium       https://de.wikipedia.org/wiki/Beryllium
+  5  B   Bor             https://de.wikipedia.org/wiki/Bor
+  6  C   Kohlenstoff     https://de.wikipedia.org/wiki/Kohlenstoff
+  7  N   Stickstoff      https://de.wikipedia.org/wiki/Stickstoff
+  8  O   Sauerstoff      https://de.wikipedia.org/wiki/Sauerstoff
+  9  F   Fluor           https://de.wikipedia.org/wiki/Fluor
+ 10  Ne  Neon            https://de.wikipedia.org/wiki/Neon
+ 11  Na  Natrium         https://de.wikipedia.org/wiki/Natrium
+ 12  Mg  Magnesium       https://de.wikipedia.org/wiki/Magnesium
+ 13  Al  Aluminium       https://de.wikipedia.org/wiki/Aluminium
+ 14  Si  Silicium        https://de.wikipedia.org/wiki/Silicium
+ 15  P   Phosphor        https://de.wikipedia.org/wiki/Phosphor
+ 16  S   Schwefel        https://de.wikipedia.org/wiki/Schwefel
+ 17  Cl  Chlor           https://de.wikipedia.org/wiki/Chlor
+ 18  Ar  Argon           https://de.wikipedia.org/wiki/Argon
+ 19  K   Kalium          https://de.wikipedia.org/wiki/Kalium
+ 20  Ca  Calcium         https://de.wikipedia.org/wiki/Calcium
+ 21  Sc  Scandium        https://de.wikipedia.org/wiki/Scandium
+ 22  Ti  Titan           https://de.wikipedia.org/wiki/Titan
+ 23  V   Vanadium        https://de.wikipedia.org/wiki/Vanadium
+ 24  Cr  Chrom           https://de.wikipedia.org/wiki/Chrom
+ 25  Mn  Mangan          https://de.wikipedia.org/wiki/Mangan
+ 26  Fe  Eisen           https://de.wikipedia.org/wiki/Eisen
+ 27  Co  Cobalt          https://de.wikipedia.org/wiki/Cobalt
+ 28  Ni  Nickel          https://de.wikipedia.org/wiki/Nickel
+ 29  Cu  Kupfer          https://de.wikipedia.org/wiki/Kupfer
+ 30  Zn  Zink            https://de.wikipedia.org/wiki/Zink
+ 31  Ga  Gallium         https://de.wikipedia.org/wiki/Gallium
+ 32  Ge  Germanium       https://de.wikipedia.org/wiki/Germanium
+ 33  As  Arsen           https://de.wikipedia.org/wiki/Arsen
+ 34  Se  Selen           https://de.wikipedia.org/wiki/Selen
+ 35  Br  Brom            https://de.wikipedia.org/wiki/Brom
+ 36  Kr  Krypton         https://de.wikipedia.org/wiki/Krypton
+ 37  Rb  Rubidium        https://de.wikipedia.org/wiki/Rubidium
+ 38  Sr  Strontium       https://de.wikipedia.org/wiki/Strontium
+ 39  Y   Yttrium         https://de.wikipedia.org/wiki/Yttrium
+ 40  Zr  Zirconium       https://de.wikipedia.org/wiki/Zirconium
+ 41  Nb  Niob            https://de.wikipedia.org/wiki/Niob
+ 42  Mo  Molybdaen       https://de.wikipedia.org/wiki/Molybdaen
+ 43  Tc  Technetium      https://de.wikipedia.org/wiki/Technetium
+ 44  Ru  Ruthenium       https://de.wikipedia.org/wiki/Ruthenium
+ 45  Rh  Rhodium         https://de.wikipedia.org/wiki/Rhodium
+ 46  Pd  Palladium       https://de.wikipedia.org/wiki/Palladium
+ 47  Ag  Silber          https://de.wikipedia.org/wiki/Silber
+ 48  Cd  Cadmium         https://de.wikipedia.org/wiki/Cadmium
+ 49  In  Indium          https://de.wikipedia.org/wiki/Indium
+ 50  Sn  Zinn            https://de.wikipedia.org/wiki/Zinn
+ 51  Sb  Antimon         https://de.wikipedia.org/wiki/Antimon
+ 52  Te  Tellur          https://de.wikipedia.org/wiki/Tellur
+ 53  I   Iod             https://de.wikipedia.org/wiki/Iod
+ 54  Xe  Xenon           https://de.wikipedia.org/wiki/Xenon
+ 55  Cs  Caesium         https://de.wikipedia.org/wiki/Caesium
+ 56  Ba  Barium          https://de.wikipedia.org/wiki/Barium
+ 57  La  Lanthan         https://de.wikipedia.org/wiki/Lanthan
+ 58  Ce  Cer             https://de.wikipedia.org/wiki/Cer
+ 59  Pr  Praseodym       https://de.wikipedia.org/wiki/Praseodym
+ 60  Nd  Neodym          https://de.wikipedia.org/wiki/Neodym
+ 61  Pm  Promethium      https://de.wikipedia.org/wiki/Promethium
+ 62  Sm  Samarium        https://de.wikipedia.org/wiki/Samarium
+ 63  Eu  Europium        https://de.wikipedia.org/wiki/Europium
+ 64  Gd  Gadolinium      https://de.wikipedia.org/wiki/Gadolinium
+ 65  Tb  Terbium         https://de.wikipedia.org/wiki/Terbium
+ 66  Dy  Dysprosium      https://de.wikipedia.org/wiki/Dysprosium
+ 67  Ho  Holmium         https://de.wikipedia.org/wiki/Holmium
+ 68  Er  Erbium          https://de.wikipedia.org/wiki/Erbium
+ 69  Tm  Thulium         https://de.wikipedia.org/wiki/Thulium
+ 70  Yb  Ytterbium       https://de.wikipedia.org/wiki/Ytterbium
+ 71  Lu  Lutetium        https://de.wikipedia.org/wiki/Lutetium
+ 72  Hf  Hafnium         https://de.wikipedia.org/wiki/Hafnium
+ 73  Ta  Tantal          https://de.wikipedia.org/wiki/Tantal
+ 74  W   Wolfram         https://de.wikipedia.org/wiki/Wolfram
+ 75  Re  Rhenium         https://de.wikipedia.org/wiki/Rhenium
+ 76  Os  Osmium          https://de.wikipedia.org/wiki/Osmium
+ 77  Ir  Iridium         https://de.wikipedia.org/wiki/Iridium
+ 78  Pt  Platin          https://de.wikipedia.org/wiki/Platin
+ 79  Au  Gold            https://de.wikipedia.org/wiki/Gold
+ 80  Hg  Quecksilber     https://de.wikipedia.org/wiki/Quecksilber
+ 81  Tl  Thallium        https://de.wikipedia.org/wiki/Thallium
+ 82  Pb  Blei            https://de.wikipedia.org/wiki/Blei
+ 83  Bi  Bismut          https://de.wikipedia.org/wiki/Bismut
+ 84  Po  Polonium        https://de.wikipedia.org/wiki/Polonium
+ 85  At  Astat           https://de.wikipedia.org/wiki/Astat
+ 86  Rn  Radon           https://de.wikipedia.org/wiki/Radon
+ 87  Fr  Francium        https://de.wikipedia.org/wiki/Francium
+ 88  Ra  Radium          https://de.wikipedia.org/wiki/Radium
+ 89  Ac  Actinium        https://de.wikipedia.org/wiki/Actinium
+ 90  Th  Thorium         https://de.wikipedia.org/wiki/Thorium
+ 91  Pa  Protactinium    https://de.wikipedia.org/wiki/Protactinium
+ 92  U   Uran            https://de.wikipedia.org/wiki/Uran
+ 93  Np  Neptunium       https://de.wikipedia.org/wiki/Neptunium
+ 94  Pu  Plutonium       https://de.wikipedia.org/wiki/Plutonium
+ 95  Am  Americium       https://de.wikipedia.org/wiki/Americium
+ 96  Cm  Curium          https://de.wikipedia.org/wiki/Curium
+ 97  Bk  Berkelium       https://de.wikipedia.org/wiki/Berkelium
+ 98  Cf  Californium     https://de.wikipedia.org/wiki/Californium
+ 99  Es  Einsteinium     https://de.wikipedia.org/wiki/Einsteinium
+100  Fm  Fermium         https://de.wikipedia.org/wiki/Fermium
+101  Md  Mendelevium     https://de.wikipedia.org/wiki/Mendelevium
+102  No  Nobelium        https://de.wikipedia.org/wiki/Nobelium
+103  Lr  Lawrencium      https://de.wikipedia.org/wiki/Lawrencium
+104  Rf  Rutherfordium   https://de.wikipedia.org/wiki/Rutherfordium
+105  Db  Dubnium         https://de.wikipedia.org/wiki/Dubnium
+106  Sg  Seaborgium      https://de.wikipedia.org/wiki/Seaborgium
+107  Bh  Bohrium         https://de.wikipedia.org/wiki/Bohrium
+108  Hs  Hassium         https://de.wikipedia.org/wiki/Hassium
+109  Mt  Meitnerium      https://de.wikipedia.org/wiki/Meitnerium
+110  Ds  Darmstadtium    https://de.wikipedia.org/wiki/Darmstadtium
+111  Rg  Roentgenium     https://de.wikipedia.org/wiki/Roentgenium
+112  Cn  Copernicium     https://de.wikipedia.org/wiki/Copernicium
+113  Nh  Nihonium        https://de.wikipedia.org/wiki/Nihonium
+114  Fl  Flerovium       https://de.wikipedia.org/wiki/Flerovium
+115  Mc  Moscovium       https://de.wikipedia.org/wiki/Moscovium
+116  Lv  Livermorium     https://de.wikipedia.org/wiki/Livermorium
+117  Ts  Tenness         https://de.wikipedia.org/wiki/Tenness
+118  Og  Oganesson       https://de.wikipedia.org/wiki/Oganesson

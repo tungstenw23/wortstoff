@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Wortstoff - Elementbilder herunterladen</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 30px auto; padding: 0 16px;
+    background: #FAFBF8; color: #1E3A4C; }
+  h1 { font-size: 22px; }
+  button { padding: 12px 20px; font-size: 16px; border-radius: 8px; border: none;
+    background: #1E3A4C; color: #fff; cursor: pointer; }
+  button:disabled { opacity: .5; }
+  #stand { margin: 14px 0; font-size: 14px; white-space: pre-wrap; }
+  #balken { height: 14px; background: #E4ECEF; border-radius: 7px; overflow: hidden; margin: 8px 0; }
+  #balken div { height: 100%; width: 0%; background: #2E7D6B; transition: width .2s; }
+  .hinweis { font-size: 13px; color: #7A8B94; line-height: 1.5; }
+</style>
+</head>
+<body>
+<h1>Elementbilder f&uuml;r Wortstoff herunterladen</h1>
+<p class="hinweis">Dieses Werkzeug l&auml;dt einmalig die Fotos aller chemischen Elemente von der
+Wikipedia-Seite <b>&bdquo;Bildtafel der chemischen Elemente&ldquo;</b> herunter und speichert sie
+in einer einzigen Datei <b>elementbilder.js</b>. Diese Datei legst du in denselben Ordner wie
+<b>wortstoff.html</b> &ndash; danach zeigt das Spiel alle Fotos sofort und komplett offline an.
+Die Bilder sind frei lizenziert (Details auf den Wikipedia-Bildseiten); die Datei ist nur
+f&uuml;r den privaten Gebrauch gedacht.</p>
+<p><button id="start" onclick="starte()">Bilder jetzt herunterladen</button></p>
+<div id="balken"><div id="fortschritt"></div></div>
+<div id="stand">Bereit. Du musst daf&uuml;r online sein.</div>
+
+<script>
+const API = "https://de.wikipedia.org/w/api.php?action=parse&format=json&origin=*&prop=text&formatversion=2&page=Bildtafel_der_chemischen_Elemente";
+
+// Elementname -> Symbol (deutsch, alle 118)
+const NAME_ZU_SYM = {"Wasserstoff":"H","Helium":"He","Lithium":"Li","Beryllium":"Be","Bor":"B","Kohlenstoff":"C","Stickstoff":"N","Sauerstoff":"O","Fluor":"F","Neon":"Ne","Natrium":"Na","Magnesium":"Mg","Aluminium":"Al","Silicium":"Si","Phosphor":"P","Schwefel":"S","Chlor":"Cl","Argon":"Ar","Kalium":"K","Calcium":"Ca","Scandium":"Sc","Titan":"Ti","Vanadium":"V","Chrom":"Cr","Mangan":"Mn","Eisen":"Fe","Cobalt":"Co","Nickel":"Ni","Kupfer":"Cu","Zink":"Zn","Gallium":"Ga","Germanium":"Ge","Arsen":"As","Selen":"Se","Brom":"Br","Krypton":"Kr","Rubidium":"Rb","Strontium":"Sr","Yttrium":"Y","Zirconium":"Zr","Niob":"Nb","Molybdaen":"Mo","Molybd\u00e4n":"Mo","Technetium":"Tc","Ruthenium":"Ru","Rhodium":"Rh","Palladium":"Pd","Silber":"Ag","Cadmium":"Cd","Indium":"In","Zinn":"Sn","Antimon":"Sb","Tellur":"Te","Iod":"I","Xenon":"Xe","Caesium":"Cs","C\u00e4sium":"Cs","Barium":"Ba","Lanthan":"La","Cer":"Ce","Praseodym":"Pr","Neodym":"Nd","Promethium":"Pm","Samarium":"Sm","Europium":"Eu","Gadolinium":"Gd","Terbium":"Tb","Dysprosium":"Dy","Holmium":"Ho","Erbium":"Er","Thulium":"Tm","Ytterbium":"Yb","Lutetium":"Lu","Hafnium":"Hf","Tantal":"Ta","Wolfram":"W","Rhenium":"Re","Osmium":"Os","Iridium":"Ir","Platin":"Pt","Gold":"Au","Quecksilber":"Hg","Thallium":"Tl","Blei":"Pb","Bismut":"Bi","Polonium":"Po","Astat":"At","Radon":"Rn","Francium":"Fr","Radium":"Ra","Actinium":"Ac","Thorium":"Th","Protactinium":"Pa","Uran":"U","Neptunium":"Np","Plutonium":"Pu","Americium":"Am","Curium":"Cm","Berkelium":"Bk","Californium":"Cf","Einsteinium":"Es","Fermium":"Fm","Mendelevium":"Md","Nobelium":"No","Lawrencium":"Lr","Rutherfordium":"Rf","Dubnium":"Db","Seaborgium":"Sg","Bohrium":"Bh","Hassium":"Hs","Meitnerium":"Mt","Darmstadtium":"Ds","Roentgenium":"Rg","R\u00f6ntgenium":"Rg","Copernicium":"Cn","Nihonium":"Nh","Flerovium":"Fl","Moscovium":"Mc","Livermorium":"Lv","Tenness":"Ts","Oganesson":"Og"};
+
+function melde(text){ document.getElementById("stand").textContent = text; }
+function balken(p){ document.getElementById("fortschritt").style.width = (p*100).toFixed(0)+"%"; }
+
+function parseBildtafel(html){
+  const tafel = {};
+  for (const kasten of html.split(/gallerybox|<li\b/).slice(1)){
+    let quelle = kasten.match(/src="(\/\/upload\.wikimedia\.org[^"]+)"/);
+    if (!quelle){
+      const ss = kasten.match(/srcset="(\/\/upload\.wikimedia\.org[^"\s]+)/);
+      if (ss) quelle = ss;
+    }
+    if (!quelle) continue;
+    const klein = "https:" + quelle[1];
+    const gross = klein.replace(/\/(\d+)px-/, "/360px-");
+    const namen = new Set();
+    for (const m of kasten.matchAll(/href="\/wiki\/([^"#?]+)"/g)){
+      try { namen.add(decodeURIComponent(m[1]).replace(/_/g," ")); } catch(e){}
+    }
+    for (const m of kasten.matchAll(/title="([^"]+)"/g)) namen.add(m[1]);
+    for (const name of namen){
+      const sym = NAME_ZU_SYM[name];
+      if (sym && !tafel[sym]) tafel[sym] = { gross, klein, name };
+    }
+  }
+  return tafel;
+}
+
+function bildAlsDataUrl(urls){
+  return new Promise((aufloesen, ablehnen) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    let versuch = 0;
+    img.onload = () => {
+      const maxB = 360;
+      const faktor = Math.min(1, maxB / img.naturalWidth);
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.naturalWidth * faktor);
+      c.height = Math.round(img.naturalHeight * faktor);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      aufloesen(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => {
+      versuch++;
+      if (versuch < urls.length) img.src = urls[versuch];
+      else ablehnen(new Error("Bild nicht ladbar"));
+    };
+    img.src = urls[0];
+  });
+}
+
+async function starte(){
+  const knopf = document.getElementById("start");
+  knopf.disabled = true;
+  try {
+    melde("Lade Bildtafel von Wikipedia \u2026");
+    const antwort = await fetch(API);
+    if (!antwort.ok) throw new Error("HTTP " + antwort.status);
+    const daten = await antwort.json();
+    const tafel = parseBildtafel(daten.parse.text);
+    const symbole = Object.keys(tafel);
+    if (!symbole.length) throw new Error("Bildtafel konnte nicht gelesen werden.");
+    melde("Bildtafel gelesen: " + symbole.length + " Elemente mit Foto. Lade Bilder \u2026");
+    const ergebnis = {};
+    let fertig = 0, fehler = [];
+    for (const sym of symbole){
+      try {
+        ergebnis[sym] = await bildAlsDataUrl([tafel[sym].gross, tafel[sym].klein]);
+      } catch(e){ fehler.push(sym); }
+      fertig++;
+      balken(fertig / symbole.length);
+      melde("Lade Bilder \u2026 " + fertig + " / " + symbole.length +
+        (fehler.length ? "  (uebersprungen: " + fehler.join(", ") + ")" : ""));
+    }
+    melde("Erzeuge Datei \u2026");
+    const inhalt = "// Elementfotos fuer Wortstoff \u2013 erzeugt aus der Wikipedia-Seite\n" +
+      "// 'Bildtafel der chemischen Elemente'. Bilder frei lizenziert (Wikipedia/Wikimedia);\n" +
+      "// Lizenzdetails auf den jeweiligen Bildseiten. Nur fuer den privaten Gebrauch.\n" +
+      "const ELEMENT_BILDER = " + JSON.stringify(ergebnis) + ";\n";
+    const blob = new Blob([inhalt], { type: "text/javascript" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "elementbilder.js";
+    a.click();
+    melde("Fertig! " + Object.keys(ergebnis).length + " Fotos gespeichert (" +
+      (blob.size/1024/1024).toFixed(1) + " MB).\n\n" +
+      "Die Datei 'elementbilder.js' liegt jetzt in deinem Downloads-Ordner.\n" +
+      "Verschiebe sie in DENSELBEN Ordner wie wortstoff.html \u2013 fertig.\n" +
+      (fehler.length ? "\nOhne Foto (z.B. kuenstliche Elemente): " + fehler.join(", ") : ""));
+  } catch(e){
+    melde("Fehler: " + e.message + "\nBist du online? Ansonsten bitte spaeter erneut versuchen.");
+    knopf.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
