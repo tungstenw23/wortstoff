@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wortstoff – das Periodensystem-Wortspiel</title>
+<title>Wortstoff 32 – Chemie-Beat mit fest eingebauter Wortliste</title>
 <style>
   :root {
     --ink: #1E3A4C; --grey: #7A8B94; --line: #C9D4D9;
@@ -110,7 +110,162 @@
   @keyframes schwund { to { transform: scale(.3); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .bubble, .bubble.weg { animation: none; }
+    .card, .pokal, .siegring, .siegbalken { animation: none !important; }
   }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  .card { animation: fadeUp .25s ease-out; }
+  @keyframes pokalWackeln { 0%,100% { transform: scale(1) rotate(-4deg); }
+    50% { transform: scale(1.15) rotate(4deg); } }
+  .pokal { font-size: 64px; animation: pokalWackeln 1.6s ease-in-out infinite;
+    filter: drop-shadow(0 4px 10px rgba(200,150,20,.45)); }
+  @keyframes ringPuls { 0% { box-shadow: 0 0 0 0 var(--sf); }
+    100% { box-shadow: 0 0 0 22px transparent; } }
+  .siegring { border-radius: 50%; display: inline-flex; animation: ringPuls 1.4s ease-out infinite; }
+  @keyframes balkenWachsen { from { width: 0 !important; } }
+  .siegbalken { animation: balkenWachsen 1.1s ease-out; }
+
+
+  /* ---------- Version 30: moderner Schueler-Look ---------- */
+  :root {
+    --accent: #15A3B8; --accent2: #6C63FF; --sun: #FFB703;
+    --soft: rgba(21,163,184,.10); --shadow: 0 14px 38px rgba(30,58,76,.13);
+  }
+  body[data-theme="tafel"] {
+    --accent:#55D6BE; --accent2:#B8A1FF; --sun:#FFD166;
+    --soft:rgba(85,214,190,.12); --shadow:0 16px 42px rgba(0,0,0,.28);
+  }
+  body[data-theme="poster"] {
+    --accent:#C45D38; --accent2:#8B5E3C; --sun:#D99A25;
+    --soft:rgba(196,93,56,.10); --shadow:0 14px 38px rgba(74,55,40,.15);
+  }
+  html { scroll-behavior:smooth; }
+  body {
+    padding:24px 14px 48px;
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(21,163,184,.13), transparent 26%),
+      radial-gradient(circle at 88% 18%, rgba(108,99,255,.12), transparent 25%),
+      radial-gradient(circle at 50% 95%, rgba(255,183,3,.10), transparent 30%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:auto,auto,auto,24px 24px,24px 24px;
+    overflow-x:hidden;
+  }
+  body::before, body::after {
+    position:fixed; z-index:-1; font-family:ui-monospace,monospace; font-weight:900;
+    color:var(--accent); opacity:.07; pointer-events:none; transform:rotate(-12deg);
+  }
+  body::before { content:"H   He   C   O   Na   Cl"; top:8%; left:-28px; font-size:42px; }
+  body::after { content:"Fe   Cu   Au   U"; right:-25px; bottom:8%; font-size:46px; transform:rotate(10deg); }
+  #app { width:min(100%, 960px); margin:0 auto; }
+  .card {
+    max-width:920px; padding:20px; border-radius:22px; border:1px solid color-mix(in srgb, var(--line) 78%, transparent);
+    box-shadow:var(--shadow); backdrop-filter:blur(10px); position:relative; overflow:hidden;
+  }
+  .card::after {
+    content:""; position:absolute; inset:0 0 auto 0; height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2),var(--sun)); opacity:.85;
+  }
+  h1 { font-size:clamp(29px,6vw,48px); letter-spacing:4px; }
+  .brand-hero { display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; margin-bottom:16px; }
+  .brand-atom {
+    width:92px; height:92px; border-radius:28px; display:grid; place-items:center; font-size:52px;
+    background:linear-gradient(145deg,var(--accent),var(--accent2)); color:white;
+    box-shadow:0 12px 28px rgba(21,163,184,.25); transform:rotate(-5deg);
+    animation:atomSchweben 3.2s ease-in-out infinite;
+  }
+  @keyframes atomSchweben { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-6px) rotate(4deg)} }
+  .hero-badges { display:flex; flex-wrap:wrap; gap:7px; margin-top:8px; }
+  .hero-badge { padding:5px 10px; border-radius:999px; background:var(--soft); border:1px solid var(--line); font-size:12px; font-weight:750; }
+  .spielidee { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin:15px 0 18px; }
+  .idee { padding:11px; border-radius:15px; background:var(--soft); border:1px solid var(--line); font-size:12px; line-height:1.35; }
+  .idee b { display:block; font-size:13px; margin-bottom:3px; }
+  .section-title { display:flex; align-items:center; gap:8px; font-weight:850; margin:19px 0 8px; font-size:15px; }
+  .section-title::before { content:""; width:9px; height:24px; border-radius:7px; background:linear-gradient(var(--accent),var(--accent2)); }
+  button { border-radius:13px; padding:11px 18px; box-shadow:0 3px 0 rgba(30,58,76,.08); }
+  button.primary { background:linear-gradient(135deg,var(--accent2),var(--accent)); color:#fff; box-shadow:0 8px 18px rgba(21,163,184,.23); }
+  button.primary:hover:not(:disabled) { box-shadow:0 11px 24px rgba(21,163,184,.30); }
+  input[type=text] { border-radius:13px; padding:12px 14px; box-shadow:inset 0 1px 0 rgba(255,255,255,.5); }
+  .player-panel { margin-bottom:12px; padding:13px; border:1.5px solid var(--line); border-radius:17px; background:linear-gradient(145deg,var(--card),var(--soft)); }
+  .avatar { width:78px; padding:8px 4px; border-radius:14px; transition:transform .16s, box-shadow .16s, opacity .16s; }
+  .avatar:hover:not(.vergeben) { transform:translateY(-4px) rotate(-1deg); box-shadow:0 8px 16px rgba(30,58,76,.14); }
+  .avatar.gewaehlt { box-shadow:0 0 0 3px var(--accent),0 8px 18px rgba(21,163,184,.18); transform:translateY(-3px); }
+  .avatar .an { font-size:10px; }
+  .tile {
+    border-radius:13px; background:linear-gradient(155deg,#fff 0%,var(--card) 57%,var(--soft) 100%);
+    box-shadow:0 6px 12px rgba(30,58,76,.13); overflow:visible;
+  }
+  body[data-theme="tafel"] .tile { background:linear-gradient(155deg,#354a40,var(--card)); }
+  .tile .sym { text-shadow:0 2px 0 rgba(255,255,255,.5); }
+  body[data-theme="tafel"] .tile .sym { text-shadow:0 2px 0 rgba(0,0,0,.22); }
+  .tile.selected { box-shadow:0 0 0 3px var(--sun),0 9px 22px rgba(255,183,3,.24); transform:translateY(-5px) rotate(-1deg); }
+  .game-header { background:linear-gradient(135deg,var(--card),var(--soft)); }
+  .hand-card { background:linear-gradient(150deg,var(--card),color-mix(in srgb,var(--soft) 65%,var(--card))); }
+  .speech {
+    margin:12px auto; max-width:620px; padding:12px 15px; border-radius:16px;
+    background:var(--soft); border:1.5px solid var(--accent); font-weight:750; line-height:1.4; position:relative;
+  }
+  .speech::before { content:""; position:absolute; left:28px; top:-8px; width:14px; height:14px; background:var(--soft); border-left:1.5px solid var(--accent); border-top:1.5px solid var(--accent); transform:rotate(45deg); }
+  .speech.good { border-color:var(--good); background:color-mix(in srgb,var(--good) 10%,var(--card)); }
+  .speech.good::before { border-color:var(--good); background:color-mix(in srgb,var(--good) 10%,var(--card)); }
+  .speech.bad { border-color:var(--bad); background:color-mix(in srgb,var(--bad) 10%,var(--card)); }
+  .speech.bad::before { border-color:var(--bad); background:color-mix(in srgb,var(--bad) 10%,var(--card)); }
+  .quiz-card { padding-top:25px; }
+  .quiz-icon { width:88px; height:88px; margin:15px auto; border-radius:28px; display:grid; place-items:center; font-size:52px; background:linear-gradient(145deg,var(--soft),var(--card)); border:1.5px solid var(--line); box-shadow:0 10px 24px rgba(30,58,76,.12); }
+  button.answer { padding:13px 15px; border-radius:14px; position:relative; }
+  button.answer::before { content:attr(data-letter); display:inline-grid; place-items:center; width:25px; height:25px; margin-right:9px; border-radius:8px; background:var(--grid); font-size:12px; }
+  button.answer.correct::before, button.answer.wrong::before { background:rgba(255,255,255,.22); }
+  .handoff-card { margin-top:70px; background:linear-gradient(145deg,var(--card),var(--soft)); }
+  .handoff-note { margin:12px auto 18px; max-width:520px; padding:10px 14px; border-radius:15px; border:1px dashed var(--accent); background:var(--soft); font-size:14px; }
+  .scorebar { display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+  .status-strip { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .status-chip { padding:5px 9px; border-radius:999px; background:var(--soft); border:1px solid var(--line); font-size:11px; font-weight:750; }
+  #arena { height:350px; border-radius:18px; border:2px dashed var(--accent); background:
+    radial-gradient(circle at 20% 30%,rgba(21,163,184,.10),transparent 25%),
+    radial-gradient(circle at 80% 70%,rgba(108,99,255,.10),transparent 25%),var(--card); }
+  .bubble { filter:drop-shadow(0 7px 6px rgba(30,58,76,.18)); }
+  .message-box { padding:10px 13px; border-radius:13px; background:color-mix(in srgb,var(--bad) 9%,var(--card)); border:1px solid var(--bad); color:var(--bad); font-size:13px; font-weight:700; margin-bottom:8px; }
+  .victory-quote { margin:8px auto 16px; max-width:520px; padding:11px 15px; border-radius:16px; background:var(--soft); border:1px solid var(--line); font-weight:800; }
+  @media (max-width:700px) {
+    .spielidee { grid-template-columns:1fr 1fr; }
+    .brand-hero { grid-template-columns:1fr; text-align:center; }
+    .brand-atom { margin:auto; width:78px; height:78px; font-size:44px; }
+    .hero-badges { justify-content:center; }
+    .avatar { width:70px; }
+    .card { padding:16px; border-radius:18px; }
+  }
+  @media (max-width:430px) {
+    body { padding:10px 7px 28px; }
+    .spielidee { grid-template-columns:1fr; }
+    .row { flex-wrap:wrap; }
+    .row > button { min-width:calc(50% - 4px); }
+    .tile { width:62px; height:75px; }
+  }
+
+
+
+  /* ---------- Version 34: Schülerwortschatz und ausschließlich Alltagschemie-Fragen ---------- */
+  .risk-panel {
+    max-width:560px; margin:0 auto 14px; padding:13px 15px; border-radius:18px;
+    background:linear-gradient(135deg,color-mix(in srgb,var(--sun) 15%,var(--card)),var(--soft));
+    border:1.5px solid color-mix(in srgb,var(--sun) 65%,var(--line)); text-align:left;
+    box-shadow:0 8px 22px rgba(30,58,76,.10);
+  }
+  .risk-title { display:flex; justify-content:space-between; gap:10px; align-items:center; font-weight:900; }
+  .risk-stake { padding:5px 9px; border-radius:999px; background:color-mix(in srgb,var(--bad) 12%,var(--card));
+    border:1px solid var(--bad); color:var(--bad); font-size:12px; white-space:nowrap; }
+  .difficulty { display:flex; align-items:center; gap:6px; margin-top:9px; color:var(--grey); font-size:12px; }
+  .difficulty-dots { display:flex; gap:4px; }
+  .difficulty-dot { width:18px; height:7px; border-radius:999px; background:var(--grid); border:1px solid var(--line); }
+  .difficulty-dot.on { background:linear-gradient(90deg,var(--accent),var(--accent2)); border-color:transparent; }
+  .hint-rule { margin:9px 0 0; font-size:12px; line-height:1.4; color:var(--grey); }
+  .hint-rule b:first-child { color:var(--good); }
+  .hint-rule b:last-child { color:var(--bad); }
+  .hint-button { position:relative; overflow:hidden; }
+  .hint-button::after { content:"QUIZ"; position:absolute; right:-17px; top:7px; transform:rotate(38deg);
+    padding:2px 20px; background:var(--sun); color:#2b2600; font-size:8px; letter-spacing:1px; font-weight:900; }
+  .sound-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px;
+    background:var(--soft); border:1px solid var(--line); font-size:11px; color:var(--grey); }
+
 </style>
 </head>
 <body>
@@ -418,72 +573,296 @@ function chip(idx){
 
 const THEMES = [["papier","Laborpapier"],["tafel","Tafel"],["poster","Vintage"]];
 
-// ---------------- Klaenge (Web Audio, keine Dateien noetig) ----------------
-let audioCtx = null;
-function ton(freq, wann, dauer, typ, lautstaerke){
+// ---------------- Eigene Chemie-Beat-Sounds (Web Audio, keine Dateien noetig) ----------------
+// Die Motive sind eigens fuer das Spiel entworfen und lehnen sich nicht an bekannte Stuecke an.
+let audioCtx = null, audioMaster = null;
+function audioStart(){
   try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type = typ || "sine"; o.frequency.value = freq;
-    const t = audioCtx.currentTime + (wann || 0);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(lautstaerke || 0.15, t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dauer);
-    o.connect(g); g.connect(audioCtx.destination);
-    o.start(t); o.stop(t + dauer + 0.05);
-  } catch(e){ /* kein Audio verfuegbar */ }
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const comp = audioCtx.createDynamicsCompressor();
+      comp.threshold.value = -20; comp.knee.value = 18;
+      comp.ratio.value = 5; comp.attack.value = .003; comp.release.value = .18;
+      audioMaster = audioCtx.createGain();
+      audioMaster.gain.value = .72;
+      audioMaster.connect(comp); comp.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  } catch(e){ return null; }
 }
-function klangRichtig(){ if(!state.klangAn) return; ton(523,0,.15); ton(784,.12,.2); }
-function klangFalsch(){ if(!state.klangAn) return; ton(220,0,.2,"sawtooth",.08); ton(165,.15,.25,"sawtooth",.08); }
+function audioZiel(){ return audioMaster || (audioStart() && audioMaster); }
+function ton(freq, wann, dauer, typ, lautstaerke, zielFreq, detune){
+  try {
+    const ctx = audioStart(), ziel = audioZiel(); if (!ctx || !ziel) return;
+    const o = ctx.createOscillator(), filter = ctx.createBiquadFilter(), g = ctx.createGain();
+    const t = ctx.currentTime + (wann || 0), d = Math.max(.04, dauer || .15);
+    o.type = typ || "sine"; o.detune.value = detune || 0;
+    o.frequency.setValueAtTime(Math.max(25,freq), t);
+    if (zielFreq) o.frequency.exponentialRampToValueAtTime(Math.max(25,zielFreq), t+d);
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(Math.max(750, Math.min(9500, freq*8)), t);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(500, Math.min(7000, freq*3)), t+d);
+    filter.Q.value = 1.7;
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(lautstaerke || .07, t + Math.min(.012,d/4));
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(filter); filter.connect(g); g.connect(ziel);
+    o.start(t); o.stop(t+d+.03);
+  } catch(e){}
+}
+function rauschen(wann, dauer, lautstaerke, frequenz, art){
+  try {
+    const ctx=audioStart(), ziel=audioZiel(); if(!ctx||!ziel) return;
+    const d=dauer||.08, len=Math.max(1,Math.floor(ctx.sampleRate*d));
+    const buffer=ctx.createBuffer(1,len,ctx.sampleRate), data=buffer.getChannelData(0);
+    for(let i=0;i<len;i++) data[i]=(Math.random()*2-1)*(1-i/len);
+    const src=ctx.createBufferSource(), filter=ctx.createBiquadFilter(), g=ctx.createGain();
+    const t=ctx.currentTime+(wann||0); src.buffer=buffer;
+    filter.type=art||"highpass"; filter.frequency.value=frequenz||2200; filter.Q.value=1.2;
+    g.gain.setValueAtTime(lautstaerke||.025,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    src.connect(filter); filter.connect(g); g.connect(ziel); src.start(t); src.stop(t+d+.02);
+  } catch(e){}
+}
+function kick(wann, lautstaerke){
+  try {
+    const ctx=audioStart(), ziel=audioZiel(); if(!ctx||!ziel) return;
+    const o=ctx.createOscillator(), g=ctx.createGain(), t=ctx.currentTime+(wann||0);
+    o.type="sine"; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(46,t+.13);
+    g.gain.setValueAtTime(lautstaerke||.09,t); g.gain.exponentialRampToValueAtTime(.0001,t+.16);
+    o.connect(g); g.connect(ziel); o.start(t); o.stop(t+.18);
+  } catch(e){}
+}
+function hihat(wann, lautstaerke){ rauschen(wann,.045,lautstaerke||.018,5200,"highpass"); }
+function snare(wann, lautstaerke){
+  rauschen(wann,.11,lautstaerke||.032,1300,"highpass");
+  ton(185,wann,.09,"triangle",(lautstaerke||.032)*.8,120);
+}
+function pluck(freq, wann, dauer, lautstaerke){
+  const d=dauer||.18, l=lautstaerke||.055;
+  ton(freq,wann,d,"triangle",l);
+  ton(freq*2,wann+.004,d*.72,"sine",l*.28,0,5);
+}
+function glitzer(wann, basis){
+  const b=basis||1047;
+  [1,1.25,1.5,2].forEach((m,i)=>pluck(b*m,(wann||0)+i*.045,.12,.027-i*.003));
+  hihat((wann||0)+.12,.014);
+}
+function akkord(freqs, wann, dauer, lautstaerke){
+  freqs.forEach((f,i)=>ton(f,(wann||0)+i*.006,dauer||.35,i%2?"triangle":"sine",lautstaerke||.038,0,(i-1)*3));
+}
+function klangRichtig(){
+  if(!state.klangAn) return;
+  const v=Math.floor(Math.random()*3);
+  kick(0,.045); hihat(.02,.014);
+  const motive=[
+    [[659,0],[784,.07],[988,.14]],
+    [[587,0],[740,.065],[880,.13],[1175,.20]],
+    [[523,0],[659,.06],[784,.12],[1047,.19]]
+  ][v];
+  motive.forEach(([f,t],i)=>pluck(f,t,.15,i===motive.length-1?.065:.048));
+  glitzer(motive[motive.length-1][1]+.06,motive[motive.length-1][0]*1.25);
+}
+function klangFalsch(){
+  if(!state.klangAn) return;
+  const v=Math.floor(Math.random()*2);
+  snare(0,.025); hihat(.10,.012);
+  if(v===0){ ton(247,0,.18,"square",.038,185); ton(165,.10,.24,"triangle",.046,98); }
+  else { ton(294,0,.12,"sawtooth",.032,220); ton(220,.09,.16,"square",.034,165); ton(147,.18,.22,"triangle",.044,92); }
+}
 function klangWort(){
   if(!state.klangAn) return;
-  // aufsteigendes Arpeggio ...
-  [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=>ton(f, i*.09, .22));
-  // ... dann voller Dur-Akkord mit Bass als Abschluss
-  [523.25, 659.25, 783.99, 1046.5].forEach(f=>ton(f, .42, .7, "sine", .1));
-  ton(130.81, .42, .8, "triangle", .12);
-  ton(261.63, .42, .8, "triangle", .08);
+  // Kurzer eigener "Labor-Pop"-Beat mit aufsteigendem Wortmotiv.
+  kick(0,.085); hihat(.10,.018); snare(.20,.028); kick(.34,.062); hihat(.42,.018);
+  [392,494,587,740,988].forEach((f,i)=>pluck(f,.02+i*.073,.18,.052));
+  akkord([196,294,392,494],.43,.48,.035); glitzer(.48,988);
+}
+function klangTippStart(){
+  if(!state.klangAn) return;
+  // Spannungsaufbau wie ein kurzer Challenge-Countdown.
+  kick(0,.045); hihat(.09,.013); hihat(.18,.016);
+  ton(262,0,.28,"triangle",.034,392); ton(523,.18,.16,"sine",.038,659);
+  glitzer(.26,784);
+}
+function klangTippGerettet(){
+  if(!state.klangAn) return;
+  // "Schutzschild": tiefer Impuls, heller Akkord und Glitzern.
+  kick(0,.058); akkord([523,659,784],.03,.34,.043);
+  [784,1047,1319].forEach((f,i)=>pluck(f,.12+i*.07,.15,.052));
+  glitzer(.29,1047);
+}
+function klangTippAbzug(){
+  if(!state.klangAn) return;
+  // Punkte fallen hoerbar nach unten, aber ohne aggressiven Alarmton.
+  kick(0,.07); snare(.05,.026);
+  [392,330,262,196,147].forEach((f,i)=>ton(f,i*.07,.13,i<2?"square":"triangle",.038,f*.78));
+  rauschen(.27,.13,.025,850,"bandpass");
+}
+function klangGefunden(){
+  if(!state.klangAn) return;
+  hihat(0,.012); [740,988,1319].forEach((f,i)=>pluck(f,i*.052,.12,.04)); glitzer(.12,988);
+}
+function klangSieg(){
+  if(!state.klangAn) return;
+  // Eigene kleine Chemie-Beat-Fanfare: Beat, Motiv, Schlussakkord.
+  [0,.22,.44,.66,.88].forEach((t,i)=>kick(t,i===4?.105:.064));
+  [.11,.33,.55,.77].forEach(t=>snare(t,.022));
+  [392,494,587,784,988,1175,1568].forEach((f,i)=>pluck(f,i*.12,i<4?.18:.30,.058));
+  akkord([196,294,392,494,587],.91,.88,.038); glitzer(1.00,1175); glitzer(1.22,1568);
+}
+function klangDemo(){
+  // Wird nur durch den sichtbaren Probeknopf gestartet.
+  state.klangAn=true;
+  kick(0,.07); hihat(.10,.016); snare(.20,.025); kick(.34,.055);
+  [523,659,784,988].forEach((f,i)=>pluck(f,.02+i*.085,.16,.05));
+  akkord([262,392,523,659],.40,.50,.035); glitzer(.46,1047);
+}
+// Anspornende und humorvolle Kommentare – mit Wiederholungsschutz
+const KOMMENTAR_MERKER = {};
+function kommentarOhneWiederholung(schluessel, liste, ...args){
+  if (!liste.length) return "";
+  let idx = Math.floor(Math.random()*liste.length);
+  if (liste.length > 1 && KOMMENTAR_MERKER[schluessel] === idx)
+    idx = (idx + 1 + Math.floor(Math.random()*(liste.length-1))) % liste.length;
+  KOMMENTAR_MERKER[schluessel] = idx;
+  const eintrag = liste[idx];
+  return typeof eintrag === "function" ? eintrag(...args) : eintrag;
 }
 
-// Anspornende Kommentare des eigenen Chemiker-Avatars nach gelegtem Wort
 const LOB = [
-  n => `${n} ist stolz auf dich!`,
-  n => `${n} applaudiert begeistert!`,
-  n => `Ausgezeichnet \u2013 ${n} haette es nicht besser gekonnt!`,
-  n => `${n} nickt anerkennend: Ein Wort wie aus dem Lehrbuch!`,
-  n => `Bravo! ${n} notiert dein Wort im Laborjournal.`,
-  n => `${n} hebt den Erlenmeyerkolben auf dich!`,
-  n => `Nobelpreisverdaechtig \u2013 findet zumindest ${n}!`,
-  n => `${n} staunt: Elemente elegant kombiniert!`,
+  n => `${n} ist stolz auf dich – und tut so, als waere das alles geplant gewesen.`,
+  n => `${n} applaudiert. Der Bunsenbrenner klatscht leider nicht mit.`,
+  n => `Stark! ${n} schreibt dein Wort ins geheime Laborjournal.`,
+  n => `${n} nickt: „Sauber kombiniert – keine Nebenprodukte!“`,
+  n => `Dieses Wort reagiert eindeutig mit guter Laune.`,
+  n => `${n} hebt den Erlenmeyerkolben: Auf dein Wort!`,
+  n => `Fast nobelpreisverdaechtig – mindestens schulpreisverdaechtig.`,
+  n => `${n} staunt: So elegant koennen Elementsymbole sein.`,
+  n => `Der Periodensystem-Endgegner wurde kurz nervoes.`,
+  n => `${n} sagt: „Das war chemisch gesehen ziemlich stabil.“`,
+  n => `Volltreffer! Selbst die Edelgase zeigen kurz eine Reaktion.`,
+  n => `Dein Wort hat mehr Bindungskraft als Gruppenkleber.`,
+  n => `${n} bestellt vorsichtshalber schon mal eine Medaille.`,
+  n => `Sauber! Kein Reagenzglas musste dabei leiden.`,
+  n => `Das sitzt besser als ein Schutzbrille im Chemieraum.`,
+  n => `${n} flüstert: „Bitte nicht den anderen verraten, wie gut das war.“`,
+  n => `Boom – aber nur punktetechnisch. Sicherheitsabstand eingehalten.`,
+  n => `Das Periodensystem sagt: „Okay, Respekt.“`,
+  n => `${n} macht einen Haken dran: Experiment gelungen.`,
+  n => `So sieht eine gelungene Wort-Synthese aus!`,
+  n => `Dein Chemie-Level ist gerade um mindestens 2 gestiegen.`,
+  n => `${n} prueft nach – ja, das Wort ist wirklich stark.`,
+  n => `Keine Panik im Labor: Du hast alles unter Kontrolle.`,
+  n => `Das war kein Zufall. Also… vermutlich kein Zufall.`
 ];
 function lobText(){
   const chemiker = CHEMIKER[state.avatare[state.current]].name;
-  return zufall(LOB)(chemiker);
+  return kommentarOhneWiederholung("lob", LOB, chemiker);
 }
 
-// Abwechslungsreiche Kommentare fuer die Zusatzfragen (c = Chemiker, e = Element)
 const BONUS_RICHTIG = [
-  (c,e) => `Volltreffer! +1 Punkt \u2013 ${c} zwinkert dir zu.`,
-  (c,e) => `Genau! Du kennst dein ${e} \u2013 +1 Punkt.`,
-  (c,e) => `Wie aus der Formelsammlung \u2013 +1 Punkt!`,
-  (c,e) => `${c} murmelt: Exzellent! +1 Punkt.`,
-  (c,e) => `Dein Periodensystem sitzt! +1 Punkt.`,
-  (c,e) => `Stark! +1 Punkt fuer die Laborkasse.`,
-  (c,e) => `Chapeau! ${e} haelt keine Geheimnisse vor dir. +1 Punkt.`,
-  (c,e) => `Richtig! ${c} klopft dir anerkennend auf die Schulter. +1 Punkt.`,
+  (c,e) => `Volltreffer! +1 Punkt – ${c} gibt dir den Labor-Daumen hoch.`,
+  (c,e) => `Genau! ${e} kann dir nichts vormachen. +1 Punkt.`,
+  (c,e) => `Richtig – die Formelsammlung darf heute geschlossen bleiben. +1!`,
+  (c,e) => `${c} murmelt: „Exzellent.“ Das heisst auf Chemisch: +1 Punkt.`,
+  (c,e) => `Dein Periodensystem sitzt. Wahrscheinlich sogar besser als dein Stundenplan. +1.`,
+  (c,e) => `Stark! +1 Punkt fuer die imaginäre Laborkasse.`,
+  (c,e) => `${e} wurde erfolgreich entschluesselt. +1 Punkt.`,
+  (c,e) => `Richtig! ${c} klopft anerkennend auf den Labortisch.`,
+  (c,e) => `Das war schnell – fast wie eine explosionsartige Reaktion. +1!`,
+  (c,e) => `Korrekt! Kein Taschenrechner wurde verletzt. +1 Punkt.`,
+  (c,e) => `Chemiehirn aktiviert: Antwort stimmt. +1.`,
+  (c,e) => `Treffer! Selbst das Elektron findet die Antwort anziehend. +1.`,
+  (c,e) => `Sauber geloest. Die Schutzbrille beschlaegt vor Begeisterung. +1.`,
+  (c,e) => `Richtig! Das gibt einen Punkt und inneren Applaus.`,
+  (c,e) => `${c} sagt: „Genau so!“ Mehr muss man nicht wissen. +1.`,
+  (c,e) => `Die Antwort ist stabiler als ein Edelgas. +1 Punkt.`
 ];
 const BONUS_FALSCH = [
-  (c,e) => `Knapp daneben \u2013 kein Extrapunkt. Die richtige Antwort leuchtet gruen.`,
-  (c,e) => `Leider falsch. ${c} blaettert schon im Lehrbuch nach.`,
-  (c,e) => `${e} bleibt diesmal raetselhaft \u2013 kein Punkt.`,
-  (c,e) => `Nicht ganz \u2013 auch ${c} musste so etwas erst nachschlagen.`,
-  (c,e) => `Kein Punkt diesmal \u2013 die naechste Frage kommt bestimmt!`,
+  (c,e) => `Knapp daneben – die richtige Antwort leuchtet gruen. Naechste Runde, neues Glueck.`,
+  (c,e) => `Nicht ganz. ${c} blaettert demonstrativ langsam im Lehrbuch.`,
+  (c,e) => `${e} spielt heute Verstecken – diesmal kein Extrapunkt.`,
+  (c,e) => `Leider falsch. Aber hey: Im Labor nennt man das einen Vorversuch.`,
+  (c,e) => `Kein Punkt diesmal – das Chemiehirn laedt noch.`,
+  (c,e) => `Fast! Die Antwort ist leider in ein anderes Reagenzglas gefallen.`,
+  (c,e) => `Nope. Selbst Elektronen springen manchmal in die falsche Schale.`,
+  (c,e) => `${c} sagt: „Interessante Hypothese.“ Das ist Forschersprache fuer falsch.`,
+  (c,e) => `Diesmal keine Reaktion. Die naechste Frage zuendet bestimmt.`,
+  (c,e) => `Falsch, aber mutig angeklickt. Das zaehlt moralisch fast als halber Punkt.`,
+  (c,e) => `Die Antwort war leider instabil und ist zerfallen.`,
+  (c,e) => `Heute nicht – ${e} hatte offenbar einen Tarnumhang an.`,
+  (c,e) => `Kein Extrapunkt. Dafuer jetzt eine Wissensluecke weniger.`,
+  (c,e) => `Das war die falsche Abzweigung im Periodensystem.`,
+  (c,e) => `Fast richtig ist in Chemie leider manchmal ziemlich explosiv.`,
+  (c,e) => `${c} troestet: „Auch Nobelpreistraeger lagen mal daneben.“`
 ];
 function bonusFeedback(sym, richtig){
   const c = CHEMIKER[state.avatare[state.current]].name;
   const e = BY_SYMBOL[sym][1];
-  return zufall(richtig ? BONUS_RICHTIG : BONUS_FALSCH)(c, e);
+  return kommentarOhneWiederholung(richtig ? "bonusR" : "bonusF", richtig ? BONUS_RICHTIG : BONUS_FALSCH, c, e);
 }
+
+const START_RICHTIG = [
+  `Richtig! Deine Wortpunkte werden verdoppelt. Der Zug hat jetzt Turboantrieb.`,
+  `Volltreffer! x2 ist aktiv – bitte verantwortungsvoll punkten.`,
+  `Korrekt! Die Punkte haben sich spontan verdoppelt. Chemie kann so schoen sein.`,
+  `Stimmt! Verdoppler aktiviert. Das Periodensystem ist gewarnt.`,
+  `Richtig! Heute gibt es Wortpunkte im Doppelpack.`,
+  `Sauber! x2 leuchtet – jetzt fehlt nur noch ein starkes Wort.`,
+  `Treffer! Deine Punkte reagieren ab jetzt besonders heftig.`,
+  `Exakt! Der Verdoppler ist stabil und einsatzbereit.`,
+  `Richtig beantwortet. Dein Zug bekommt die Sonderedition mit x2.`,
+  `Perfekt! Doppelpunktzahl – ganz ohne Extra-Hausaufgaben.`
+];
+const START_FALSCH = [
+  `Leider falsch – diesmal kein Verdoppler. Das Wort kann trotzdem stark werden.`,
+  `Knapp daneben. x2 bleibt heute im Giftschrank.`,
+  `Nicht ganz – die Punkte bleiben einfach. Einfach kann ja auch gut sein.`,
+  `Falsch. Der Verdoppler macht kurz Pause, du aber nicht.`,
+  `Diesmal keine Doppelwirkung. Naechster Versuch, naechste Reaktion.`,
+  `Die Antwort war instabil. Wortpunkte gibt es deshalb normal.`,
+  `Kein x2 – aber ein gutes Wort kann das locker ausgleichen.`,
+  `Leider nein. Das Periodensystem grinst kurz, noch ist nichts verloren.`,
+  `Nicht korrekt. Der Zug laeuft im Energiesparmodus weiter.`,
+  `Heute keine Verdopplung. Dafuer volle Konzentration aufs Wort.`
+];
+function startFeedback(richtig){
+  return kommentarOhneWiederholung(richtig ? "startR" : "startF", richtig ? START_RICHTIG : START_FALSCH);
+}
+
+const HANDOFF_SPRUECHE = [
+  `Schutzbrille richten, Chemiehirn einschalten – dein Zug beginnt.`,
+  `Das Periodensystem wartet. Kein Druck. Also nur ein bisschen.`,
+  `Zeit fuer eine neue Wort-Synthese.`,
+  `Deine Elemente sind bereit – hoffentlich bist du es auch.`,
+  `Labor frei! Jetzt wird kombiniert statt kopiert.`,
+  `Naechste Versuchsperson… pardon: naechster Spieler!`,
+  `Die Karten wurden gemischt. Die Ausreden bitte auch.`,
+  `Einmal tief einatmen – ausser es riecht nach Schwefel.`,
+  `Dein Zug. Bitte keine echten Explosionen.`,
+  `Elementsymbole bereit. Gehirn hoffentlich ebenfalls.`
+];
+function handoffText(){ return kommentarOhneWiederholung("handoff", HANDOFF_SPRUECHE); }
+
+const UNGUELTIG_SPRUECHE = [
+  `Dieses Wort steht nicht in der Rundenliste. Die Auswahl wurde geleert – neuer Versuch!`,
+  `Das Wort hat leider keine Spielgenehmigung. Auswahl leer, weiterkombinieren!`,
+  `Nicht in der Liste – das Wort ist durchs Chemie-Raster gefallen.`,
+  `Gute Idee, aber kein gesuchtes Rundenwort. Noch einmal mischen!`,
+  `Dieses Wort reagiert nicht mit der Wortliste. Auswahl wurde zurueckgesetzt.`,
+  `Leider kein Listenwort. Das Periodensystem sagt: „Noch mal!“`
+];
+function ungueltigText(){ return kommentarOhneWiederholung("ungueltig", UNGUELTIG_SPRUECHE); }
+
+const SIEG_SPRUECHE = [
+  n => `${n} hat das Periodensystem heute offiziell besiegt.`,
+  n => `Experiment beendet: ${n} ist eindeutig das stabilste Element der Runde.`,
+  n => `${n} gewinnt – die Konkurrenz darf jetzt vorsichtig applaudieren.`,
+  n => `Nobelpreis noch unklar, Spielsieg eindeutig: ${n}!`,
+  n => `${n} hat mehr Punkte gesammelt als ein Reagenzglas Blasen.`,
+  n => `Die Endreaktion ist abgeschlossen: ${n} gewinnt!`
+];
+function siegText(name){ return kommentarOhneWiederholung("sieg", SIEG_SPRUECHE, name); }
 
 // ---------------------------------------------------------------
 // Reaktionsfragen fuer die Startfrage, gestaffelt nach Jahrgangsstufe
@@ -618,6 +997,519 @@ ober: [
 ],
 };
 
+
+// ---------------- Tipp-Challenge: Fragen mit deutlich steigender Schwierigkeit ----------------
+// min: 1 = Klasse 7/8, 2 = Klasse 9/10, 3 = Oberstufe
+const HINWEIS_SCHWIERIGKEIT = ["", "knifflig", "anspruchsvoll", "schwer", "sehr schwer", "Endgegner"];
+const HINWEISFRAGEN = [
+  // Stufe 1 – bereits anspruchsvoller als reine Abfragefragen
+  {grad:1,min:1,t:"Welche Reaktionsgleichung fuer die Verbrennung von Magnesium ist richtig ausgeglichen?",r:"2 Mg + O₂ → 2 MgO",f:["Mg + O₂ → MgO","2 Mg + O₂ → Mg₂O","Mg + 2 O₂ → MgO₂"],h:"Auf beiden Seiten muessen gleich viele Mg- und O-Atome stehen."},
+  {grad:1,min:1,t:"Bei der Reaktion von Calciumcarbonat mit Salzsaeure entsteht ein Gas. Welches?",r:"Kohlenstoffdioxid",f:["Wasserstoff","Sauerstoff","Chlor"],h:"Carbonate bilden mit Saeuren CO₂."},
+  {grad:1,min:1,t:"Bei der Elektrolyse von Wasser entstehen Wasserstoff und Sauerstoff. In welchem Volumenverhaeltnis?",r:"2 : 1",f:["1 : 1","1 : 2","3 : 1"],h:"2 H₂O → 2 H₂ + O₂"},
+  {grad:1,min:2,t:"Warum lautet die Formel von Magnesiumoxid MgO und nicht Mg₂O?",r:"Mg²⁺ und O²⁻ gleichen sich im Verhaeltnis 1:1 aus",f:["Magnesium besitzt nur ein Proton","Sauerstoff ist immer einatomig","Beide Elemente haben dieselbe Ordnungszahl"]},
+  {grad:1,min:2,t:"Welche Teilchenzahl besitzt ein neutrales Chloratom mit der Ordnungszahl 17?",r:"17 Protonen und 17 Elektronen",f:["17 Protonen und 18 Elektronen","18 Protonen und 17 Elektronen","17 Neutronen und 17 Protonen, aber keine Elektronen"]},
+  {grad:1,min:2,t:"Welches Halogen kann Bromid-Ionen aus einer Salzloesung oxidieren?",r:"Chlor",f:["Iod","Astat","Keines der genannten"],h:"In der Halogengruppe nimmt die Reaktivitaet nach unten ab."},
+
+  // Stufe 2 – Gleichungen, Teilchen und Stoffmengenverhaeltnisse
+  {grad:2,min:1,t:"56 g Eisen reagieren vollstaendig mit 32 g Schwefel. Welche Masse Eisensulfid entsteht?",r:"88 g",f:["24 g","56 g","64 g"],h:"Gesetz der Massenerhaltung."},
+  {grad:2,min:2,t:"Welche Koeffizienten gleichen Al + O₂ → Al₂O₃ korrekt aus?",r:"4 : 3 : 2",f:["2 : 1 : 1","2 : 3 : 1","3 : 2 : 1"]},
+  {grad:2,min:2,t:"Fuer 3 mol Sauerstoff reagieren bei der Knallgasreaktion wie viele mol Wasserstoff vollstaendig?",r:"6 mol",f:["1,5 mol","3 mol","9 mol"],h:"2 H₂ + O₂ → 2 H₂O"},
+  {grad:2,min:2,t:"In CuO + H₂ → Cu + H₂O: Welcher Stoff wird oxidiert?",r:"Wasserstoff",f:["Kupferoxid","Kupfer","Wasser"],h:"H nimmt in Wasser die Oxidationszahl +I an."},
+  {grad:2,min:2,t:"Wie viele Elektronen besitzt ein Chlorid-Ion Cl⁻?",r:"18",f:["16","17","19"],h:"Das neutrale Chloratom hat 17 Elektronen und nimmt eines auf."},
+  {grad:2,min:3,t:"Was veraendert ein Katalysator bei einer umkehrbaren Reaktion?",r:"Er beschleunigt Hin- und Rueckreaktion, aber verschiebt das Gleichgewicht nicht",f:["Er erhoeht die Gleichgewichtskonstante","Er macht eine endotherme Reaktion exotherm","Er erhoeht dauerhaft die Produktmenge"]},
+
+  // Stufe 3 – Redox, Oxidationszahlen und erste Rechnungen
+  {grad:3,min:2,t:"Welche Oxidationszahl besitzt Schwefel im Sulfat-Ion SO₄²⁻?",r:"+VI",f:["−II","+II","+IV"],h:"Vier O-Atome tragen zusammen −VIII; die Gesamtladung ist −II."},
+  {grad:3,min:2,t:"In Fe₂O₃ + 3 CO → 2 Fe + 3 CO₂ ist das Reduktionsmittel ...",r:"Kohlenstoffmonoxid",f:["Eisen(III)-oxid","Eisen","Kohlenstoffdioxid"],h:"Das Reduktionsmittel wird selbst oxidiert."},
+  {grad:3,min:2,t:"Im Daniell-Element fliessen die Elektronen im aeusseren Leiter ...",r:"von der Zinkelektrode zur Kupferelektrode",f:["von Kupfer zu Zink","von der Salzbruecke zu beiden Elektroden","gar nicht; nur Ionen bewegen sich"]},
+  {grad:3,min:3,t:"Welche Oxidationszahl besitzt Mangan in Kaliumpermanganat KMnO₄?",r:"+VII",f:["+II","+IV","+VI"]},
+  {grad:3,min:3,t:"Eine starke Saeure mit pH 2 wird hundertfach verduennt. Welcher pH-Wert ergibt sich naeherungsweise?",r:"pH 4",f:["pH 1","pH 2,02","pH 6"],h:"Hundertfache Verduennung senkt [H₃O⁺] um den Faktor 100."},
+  {grad:3,min:3,t:"Wie viele Teilchen sind ungefaehr in 0,25 mol eines Stoffes enthalten?",r:"1,5 · 10²³",f:["6,0 · 10²³","2,5 · 10²²","4,0 · 10²⁴"],h:"N = n · Nₐ"},
+
+  // Stufe 4 – quantitative Chemie und Gleichgewichte
+  {grad:4,min:2,t:"Nach drei Halbwertszeiten sind von einer radioaktiven Probe noch wie viel Prozent vorhanden?",r:"12,5 %",f:["25 %","33,3 %","6,25 %"]},
+  {grad:4,min:3,t:"25,0 mL Salzsaeure mit c = 0,20 mol/L werden mit Natronlauge c = 0,10 mol/L neutralisiert. Welches Volumen NaOH wird benoetigt?",r:"50,0 mL",f:["12,5 mL","25,0 mL","100,0 mL"]},
+  {grad:4,min:3,t:"Welche Teilgleichung beschreibt die Abscheidung von Kupfer an der Kathode?",r:"Cu²⁺ + 2 e⁻ → Cu",f:["Cu → Cu²⁺ + 2 e⁻","Cu²⁺ → Cu + 2 e⁻","2 Cu⁺ + e⁻ → 2 Cu²⁺"]},
+  {grad:4,min:3,t:"Die Ammoniaksynthese ist exotherm. Was bewirkt eine Temperaturerhoehung im Gleichgewicht?",r:"Die Gleichgewichtslage verschiebt sich zu Stickstoff und Wasserstoff",f:["Sie verschiebt sich zu Ammoniak","Die Gleichgewichtskonstante bleibt immer gleich","Ammoniak zerfaellt nur bei Drucksenkung"]},
+  {grad:4,min:3,t:"Eine Verbindung enthaelt 40,0 % C, 6,7 % H und 53,3 % O. Welche empirische Formel passt?",r:"CH₂O",f:["CHO","C₂H₄O","CH₄O"]},
+  {grad:4,min:3,t:"10 L H₂ reagieren bei gleichen Bedingungen vollstaendig mit 5 L O₂. Wie viel Wasserdampf kann entstehen?",r:"10 L",f:["5 L","15 L","20 L"],h:"Gasvolumina verhalten sich wie die Koeffizienten."},
+
+  // Stufe 5 – Endgegner, aber weiterhin Schulchemie
+  {grad:5,min:2,t:"Wasserstoffperoxid zerfaellt: 2 H₂O₂ → 2 H₂O + O₂. Was geschieht mit dem Sauerstoff?",r:"Er wird gleichzeitig oxidiert und reduziert",f:["Er wird nur oxidiert","Er wird nur reduziert","Seine Oxidationszahl bleibt unveraendert"],h:"O hat in H₂O₂ −I, in H₂O −II und in O₂ 0."},
+  {grad:5,min:3,t:"Welche Oxidationszahl besitzt Chrom im Dichromat-Ion Cr₂O₇²⁻?",r:"+VI",f:["+III","+IV","+VII"]},
+  {grad:5,min:3,t:"4 Al + 3 O₂ → 2 Al₂O₃. Es liegen 4 mol Al und 2 mol O₂ vor. Wie viel Al₂O₃ kann maximal entstehen?",r:"4/3 mol",f:["1 mol","2 mol","8/3 mol"],h:"Sauerstoff ist der limitierende Stoff."},
+  {grad:5,min:3,t:"Wie lautet der Konzentrationsterm fuer N₂ + 3 H₂ ⇌ 2 NH₃?",r:"Kc = [NH₃]² / ([N₂] · [H₂]³)",f:["Kc = [N₂] · [H₂]³ / [NH₃]²","Kc = 2[NH₃] / ([N₂] + 3[H₂])","Kc = [NH₃] / ([N₂] · [H₂])"]},
+  {grad:5,min:3,t:"In einer galvanischen Zelle ist die Anode ...",r:"der Ort der Oxidation und bei der galvanischen Zelle der Minuspol",f:["der Ort der Reduktion und immer der Pluspol","nur die Elektrode mit der groesseren Masse","der Ort, an dem Elektronen verbraucht werden"]},
+  {grad:5,min:3,t:"100 mL 0,10-molare HCl werden mit 50 mL 0,10-molarer NaOH gemischt. Welche Aussage stimmt?",r:"Es bleiben 0,005 mol H₃O⁺ im Ueberschuss",f:["Die Loesung ist neutral","Es bleiben 0,005 mol OH⁻ im Ueberschuss","Es entstehen 0,015 mol H₃O⁺"]}
+];
+let letzteHinweisFrage = "";
+function macheHinweisfrage(nummer){
+  const grad = Math.min(5, Math.max(1, nummer));
+  const basis = ({k78:1,k9:2,ober:3})[state.niveau || "k9"] || 2;
+  const maxMin = Math.min(3, basis + (nummer >= 3 ? 1 : 0));
+  let pool = HINWEISFRAGEN.filter(q => q.grad === grad && q.min <= maxMin);
+  if (!pool.length) pool = HINWEISFRAGEN.filter(q => q.grad === grad);
+  let kandidaten = pool.filter(q => q.t !== letzteHinweisFrage);
+  if (!kandidaten.length) kandidaten = pool;
+  const q = zufall(kandidaten);
+  letzteHinweisFrage = q.t;
+  const optionen = mischen([q.r, ...q.f]);
+  return {
+    text:q.t, optionen, richtig:optionen.indexOf(q.r), hinweis:q.h,
+    schwierigkeitsgrad:grad, schwierigkeitsname:HINWEIS_SCHWIERIGKEIT[grad]
+  };
+}
+const HINWEIS_RICHTIG = [
+  k=>`Gerettet! Die ${k} Punkte bleiben auf deinem Konto. Der Tipp ist gratis.`,
+  k=>`Stark beantwortet – Punktabzug erfolgreich neutralisiert. ${k} Punkte gespart!`,
+  k=>`Chemie-Schild aktiviert: kein Abzug. Der Tipp gehoert dir.`,
+  k=>`Richtig! Dein Punktekonto bleibt stabiler als ein Edelgas.`,
+  k=>`Challenge bestanden. ${k} Punkte bleiben da, wo sie hingehoeren: bei dir.`
+];
+const HINWEIS_FALSCH = [
+  k=>`Die Rettungsreaktion ist leider fehlgeschlagen: −${k} Punkte. Der Tipp wird trotzdem angezeigt.`,
+  k=>`Knapp vorbei – ${k} Punkte verdampfen, aber der Hinweis bleibt.`,
+  k=>`Falsche Antwort. Das kostet ${k} Punkte; wenigstens rueckt der Tipp jetzt raus.`,
+  k=>`Der Chemie-Endgegner gewinnt diese Runde: −${k} Punkte.`,
+  k=>`Leider nicht stabil genug: ${k} Punkte zerfallen. Den Tipp bekommst du trotzdem.`
+];
+function hinweisFeedback(richtig, kosten){
+  return kommentarOhneWiederholung(richtig ? "hintR" : "hintF", richtig ? HINWEIS_RICHTIG : HINWEIS_FALSCH, kosten);
+}
+
+// ---------------------------------------------------------------
+// Chemie-des-Alltags-Fragen für die Startfrage / den Verdoppler.
+// Die Fragen sind nach dem gewählten Lernniveau gestaffelt.
+// ---------------------------------------------------------------
+const ALLTAGSCHEMIE_FRAGEN = {
+k78: [
+ {t:"Warum sind Fluoride in Zahnpasta enthalten?", r:"Sie fördern die Remineralisation und machen den Zahnschmelz widerstandsfähiger gegen Säuren",
+  f:["Sie bleichen die Zähne dauerhaft","Sie lösen Zahnbelag wie ein Lösungsmittel auf","Sie ersetzen das Zähneputzen"],
+  h:"Fluorid hilft, beginnende Schäden am Zahnschmelz zu reparieren und Karies vorzubeugen."},
+ {t:"Wozu wird Kochsalz häufig mit Iodat angereichert?", r:"Zur Versorgung mit Iod und zur Vorbeugung gegen Iodmangel",
+  f:["Damit das Salz stärker salzig schmeckt","Damit das Salz nicht gefriert","Damit Speisen länger heiß bleiben"],
+  h:"Der Körper benötigt Iod unter anderem zur Bildung von Schilddrüsenhormonen."},
+ {t:"Warum geht ein Kuchen durch Backpulver auf?", r:"Beim Reagieren entsteht Kohlenstoffdioxid, das Gasbläschen im Teig bildet",
+  f:["Backpulver verwandelt Wasser in Sauerstoff","Es schmilzt den Zucker im Teig","Es macht das Mehl magnetisch"],
+  h:"Die CO₂-Bläschen lockern den Teig."},
+ {t:"Warum sprudelt eine Mineralwasserflasche beim Öffnen?", r:"Der Druck sinkt und gelöstes Kohlenstoffdioxid tritt als Gas aus",
+  f:["Wasser zerfällt in Wasserstoff und Sauerstoff","Die Flasche saugt Luft in das Wasser","Das Wasser beginnt sofort zu kochen"],
+  h:"Unter hohem Druck kann mehr CO₂ im Wasser gelöst bleiben."},
+ {t:"Warum entfernt Essig Kalkablagerungen?", r:"Die Säure reagiert mit Calciumcarbonat; dabei entstehen lösliche Stoffe und Kohlenstoffdioxid",
+  f:["Essig schmilzt Kalk durch hohe Temperatur","Essig macht Kalk magnetisch","Der Kalk verdunstet unverändert"],
+  h:"Beim Entkalken sind deshalb oft Gasbläschen zu sehen."},
+ {t:"Warum kann Spülmittel Fett mit Wasser abwaschbar machen?", r:"Tenside besitzen einen wasserliebenden und einen fettliebenden Teil und umschließen Fetttröpfchen",
+  f:["Spülmittel verwandelt Fett vollständig in Wasser","Es erhöht nur die Temperatur des Wassers","Es macht Fett elektrisch geladen und schwerer"],
+  h:"Die eingeschlossenen Fetttröpfchen können mit dem Wasser fortgespült werden."},
+ {t:"Warum verderben Lebensmittel im Kühlschrank langsamer?", r:"Bei niedrigerer Temperatur laufen viele chemische und biologische Vorgänge langsamer ab",
+  f:["Im Kühlschrank gibt es keinen Sauerstoff","Kälte zerstört alle Stoffe in den Lebensmitteln","Lebensmittel werden im Kühlschrank steril"],
+  h:"Kühlen bremst Reaktionen und das Wachstum vieler Mikroorganismen, stoppt sie aber nicht vollständig."},
+ {t:"Warum rostet Eisen in Salzwasser meist schneller als in reinem Wasser?", r:"Gelöste Ionen erhöhen die elektrische Leitfähigkeit und beschleunigen die Korrosion",
+  f:["Salz liefert dem Eisen zusätzlichen Sauerstoff","Salz macht Eisen weicher und lässt es schmelzen","Salz entzieht dem Eisen alle Elektronen auf einmal"],
+  h:"Darum ist Streusalz für Fahrzeuge und Brücken problematisch."},
+ {t:"Warum schützt Sonnencreme die Haut?", r:"Ihre Stoffe absorbieren oder streuen einen Teil der energiereichen UV-Strahlung",
+  f:["Sie kühlt die Sonne ab","Sie verhindert jede Wärmeaufnahme der Haut","Sie bildet Sauerstoff auf der Haut"],
+  h:"Der Schutz wirkt nur ausreichend, wenn genug Creme verwendet und nachgecremt wird."},
+ {t:"Warum streut man Salz auf vereiste Wege?", r:"Gelöstes Salz senkt den Gefrierpunkt des Wassers",
+  f:["Salz erwärmt das Eis durch Verbrennung","Salz saugt das gesamte Eis auf","Salz verwandelt Eis in Wasserdampf"],
+  h:"Eine Salzlösung gefriert erst bei einer niedrigeren Temperatur als reines Wasser."},
+ {t:"Warum kann Aktivkohle Gerüche und Verunreinigungen aus Wasser oder Luft entfernen?", r:"Viele Moleküle lagern sich an ihrer sehr großen Oberfläche an",
+  f:["Aktivkohle verbrennt alle Fremdstoffe sofort","Sie macht alle Moleküle schwerelos","Sie erzeugt aus Schmutz Sauerstoff"],
+  h:"Dieser Vorgang heißt Adsorption."},
+ {t:"Warum kann ein Mittel gegen Sodbrennen Magensäure abschwächen?", r:"Basische Bestandteile neutralisieren einen Teil der Salzsäure im Magen",
+  f:["Es verwandelt Magensäure in Zucker","Es entfernt sämtliches Wasser aus dem Magen","Es erhöht die Säurekonzentration"],
+  h:"Bei einer Neutralisation reagieren Säure und Base miteinander."},
+ {t:"Warum verändert Rotkohlsaft seine Farbe in sauren oder basischen Lösungen?", r:"Seine Farbstoffe ändern abhängig vom pH-Wert ihre Struktur und damit ihre Farbe",
+  f:["Der Rotkohl wird dabei radioaktiv","Die Lösung ändert nur ihre Temperatur","Der Farbstoff verdampft vollständig"],
+  h:"Rotkohlsaft kann deshalb als Säure-Base-Indikator dienen."},
+ {t:"Warum ist Edelstahl oft rostbeständiger als gewöhnlicher Stahl?", r:"Chrom bildet an der Oberfläche eine dünne, schützende Oxidschicht",
+  f:["Edelstahl enthält überhaupt kein Eisen","Edelstahl stößt Wasser durch Magnetismus ab","Chrom entfernt jeden Sauerstoff aus der Luft"],
+  h:"Diese schützende Passivschicht kann sich nach kleinen Beschädigungen erneut bilden."},
+ {t:"Warum schäumt Wasserstoffperoxid manchmal auf einer Wunde?", r:"Das Enzym Katalase beschleunigt den Zerfall zu Wasser und Sauerstoff",
+  f:["Es entsteht Chlor","Blut beginnt zu kochen","Wasserstoffperoxid verwandelt sich in Kochsalz"],
+  h:"Die sichtbaren Bläschen bestehen überwiegend aus Sauerstoff."}
+],
+k9: [
+ {t:"Wozu werden künstlich hergestellte radioaktive Isotope genutzt?", r:"Zum Beispiel als Tracer sowie für medizinische Diagnose und Therapie",
+  f:["Nur zur Herstellung von Feuerwerkskörpern","Damit Metalle dauerhaft leichter werden","Ausschließlich zum Färben von Kunststoffen"],
+  h:"Radioisotope können in sehr kleinen Mengen verfolgt oder gezielt zur Bestrahlung eingesetzt werden."},
+ {t:"Warum verwendet man in iodiertem Speisesalz häufig Iodat statt elementarem Iod?", r:"Iodat ist im Salz vergleichsweise stabil und liefert dem Körper Iod",
+  f:["Iodat schmeckt süß und ersetzt Zucker","Iodat verhindert jede Feuchtigkeitsaufnahme","Elementares Iod wäre ein notwendiger Geschmacksverstärker"],
+  h:"Elementares Iod ist flüchtiger und reaktionsfreudiger; Iodat lässt sich besser dosiert zusetzen."},
+ {t:"Was geschieht in einer Batterie beim Entladen?", r:"Eine Redoxreaktion wandelt chemische Energie in elektrische Energie um",
+  f:["Elektrische Energie wird ohne Stoffumwandlung erzeugt","Die Batterie erzeugt Materie aus dem Nichts","Nur die Temperatur wird in Licht umgewandelt"],
+  h:"Elektronen fließen durch den äußeren Stromkreis von einer Elektrode zur anderen."},
+ {t:"Welche Aufgabe hat ein Katalysator im Autoabgas-System?", r:"Er beschleunigt Reaktionen, die schädliche Abgasbestandteile in weniger schädliche Stoffe umwandeln",
+  f:["Er filtert ausschließlich Staub mit einem Sieb","Er erhöht den Kraftstoffverbrauch absichtlich","Er kühlt das Abgas auf den absoluten Nullpunkt"],
+  h:"Unter anderem werden Kohlenstoffmonoxid und unverbrannte Kohlenwasserstoffe oxidiert."},
+ {t:"Warum füllt man manche Lebensmittelverpackungen mit Stickstoff?", r:"Stickstoff ist reaktionsträge und vermindert Oxidation; außerdem schützt das Gaspolster den Inhalt",
+  f:["Stickstoff macht Lebensmittel radioaktiv","Er lässt Fette schneller ranzig werden","Er ersetzt alle Konservierungsverfahren vollständig"],
+  h:"Die Verpackung enthält deshalb nicht nur ‚Luft‘, sondern oft eine Schutzatmosphäre."},
+ {t:"Wie schützt eine Zinkschicht Eisen vor Rost?", r:"Zink bildet eine Schutzschicht und kann als unedleres Metall bevorzugt oxidiert werden",
+  f:["Zink zieht sämtliches Wasser dauerhaft an","Zink verhindert, dass Eisen Atome besitzt","Zink verwandelt Rost zurück in reines Eisen"],
+  h:"Dieser Schutz wird unter anderem beim Verzinken genutzt."},
+ {t:"Warum wird Schwimmbadwasser chloriert?", r:"Chlorhaltige Wirkstoffe oxidieren Bestandteile von Mikroorganismen und inaktivieren sie",
+  f:["Chlor macht das Wasser dichter","Chlor entfernt alle gelösten Salze","Chlor erhöht nur die Wassertemperatur"],
+  h:"Die Konzentration muss kontrolliert werden, damit die Desinfektion wirksam und sicher bleibt."},
+ {t:"Warum ist Kohlenstoffmonoxid besonders gefährlich?", r:"Es ist farb- und geruchlos und bindet stark an Hämoglobin, wodurch der Sauerstofftransport gestört wird",
+  f:["Es ist nur wegen seiner roten Farbe gefährlich","Es verwandelt sich im Körper sofort in festes Eisen","Es greift ausschließlich Glas an"],
+  h:"Darum können CO-Melder in Räumen mit Feuerstätten lebensrettend sein."},
+ {t:"Warum läuft Silber mit der Zeit dunkel an?", r:"Silber reagiert mit schwefelhaltigen Stoffen aus der Umgebung zu dunklem Silbersulfid",
+  f:["Silber verwandelt sich in Kohlenstoff","Es nimmt ausschließlich Wasser auf","Die Oberfläche wird durch Licht zu Kunststoff"],
+  h:"Schon geringe Mengen schwefelhaltiger Gase können die Schicht bilden."},
+ {t:"Warum bildet Kupfer im Freien oft eine grüne Patina?", r:"Kupfer reagiert langsam mit Sauerstoff, Wasser und Kohlenstoffdioxid zu einer schützenden Oberflächenschicht",
+  f:["Kupfer nimmt grünen Farbstoff aus Pflanzen auf","Kupfer schmilzt bei Regen","Die grüne Farbe entsteht nur durch Staub"],
+  h:"Die Patina kann das darunterliegende Metall vor weiterer Korrosion schützen."},
+ {t:"Wie arbeitet ein Wasserenthärter mit Ionenaustauscher?", r:"Er tauscht Calcium- und Magnesium-Ionen gegen andere Ionen, häufig Natrium-Ionen, aus",
+  f:["Er kocht das Wasser dauerhaft","Er entfernt alle Wassermoleküle","Er zerlegt Calciumkerne in kleinere Atome"],
+  h:"So entstehen weniger Kalkablagerungen."},
+ {t:"Warum beschleunigt Wärme viele chemische Reaktionen?", r:"Teilchen bewegen sich schneller und stoßen häufiger sowie energiereicher zusammen",
+  f:["Wärme erhöht die Zahl der Atome in jedem Stoff","Wärme macht alle Reaktionen automatisch explosiv","Wärme senkt bei jeder Reaktion die Teilchenbewegung"],
+  h:"Mehr Teilchen können dadurch die Aktivierungsenergie überwinden."}
+],
+ober: [
+ {t:"Warum wird Technetium-99m häufig in der medizinischen Diagnostik verwendet?", r:"Es sendet gut messbare Gammastrahlung aus und besitzt eine relativ kurze Halbwertszeit",
+  f:["Es ist vollkommen stabil und strahlt nicht","Es bleibt für Jahrtausende unverändert im Körper","Es erzeugt ausschließlich sichtbares Licht"],
+  h:"Eine kurze Halbwertszeit begrenzt die Strahlenbelastung, während die Strahlung detektiert werden kann."},
+ {t:"Was ist der chemische Zweck eines Tracers?", r:"Ein markierter Stoff ermöglicht es, Wege und Stoffumsetzungen in sehr kleinen Mengen zu verfolgen",
+  f:["Er erhöht die Masse jedes untersuchten Stoffes","Er verhindert jede chemische Reaktion","Er ersetzt Messgeräte durch eine Farbänderung"],
+  h:"Tracer können stabil oder radioaktiv markiert sein."},
+ {t:"Warum können Enzyme schon in kleinen Mengen wirksam sein?", r:"Sie wirken als Katalysatoren und werden bei der Reaktion nicht dauerhaft verbraucht",
+  f:["Sie liefern unbegrenzt Energie aus dem Nichts","Sie erhöhen die Masse der Produkte","Sie ändern die Gleichgewichtslage jeder Reaktion vollständig"],
+  h:"Enzyme senken die Aktivierungsenergie bestimmter Reaktionen."},
+ {t:"Warum werden manche Arzneistoffe als Salz formuliert?", r:"Die Salzform kann Löslichkeit, Stabilität oder Aufnahme des Wirkstoffs verbessern",
+  f:["Salze machen jeden Wirkstoff automatisch ungiftig","Damit das Arzneimittel salzig schmeckt","Salze verhindern grundsätzlich jede Auflösung"],
+  h:"Welche Salzform geeignet ist, hängt von den Eigenschaften des Wirkstoffs ab."},
+ {t:"Warum schützt eine Opferanode aus Magnesium einen Warmwasserspeicher aus Stahl?", r:"Das unedlere Magnesium wird bevorzugt oxidiert und schützt dadurch den Stahl",
+  f:["Magnesium bindet sämtlichen Sauerstoff im Wasser dauerhaft","Magnesium macht Stahl zu Edelstahl","Magnesium senkt nur die Wassertemperatur"],
+  h:"Die Opferanode wird dabei langsam verbraucht und muss gelegentlich ersetzt werden."}
+]
+};
+
+// ---------------------------------------------------------------
+// Alltagschemie-Zusatzfragen
+// Die Zusatzfragen beziehen sich nur noch auf Anwendungen, Körper,
+// Ernährung, Haushalt, Umwelt, Technik oder medizinische Diagnostik.
+// Fachliche Orientierung: NIH/NIDDK, NIH-ODS, IAEA, ACR/RSNA und RSC.
+// s = passende Elementsymbole; n = Niveau 1 bis 3
+// ---------------------------------------------------------------
+const ALLTAG_ZUSATZFRAGEN = [
+  {s:["W"], n:1,
+   t:"Wofür werden Wolfram und besonders Wolframcarbid häufig verwendet?",
+   r:"Für sehr harte Schneid-, Bohr- und Fräswerkzeuge",
+   f:["Als leichtes Füllgas in Luftballons","Als Süßstoff in Getränken","Zum Enthärten von Wasser"],
+   h:"Wolframcarbid ist sehr hart und verschleißfest; Wolfram hält außerdem sehr hohe Temperaturen aus."},
+  {s:["W"], n:2,
+   t:"Warum eignet sich Wolfram für Glühdrähte und stark erhitzte Bauteile?",
+   r:"Weil es einen extrem hohen Schmelzpunkt besitzt",
+   f:["Weil es bei Raumtemperatur gasförmig ist","Weil es sich sofort in Wasser löst","Weil es besonders leicht ist"],
+   h:"Wolfram hat den höchsten Schmelzpunkt aller Metalle."},
+
+  {s:["Gd"], n:2,
+   t:"Wozu werden Gadoliniumverbindungen bei manchen MRT-Untersuchungen eingesetzt?",
+   r:"Als Kontrastmittel, damit Gewebe und Blutgefäße deutlicher unterscheidbar werden",
+   f:["Als Röntgenquelle im Gerät","Zur Betäubung während der Untersuchung","Um Knochen dauerhaft zu härten"],
+   h:"Gebundenes Gadolinium beeinflusst die magnetischen Eigenschaften der Wasserstoffkerne in seiner Umgebung und verändert dadurch den Bildkontrast."},
+  {s:["Ba"], n:1,
+   t:"Warum wird bei manchen Röntgenuntersuchungen des Verdauungstrakts Bariumsulfat verwendet?",
+   r:"Es hält Röntgenstrahlung stark zurück und macht den Verdauungstrakt sichtbar",
+   f:["Es erzeugt im Körper selbst Röntgenstrahlen","Es färbt Knochen dauerhaft blau","Es löst alle Speisereste auf"],
+   h:"Das schwer lösliche Bariumsulfat dient als Röntgenkontrastmittel und wird normalerweise nicht nennenswert vom Körper aufgenommen."},
+
+  {s:["F"], n:1,
+   t:"Warum sind Fluoridverbindungen in vielen Zahnpasten enthalten?",
+   r:"Sie fördern die Remineralisierung und machen den Zahnschmelz widerstandsfähiger gegen Säuren",
+   f:["Sie bleichen die Zähne durch starke Oxidation","Sie lösen Zahnbelag vollständig auf","Sie ersetzen das Zähneputzen"],
+   h:"Gemeint sind Fluoride, nicht elementares Fluor. Fluoride helfen, beginnende Säureschäden am Zahnschmelz zu reparieren."},
+  {s:["I"], n:1,
+   t:"Welchen Zweck erfüllt Iodat in jodiertem Speisesalz?",
+   r:"Es beugt Jodmangel vor, damit die Schilddrüse Hormone bilden kann",
+   f:["Es macht Salz dauerhaft keimfrei","Es ersetzt Natriumchlorid vollständig","Es verhindert, dass Salz Wasser aufnimmt"],
+   h:"Jod wird für die Bildung der Schilddrüsenhormone benötigt."},
+
+  {s:["Ti","Zn"], n:1,
+   t:"Wie vermindern UV-Filter wie Titandioxid oder Zinkoxid in Sonnencreme die UV-Belastung der Haut?",
+   r:"Sie absorbieren einen großen Teil der UV-Strahlung und streuen oder reflektieren einen Teil",
+   f:["Sie wandeln die Haut in einen elektrischen Leiter um","Sie kühlen die Sonne außerhalb der Haut ab","Sie erzeugen eine sichtbare Lichtschicht über dem Körper"],
+   h:"Moderne mineralische UV-Filter schützen vor allem durch Absorption; Streuung und Reflexion tragen ebenfalls bei."},
+  {s:["C"], n:1,
+   t:"Warum kann Aktivkohle Gerüche und manche Schadstoffe aus Luft oder Wasser entfernen?",
+   r:"Ihre sehr große Oberfläche bindet viele Stoffteilchen durch Adsorption",
+   f:["Sie verbrennt alle Stoffe ohne Sauerstoff","Sie verwandelt Schadstoffe in reinen Sauerstoff","Sie erhöht nur die Temperatur des Wassers"],
+   h:"Adsorption bedeutet: Teilchen lagern sich an der Oberfläche an."},
+
+  {s:["Fe"], n:1,
+   t:"Wozu benötigt der menschliche Körper Eisen?",
+   r:"Vor allem zur Bildung von Hämoglobin für den Sauerstofftransport im Blut",
+   f:["Zur Herstellung von Magensäure","Als Hauptbaustoff der Knochen","Zur Bildung von Vitamin C"],
+   h:"Eisen ist außerdem Bestandteil von Myoglobin und vielen Enzymen."},
+  {s:["Co"], n:2,
+   t:"In welchem wichtigen Vitamin befindet sich ein Cobalt-Ion?",
+   r:"Vitamin B12",
+   f:["Vitamin C","Vitamin D","Vitamin K"],
+   h:"Vitamin B12 enthält Cobalt im Zentrum seiner komplexen Molekülstruktur."},
+  {s:["Ca","P"], n:1,
+   t:"Welche gemeinsame Aufgabe haben Calcium- und Phosphatverbindungen im Körper?",
+   r:"Sie sind wichtige Baustoffe für Knochen und Zähne",
+   f:["Sie transportieren den gesamten Sauerstoff","Sie bilden die Magensäure","Sie ersetzen alle Eiweiße"],
+   h:"Der mineralische Hauptbestandteil von Knochen und Zähnen ähnelt Hydroxylapatit, einem Calciumphosphat."},
+  {s:["Na","K","Cl"], n:1,
+   t:"Warum benötigt der Körper Natrium-, Kalium- und Chlorid-Ionen?",
+   r:"Für Wasserhaushalt, Nervenleitung und Muskelfunktion",
+   f:["Damit Blut magnetisch wird","Damit der Körper UV-Strahlung erzeugt","Zur Bildung von Zahnschmelz allein"],
+   h:"Diese Ionen gehören zu den Elektrolyten des Körpers."},
+  {s:["Mg"], n:2,
+   t:"Welche Aufgabe haben Magnesium-Ionen im Körper?",
+   r:"Sie unterstützen zahlreiche Enzyme und sind wichtig für Muskel- und Nervenfunktionen",
+   f:["Sie ersetzen Sauerstoff im Blut","Sie bilden ausschließlich Fettreserven","Sie machen alle Körperflüssigkeiten sauer"],
+   h:"Viele Reaktionen mit ATP funktionieren nur richtig, wenn Magnesium beteiligt ist."},
+  {s:["Zn"], n:2,
+   t:"Warum ist Zink für den Körper wichtig?",
+   r:"Es ist Bestandteil oder Helfer vieler Enzyme und unterstützt unter anderem Wundheilung und Immunsystem",
+   f:["Es dient als Hauptenergieträger wie Zucker","Es ersetzt Calcium in allen Knochen","Es transportiert ausschließlich Kohlenstoffdioxid"],
+   h:"Zink ist ein Spurenelement und wird nur in kleinen Mengen benötigt."},
+  {s:["Se"], n:2,
+   t:"Welche Rolle spielt Selen im Körper?",
+   r:"Es ist Bestandteil von Enzymen, die unter anderem vor schädlicher Oxidation schützen",
+   f:["Es bildet den Hauptbestandteil des Blutes","Es ersetzt alle Vitamine","Es dient als Speicher für Stickstoffgas"],
+   h:"Selen ist ein Spurenelement; sowohl Mangel als auch zu hohe Zufuhr können problematisch sein."},
+
+  {s:["Li"], n:1,
+   t:"Warum wird Lithium in vielen Akkus von Handys und Elektrofahrzeugen verwendet?",
+   r:"Lithium-Ionen können in leichten Zellen viel elektrische Energie speichern und wieder abgeben",
+   f:["Lithium leuchtet ohne Strom dauerhaft","Lithium ist ein nichtleitendes Edelgas","Lithium verhindert jede Erwärmung eines Akkus"],
+   h:"Beim Laden und Entladen wandern Lithium-Ionen zwischen den Elektroden."},
+  {s:["Ni","Co","Mn","Li"], n:2,
+   t:"Welche Aufgabe haben Nickel-, Cobalt- oder Manganverbindungen in vielen Lithium-Ionen-Akkus?",
+   r:"Sie bilden aktive Bestandteile der Elektroden und ermöglichen die reversible Speicherung von Ladung",
+   f:["Sie dienen nur als äußere Farbe des Akkus","Sie kühlen den Akku durch Verdampfen","Sie ersetzen den elektrischen Strom"],
+   h:"Die genaue Zusammensetzung hängt vom Akkutyp ab."},
+  {s:["Cu"], n:1,
+   t:"Warum wird Kupfer häufig für Stromkabel verwendet?",
+   r:"Es leitet elektrischen Strom sehr gut und lässt sich gut zu Drähten formen",
+   f:["Es ist vollkommen durchsichtig","Es ist leichter als jedes andere Metall","Es isoliert besonders gut gegen Strom"],
+   h:"Kupfer verbindet hohe Leitfähigkeit mit guter Verformbarkeit."},
+  {s:["Al"], n:1,
+   t:"Warum korrodieren Aluminiumdosen nicht so schnell weiter, obwohl Aluminium reaktionsfreudig ist?",
+   r:"Eine dünne, dichte Oxidschicht schützt das Metall darunter",
+   f:["Aluminium reagiert grundsätzlich nie mit Sauerstoff","Die Dose enthält innen keinen Sauerstoff","Aluminium wird durch Wasser zu Edelstahl"],
+   h:"Diese Schutzwirkung nennt man Passivierung."},
+  {s:["Cr","Ni","Fe"], n:2,
+   t:"Warum rostet Edelstahl meist deutlich langsamer als gewöhnlicher Stahl?",
+   r:"Chrom bildet eine dünne, schützende Oxidschicht; Nickel kann die Eigenschaften zusätzlich verbessern",
+   f:["Edelstahl enthält überhaupt kein Eisen","Edelstahl stößt Wasser durch Magnetismus ab","Nickel verwandelt Rost zurück in Sauerstoff"],
+   h:"Die Passivschicht kann sich nach kleinen Beschädigungen in Gegenwart von Sauerstoff neu bilden."},
+  {s:["Zn","Fe"], n:1,
+   t:"Wie schützt eine Zinkschicht Stahl vor Rost?",
+   r:"Sie trennt den Stahl von Wasser und Sauerstoff; bei Kratzern wird Zink bevorzugt oxidiert",
+   f:["Zink macht das Eisen zu einem Edelgas","Zink entfernt alle Elektronen aus dem Stahl","Zink hält den Stahl nur durch Kühlung trocken"],
+   h:"Zink kann als Opfermetall wirken."},
+  {s:["Sn","Fe"], n:1,
+   t:"Wozu dient eine Zinnschicht bei Konservendosen aus Stahl?",
+   r:"Sie schützt den Stahl und das Lebensmittel vor direktem Kontakt miteinander",
+   f:["Sie macht den Inhalt radioaktiv haltbar","Sie erzeugt im Inneren Kälte","Sie verwandelt Stahl in Kunststoff"],
+   h:"Beschädigte Beschichtungen können die Korrosion jedoch begünstigen."},
+
+  {s:["Si"], n:1,
+   t:"Warum ist Silicium für Computerchips so wichtig?",
+   r:"Seine elektrische Leitfähigkeit lässt sich gezielt verändern, sodass Halbleiterbauteile entstehen",
+   f:["Es ist ein besonders gutes Füllgas","Es erzeugt Strom ohne Energiequelle","Es ist bei Raumtemperatur flüssig"],
+   h:"Durch Dotierung mit kleinen Mengen anderer Elemente entstehen Bereiche mit unterschiedlichen elektrischen Eigenschaften."},
+  {s:["B","Si"], n:1,
+   t:"Warum ist Borosilikatglas für hitzebeständige Gefäße geeignet?",
+   r:"Es dehnt sich bei Temperaturänderungen vergleichsweise wenig aus",
+   f:["Es besteht vollständig aus Metall","Es schmilzt bereits bei Körpertemperatur","Es leitet Wärme überhaupt nicht"],
+   h:"Dadurch entstehen bei schnellem Erwärmen oder Abkühlen geringere Spannungen im Glas."},
+  {s:["Ga"], n:2,
+   t:"Wofür werden Galliumverbindungen wie Galliumnitrid häufig eingesetzt?",
+   r:"Für LEDs, Laser und leistungsfähige elektronische Bauteile",
+   f:["Als Speisesalz-Ersatz","Zum Entkalken von Kaffeemaschinen","Als Füllstoff in Zahnpasta"],
+   h:"Galliumnitrid ist ein Halbleitermaterial."},
+  {s:["In","Sn"], n:2,
+   t:"Warum befindet sich Indiumzinnoxid in vielen Touchscreens und Displays?",
+   r:"Es ist elektrisch leitfähig und gleichzeitig weitgehend durchsichtig",
+   f:["Es erzeugt die Bildpunkte durch Verbrennung","Es ist ein unsichtbares Gas","Es verhindert jede Berührung des Displays"],
+   h:"Diese Kombination ist für transparente Elektroden besonders nützlich."},
+  {s:["Nd","Fe","B"], n:2,
+   t:"Warum werden Neodym-Eisen-Bor-Verbindungen für starke Dauermagnete verwendet?",
+   r:"Sie können sehr starke und dauerhafte Magnetfelder erzeugen",
+   f:["Sie sind besonders gute elektrische Isolatoren","Sie lösen sich sofort in Luft auf","Sie erzeugen Magnetfelder nur bei ständiger Erwärmung"],
+   h:"Solche Magnete stecken beispielsweise in Lautsprechern, Motoren und Festplatten."},
+
+  {s:["Pt","Pd","Rh"], n:2,
+   t:"Welche Aufgabe haben Platin, Palladium oder Rhodium im Auto-Katalysator?",
+   r:"Sie beschleunigen die Umwandlung schädlicher Abgase in weniger schädliche Stoffe",
+   f:["Sie erhöhen den Bleigehalt des Kraftstoffs","Sie speichern den gesamten Auspuffrauch","Sie erzeugen zusätzlichen Sauerstoff aus dem Nichts"],
+   h:"Katalysatoren werden bei der Reaktion nicht dauerhaft verbraucht, können aber altern oder vergiftet werden."},
+  {s:["Ag"], n:1,
+   t:"Warum werden Silberverbindungen manchmal in Wundauflagen oder Beschichtungen eingesetzt?",
+   r:"Silber-Ionen können das Wachstum vieler Mikroorganismen hemmen",
+   f:["Silber liefert dem Körper Sauerstoff","Silber wirkt als Vitamin","Silber löst jede Art von Schmutz"],
+   h:"Antimikrobielle Wirkung bedeutet nicht, dass Silberprodukte für jede Anwendung geeignet sind."},
+  {s:["I"], n:2,
+   t:"Warum werden manche Iodverbindungen zur Desinfektion verwendet?",
+   r:"Sie können wichtige Bestandteile von Mikroorganismen chemisch verändern und diese dadurch inaktivieren",
+   f:["Sie entziehen der Luft sämtlichen Stickstoff","Sie wirken nur durch ihre braune Farbe","Sie machen Wasser grundsätzlich basisch"],
+   h:"Iodhaltige Desinfektionsmittel werden gezielt und in geeigneter Konzentration eingesetzt."},
+
+  {s:["He"], n:2,
+   t:"Wofür wird flüssiges Helium in manchen MRT-Geräten benötigt?",
+   r:"Zur starken Kühlung der supraleitenden Magnetspulen",
+   f:["Als Röntgenkontrastmittel im Körper","Zum Färben der MRT-Bilder","Zum Erzeugen ionisierender Strahlung"],
+   h:"Bei sehr niedrigen Temperaturen können bestimmte Spulen nahezu widerstandslos Strom leiten."},
+  {s:["Ne"], n:1,
+   t:"Warum leuchtet Neon in Leuchtröhren charakteristisch rot-orange?",
+   r:"Angeregte Neonatome geben beim Zurückfallen Licht bestimmter Wellenlängen ab",
+   f:["Neon verbrennt mit roter Flamme","Neon enthält rote Farbstoffteilchen","Neon reflektiert nur das Sonnenlicht"],
+   h:"Andere Gasfüllungen oder Leuchtstoffe erzeugen andere Farben."},
+  {s:["Ar"], n:1,
+   t:"Warum wird Argon beim Schweißen als Schutzgas verwendet?",
+   r:"Es reagiert kaum und hält Luftsauerstoff vom heißen Metall fern",
+   f:["Es verbrennt das Metall besonders schnell","Es ist ein starkes Säuregas","Es ersetzt den elektrischen Lichtbogen"],
+   h:"Argon gehört zu den Edelgasen."},
+  {s:["N"], n:1,
+   t:"Warum werden manche Lebensmittelverpackungen mit Stickstoff gefüllt?",
+   r:"Stickstoff verdrängt Sauerstoff und kann Oxidation sowie Qualitätsverlust verlangsamen",
+   f:["Stickstoff sterilisiert jedes Lebensmittel vollständig","Stickstoff macht Lebensmittel automatisch süß","Stickstoff erhöht die Temperatur der Packung"],
+   h:"Die Schutzatmosphäre ersetzt keine Kühlung und keine Hygiene."},
+  {s:["CO2","C","O"], n:1,
+   t:"Warum prickeln Getränke mit gelöstem Kohlenstoffdioxid?",
+   r:"Beim Öffnen sinkt der Druck, sodass Kohlenstoffdioxid als Gasbläschen entweicht",
+   f:["Wasser zerfällt dabei in Wasserstoff und Sauerstoff","Zucker verwandelt sich in Luft","Die Flasche erzeugt neue Atome"],
+   h:"Unter höherem Druck löst sich mehr Kohlenstoffdioxid im Getränk."},
+
+  {s:["Pb"], n:1,
+   t:"Warum kann Blei Röntgenstrahlung gut abschirmen?",
+   r:"Wegen seiner hohen Dichte und hohen Ordnungszahl schwächt es Röntgenstrahlung stark",
+   f:["Weil Blei Röntgenstrahlung in Schall verwandelt","Weil Blei vollkommen durchsichtig ist","Weil Blei selbst keine Elektronen besitzt"],
+   h:"Blei ist giftig und wird deshalb nur abgeschirmt und kontrolliert eingesetzt."},
+  {s:["Tc"], n:2,
+   t:"Wozu wird das künstliche Isotop Technetium-99m in der Medizin verwendet?",
+   r:"Als kurzlebiger radioaktiver Marker für diagnostische Aufnahmen von Organen",
+   f:["Als dauerhaftes Knochenmaterial","Zum Kühlen von MRT-Magneten","Als Zahnpasta-Zusatz"],
+   h:"Die ausgesandte Gammastrahlung kann außerhalb des Körpers gemessen werden."},
+  {s:["Co"], n:2,
+   t:"Wofür kann das künstlich erzeugte Isotop Cobalt-60 eingesetzt werden?",
+   r:"Unter anderem für Strahlentherapie und zur Bestrahlung beziehungsweise Sterilisation von Materialien",
+   f:["Als gewöhnliches Speisesalz","Als Füllgas für Luftballons","Zum Härten von Zahnschmelz"],
+   h:"Cobalt-60 sendet energiereiche Gammastrahlung aus."},
+  {s:["Am"], n:2,
+   t:"Wozu wurde Americium-241 besonders in Ionisationsrauchmeldern verwendet?",
+   r:"Seine Strahlung ionisiert Luft; Rauch verändert den kleinen Messstrom und löst Alarm aus",
+   f:["Es erzeugt den Alarmton direkt","Es färbt Rauch sichtbar rot","Es kühlt den Sensor unter null Grad"],
+   h:"Der radioaktive Stoff ist in einer sehr kleinen, gekapselten Quelle enthalten."},
+  {s:["U"], n:2,
+   t:"Warum kann Uran in Kernkraftwerken als Brennstoff dienen?",
+   r:"Bei der Spaltung bestimmter Uranisotope wird viel Energie frei",
+   f:["Uran verbrennt dort wie Kohle mit Sauerstoff","Uran erzeugt Energie durch Auflösen in Wasser","Uran ist ein besonders starker Dauermagnet"],
+   h:"Vor allem Uran-235 kann durch Neutronen gespalten werden."},
+  {s:["Rn"], n:2,
+   t:"Warum ist Radon in Gebäuden gesundheitlich problematisch?",
+   r:"Es ist ein radioaktives Gas; seine Zerfallsprodukte können beim Einatmen die Lunge bestrahlen",
+   f:["Es verdrängt immer sofort sämtlichen Sauerstoff","Es ist stark ätzend wie Salzsäure","Es verwandelt Wasser in Wasserstoff"],
+   h:"Lüften und bauliche Maßnahmen können die Radonkonzentration senken."},
+
+  {s:null, n:1,
+   t:"Welche Aufgabe haben Enzyme im Körper?",
+   r:"Sie beschleunigen gezielt chemische Reaktionen, ohne dabei dauerhaft verbraucht zu werden",
+   f:["Sie speichern alle Erbinformationen","Sie ersetzen Wasser in den Zellen","Sie sind ausschließlich Baustoffe der Knochen"],
+   h:"Enzyme wirken als biologische Katalysatoren."},
+  {s:null, n:1,
+   t:"Welche Aufgabe haben Verdauungsenzyme?",
+   r:"Sie zerlegen große Nährstoffmoleküle in kleinere, aufnehmbare Bestandteile",
+   f:["Sie verwandeln Nahrung direkt in Sauerstoff","Sie bilden ausschließlich Magensäure","Sie transportieren Blut durch den Körper"],
+   h:"Zum Beispiel spalten Amylasen Stärke, Proteasen Eiweiße und Lipasen Fette."},
+  {s:null, n:2,
+   t:"Welchen Zweck erfüllen Omega-3-Fettsäuren im Körper?",
+   r:"Sie sind Bausteine von Zellmembranen, liefern Energie und dienen als Ausgangsstoffe für Signalstoffe",
+   f:["Sie ersetzen alle Vitamine","Sie bilden ausschließlich Knochen","Sie machen Blut grundsätzlich gerinnungsunfähig"],
+   h:"Zu den bekannten Omega-3-Fettsäuren gehören ALA, EPA und DHA."},
+  {s:null, n:1,
+   t:"Warum geht Brotteig mit Hefe auf?",
+   r:"Hefezellen bilden bei der Gärung Kohlenstoffdioxid, das Gasblasen im Teig erzeugt",
+   f:["Hefe bildet festen Sauerstoff","Mehl verdampft im Teig","Salz zerfällt zu Wasserstoff"],
+   h:"Ein Teil des gebildeten Ethanols verdampft beim Backen."},
+  {s:null, n:1,
+   t:"Warum entfernt Essig Kalkablagerungen?",
+   r:"Die Säure reagiert mit Calciumcarbonat; dabei entstehen lösliche Stoffe und Kohlenstoffdioxid",
+   f:["Essig schmilzt Kalk nur durch Wärme","Essig macht Kalk magnetisch","Essig verwandelt Kalk in Kunststoff"],
+   h:"Bei Marmor oder anderen kalkhaltigen Oberflächen würde Säure ebenfalls angreifen."},
+  {s:null, n:1,
+   t:"Wie helfen Tenside in Seife oder Spülmittel beim Entfernen von Fett?",
+   r:"Ein Molekülteil bindet an Fett, der andere an Wasser; dadurch kann Fett verteilt und abgespült werden",
+   f:["Tenside verbrennen Fett ohne Wärme","Tenside verwandeln Wasser in Alkohol","Tenside machen Fett schwerer als Metall"],
+   h:"In Wasser können sich Micellen bilden, die Fetttröpfchen einschließen."},
+  {s:null, n:1,
+   t:"Warum lässt Backpulver einen Kuchen locker werden?",
+   r:"Es bildet Kohlenstoffdioxid, das sich als Gasblasen im Teig ausdehnt",
+   f:["Es bildet Metallblasen","Es entzieht dem Teig alle Flüssigkeit","Es verwandelt Zucker in Helium"],
+   h:"Meist reagieren Hydrogencarbonat und eine Säurekomponente miteinander."},
+  {s:null, n:2,
+   t:"Warum beschleunigt warmes Wasser viele Reinigungsprozesse?",
+   r:"Teilchen bewegen sich schneller; Fette werden weicher und Reaktionen sowie Lösungsvorgänge laufen oft schneller",
+   f:["Warmes Wasser enthält keine Moleküle mehr","Wärme verwandelt jedes Reinigungsmittel in Säure","Schmutz wird durch Wärme magnetisch"],
+   h:"Zu hohe Temperaturen können Materialien oder Enzyme in Waschmitteln schädigen."},
+  {s:null, n:2,
+   t:"Warum sind Enzyme in manchen Waschmitteln enthalten?",
+   r:"Sie spalten Fleckenbestandteile wie Eiweiße, Fette oder Stärke in leichter lösliche Stücke",
+   f:["Sie färben alle Textilien weiß","Sie erzeugen Chlor aus Wasser","Sie verhindern jede Schaumbildung"],
+   h:"Proteasen, Lipasen und Amylasen wirken jeweils auf unterschiedliche Stoffklassen."},
+  {s:null, n:1,
+   t:"Warum rostet Eisen in salzhaltigem Wasser meist schneller?",
+   r:"Gelöste Ionen erhöhen die elektrische Leitfähigkeit und beschleunigen die elektrochemische Korrosion",
+   f:["Salz entzieht Eisen alle Protonen","Salz verwandelt Eisen direkt in Kupfer","Salz verhindert den Kontakt mit Sauerstoff"],
+   h:"Deshalb sind Fahrzeuge und Brücken in salzreicher Umgebung besonders korrosionsgefährdet."},
+  {s:null, n:2,
+   t:"Wozu werden künstlich erzeugte radioaktive Isotope genutzt?",
+   r:"Für Diagnostik, Therapie, Forschung, Messverfahren und technische Prüfungen",
+   f:["Nur zur Herstellung von Schmuck","Ausschließlich als Brennstoff für Autos","Nur zum Färben von Glas"],
+   h:"Radioisotope können als Strahlenquelle oder als verfolgbare Marker dienen."}
+];
+
+let letzteAlltagsZusatzfrage = "";
+function macheAlltagsZusatzfrage(sym){
+  const niveau = state.niveau || "k9";
+  const maxN = niveau === "k78" ? 1 : niveau === "k9" ? 2 : 3;
+  const passend = ALLTAG_ZUSATZFRAGEN.filter(q =>
+    q.n <= maxN && Array.isArray(q.s) && q.s.includes(sym)
+  );
+  const allgemein = ALLTAG_ZUSATZFRAGEN.filter(q => q.n <= maxN && q.s === null);
+
+  // Ist eine passende Anwendung vorhanden, wird sie bevorzugt.
+  let pool = passend.length ? passend : allgemein;
+  let kandidaten = pool.filter(q => q.t !== letzteAlltagsZusatzfrage);
+  if (!kandidaten.length && passend.length) {
+    kandidaten = allgemein.filter(q => q.t !== letzteAlltagsZusatzfrage);
+  }
+  if (!kandidaten.length) kandidaten = pool.length ? pool : allgemein;
+
+  const q = zufall(kandidaten);
+  letzteAlltagsZusatzfrage = q.t;
+  const optionen = mischen([q.r, ...q.f]);
+  return {
+    text:q.t,
+    optionen,
+    richtig:optionen.indexOf(q.r),
+    hinweis:q.h,
+    alltagschemie:true
+  };
+}
+
+let letzteAlltagsfrage = "";
+function macheAlltagsfrage(){
+  const niveau = state.niveau || "k9";
+  let pool;
+  if (niveau === "k78") pool = ALLTAGSCHEMIE_FRAGEN.k78;
+  else if (niveau === "k9") pool = [...ALLTAGSCHEMIE_FRAGEN.k78, ...ALLTAGSCHEMIE_FRAGEN.k9, ...ALLTAGSCHEMIE_FRAGEN.k9];
+  else pool = [...ALLTAGSCHEMIE_FRAGEN.k78, ...ALLTAGSCHEMIE_FRAGEN.k9, ...ALLTAGSCHEMIE_FRAGEN.ober, ...ALLTAGSCHEMIE_FRAGEN.ober];
+  let kandidaten = pool.filter(q => q.t !== letzteAlltagsfrage);
+  if (!kandidaten.length) kandidaten = pool;
+  const q = zufall(kandidaten);
+  letzteAlltagsfrage = q.t;
+  const optionen = mischen([q.r, ...q.f]);
+  return { text:q.t, optionen, richtig:optionen.indexOf(q.r), hinweis:q.h };
+}
+
 function macheReaktionsfrage(){
   const niveau = state.niveau || "k9";
   let pool;
@@ -629,7 +1521,50 @@ function macheReaktionsfrage(){
   const optionen = mischen([q.r, ...q.f]);
   return { text: q.t, optionen, richtig: optionen.indexOf(q.r), hinweis: q.h };
 }
-function klangGefunden(){ if(!state.klangAn) return; ton(659,0,.12); ton(880,.1,.18); }
+// ---------------- Konfetti fuer den Siegbildschirm ----------------
+let konfettiRAF = null;
+function startKonfetti(){
+  try {
+    if (typeof requestAnimationFrame === "undefined" || !document.body || !document.body.appendChild) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    stopKonfetti();
+    const c = document.createElement("canvas");
+    c.id = "konfetti";
+    c.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:45";
+    document.body.appendChild(c);
+    const ctx = c.getContext("2d");
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    const farben = CHEMIKER.map(ch=>ch.farbe).concat(["#E8B84B","#D96A4E","#4E9AD9"]);
+    const teile = Array.from({length:140}, ()=>({
+      x: Math.random()*c.width, y: -20 - Math.random()*c.height,
+      w: 6+Math.random()*7, h: 4+Math.random()*5,
+      vy: 1.4+Math.random()*2.4, vx: (Math.random()-0.5)*1.4,
+      rot: Math.random()*Math.PI, vr: (Math.random()-0.5)*0.16,
+      farbe: farben[Math.floor(Math.random()*farben.length)],
+    }));
+    const start = Date.now();
+    (function tick(){
+      ctx.clearRect(0,0,c.width,c.height);
+      for (const t of teile){
+        t.y += t.vy; t.x += t.vx + Math.sin(t.y*0.02)*0.6; t.rot += t.vr;
+        if (t.y > c.height + 20){ t.y = -20; t.x = Math.random()*c.width; }
+        ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.rot);
+        ctx.fillStyle = t.farbe; ctx.fillRect(-t.w/2, -t.h/2, t.w, t.h);
+        ctx.restore();
+      }
+      if (Date.now() - start < 12000 && state.phase === "won")
+        konfettiRAF = requestAnimationFrame(tick);
+      else stopKonfetti();
+    })();
+  } catch(e){ /* Feiern ohne Konfetti geht auch */ }
+}
+function stopKonfetti(){
+  try {
+    if (konfettiRAF){ cancelAnimationFrame(konfettiRAF); konfettiRAF = null; }
+    const alt = document.getElementById("konfetti");
+    if (alt && alt.remove) alt.remove();
+  } catch(e){}
+}
 
 // ---------------- Hintergrundwissen zu jedem Element ----------------
 // Format: "Entdeckung \u00b7 Verwendung"
@@ -863,34 +1798,77 @@ function zeichneSynthese(sym){
 }
 
 // ------------------------------------------------------------------
-// Rundenwoerter fuer den aufsteigenden Modus (mit elemente.py erzeugt
-// und verifiziert: Stufe = minimale Symbolanzahl). Eigene Woerter:
-// entweder hier direkt ergaenzen ODER im Startbildschirm eine
-// Textdatei laden (ein Wort pro Zeile, # = Kommentar).
+// Schulgerecht gefilterte Rundenwortliste.
+// Grundlage: nur die häufigsten Wörter der Gruppen 3–8 aus der
+// Begleitdatei; englische Fremdeinträge, Eigennamen/Fehlformen und
+// klar ungeeignete Erwachseneninhalte wurden entfernt.
 // ------------------------------------------------------------------
+const EINGEBAUTE_WORTZAHL_CSV = 483;
+const EINGEBAUTE_WORTZAHL_GESAMT = 483;
 const RUNDENWOERTER = {
 3: [
-    "Bank","Bahn","Garage","Banane","Kino","Tasche","Blase","Besen","Feuer","Reis",
-    "Salat","Erbse","Birne","Senf","Ofen","Tisch","Hefte","Tinte","Schere","Pause"],
+  "ich","warte","lasse","hier","essen","tagen","von","getan","halte","noch",
+  "gegen","bringe","sich","Sache","Sinn","uns","Kind","stand","auch","frage",
+  "schon","hasse","ihn","seiner","aufs","nach","Augen","Monate","also","sogar",
+  "Tages","gehen","hoffe","Tisch","sehen","oben","ihre","erste","starb","euch",
+  "hoch","Monat","hatte","schau","wach","heute","vier","Chef","nun","beste",
+  "reise","seine","Seite","Lauf","genau","frei","Tasche","lass","alten","steh",
+  "Vater","plan","Liste","sagte","Pass","neben","raus","sechs","Tante","ohne",
+  "Hund","sauer","lange","neues","Karte","geben","euren","Hause","Feuer","bekam",
+  "haus","froh","Bank","freund","rufen"
+],
 4: [
-    "Hausbau","Nashorn","Fisch","Flasche","Bauch","Wasser","Bohne","Kirsche","Nuss","Buch",
-    "Papier","Klasse","Fluss","Teich","Scheune","Huhn","Fuchs","Hirsch","Fische","Krebs",
-    "lustlos","ruflaute"],
+  "nichts","unten","Paris","ihnen","besten","bisher","sicher","falsch","preis","lassen",
+  "wohin","wunder","gesehen","gegeben","links","unsere","bereits","Kirche","besser","nennen",
+  "reich","wieso","laufen","Sonne","ihren","erinnern","singen","unser","suche","Schlaf",
+  "Kinder","Buch","brachte","bringen","krank","Blick","fragen","super","rechts","warten",
+  "kaufen","sauber","Sohn","sagten","Vaters","brauche","Opfer","passen","hatten","Herren",
+  "feiern","halten","klasse","gebeten","seinen","lachen","Schuhe","kopf","falsche","stehen",
+  "Aufgabe","woher","vorher","werfen","gestern","hinten","brauch","schwer","erinnere","gesund",
+  "Wasser","heraus","nachts","Woche","arbeite","rennen","ersten","Kampf","sprach","Freundin",
+  "ihres","sowas","Sachen","Monaten","Flasche","offen","fassen"
+],
 5: [
-    "Hofhund","Nachbar","Kuchen","Koffer","Knochen","Wissen","K\u00fcrbis","Klavier","Kulisse","Bahnhof",
-    "Bergbahn","Gasthaus","Gasthof","Bauhaus","Hofpause","Springen","Suchen","Fl\u00fcstern","Hochbau","Bauschein",
-    "bereisen"],
+  "wissen","aussehen","sprich","brauchen","geboren","steigen","konnte","Kindern","Kuchen","verstehe",
+  "verraten","Wunsch","wusste","Besuch","Koffer","bisschen","wohnen","aufgeben","arbeiten","erhalten",
+  "nachher","suchen","gelassen","scheinen","unserer","verstand","neulich","schlafen","worauf","weshalb",
+  "unseren","gegessen","kochen","irgendwas","falschen","schwach","sondern","Unsinn","schatten","hierher",
+  "Planeten","hingehen","Wochen","Position","Knochen","Schiff","fernsehen","schick","heiraten","unseres",
+  "Nachbarn","gegangen","reichen","rauchen","irgendwo","Interesse","vergeben","genauso","Schuss","ausgehen",
+  "wovon","spreche","passierte","Person","offenbar","erlauben","solange","brechen","voraus","geschehen",
+  "innerhalb","Schluss","versteh","heiligen","behalten","gelaufen","aufmachen","gewinnen","gehalten","schreibe",
+  "schlagen","besseres","springen","Geschenk","perfekte","erwarten","brauchte","sprachen"
+],
 6: [
-    "Laufmasche","Rucksack","Bauernhof","Kinokasse","Kaufhaus","Rennbahn","Laufbahn","Nachtbus","Fischauge","Waschb\u00e4r",
-    "Hausbank","Baukasten","Besucher","Hausgarten","Fischerei","Bierflasche","Ofenbank","Fuchsbau","Hosentasche","Pausenhof",
-    "bereinigen","Brautschau","kragenbaer","Tierkreis"],
+  "wirklich","beruhigen","beibringen","sprechen","geschossen","geschnappt","vergessen","verstehen","verlangen","Hintergrund",
+  "verlassen","aufstehen","berichte","versuche","gebrauchen","Ergebnisse","schreiben","nirgendwo","Besucher","Versuch",
+  "verboten","erwachsene","besonders","freundlich","verkaufen","erwachsen","Hauptsache","konnten","Schwestern","Tagebuch",
+  "Augenblick","wichtige","Teppich","wunderbar","Erlaubnis","versichere","gewonnen","versprach","sowieso","verpassen",
+  "Chinesen","wussten","praktisch","aufmerksam","erreichen","Personen","Generation","Geheimnis","festhalten","gewachsen",
+  "geschlafen","Versteck","verlaufen","aufhalten","auseinander","brauchten","schickte","besuchen","behaupten","rausgehen",
+  "erschossen","Freundinnen","aufgehoben","geschlagen","aufgegeben","besonderes","aufwachen","verbessern","verhalten","erscheinen",
+  "gesungen","verbringen","erwischen","vergangen","aufpassen","nachsehen","sprengen","gebrochen","wunderbare","perfekten",
+  "gewissen","verbergen","Sensoren"
+],
 7: [
-    "Wischmopp","Flugdrachen","Seeungeheuer","Hosenknopf","Bauchtasche","Schlafsack","Scheinwerfer","Hausschuh","Hefekuchen","Fachbuch",
-    "Waschsalon","Waschpulver","Kassenbuch","Laufschuh","Taschenbuch","Flaschenhals","Sauerkirsche","Thunfisch","Tintenfass","Wasserfloh",
-    "Pausenbrote","Boxengasse","Listenpreis","Krauskopf"],
+  "versuchen","Revolution","chinesisch","Geschichte","beschreiben","reichlich","gesprochen","wichtigen","Generationen","verspreche",
+  "aufgehalten","Finsternis","Schicksal","ausgegangen","wunderbaren","verbrechen","ausrichten","bereithalten","unterhalten","bewusstlos",
+  "wunderbarer","Operation","verhungern","voneinander","versuchte","ausschalten","besprechen","besprochen","chinesische","verhindern",
+  "aussuchen","erwachsener","Erinnerungen","geschworen","Nickerchen","Geheimnisse","Assistentin","schickten","beobachten","irgendwohin",
+  "wunderbares","vernichten","schwierige","vergangenen","unsichtbar","restlichen","wichtiges","sichergehen","freilassen","sicherlich",
+  "ausreichend","Verbrecher","erwachsenen","hingegangen","berichten","Buchstaben","Restaurants","gesprungen","Assistenten","verbrennen",
+  "versteckte","schlachten","pflichten","rauswerfen","aussteigen","verbreiten","verarbeiten","auftauchen","aufbrechen"
+],
 8: [
-    "Pustekuchen","Hausaufgaben","Bausparkasse","Sonnenschein","Sonnenbank","Fachwissen","Fischteich","Schuhkasten","Klassenkasse","Klassenbuch",
-    "Kirschwasser","Busbahnhof","Reiskuchen","Mohnkuchen","Napfkuchen","Fischreiher","Tintenfisch","Wasserrutsche","Bankkauffrau","Bucheckern"],
+  "versprochen","chinesischen","psychisch","hoffentlich","unsterblich","Visitenkarte","schrecklich","Operationen","verschlingen","versprechen",
+  "Inspiration","Aschenbecher","Geschichten","ausgebrochen","chinesisches","Frankreich","Wohnungen","untereinander","schreckliche","Wichtigeres",
+  "unfreundlich","Schreibtisch","aufschreiben","Spannungen","erstaunlich","schwierigen","psychische","aufgewachsen","international","Hausaufgaben",
+  "verschlungen","unterbrechen","Verbrechens","rausgegangen","versuchten","unberechenbar","Funktionen","Psychiater","versteckten","rausgelassen",
+  "nirgendwohin","beunruhigen","Scheiterhaufen","Verbindungen","aufgebrochen","Architekten","Rechnungen","hintereinander","Geheimnissen","Lautsprecher",
+  "Frankreichs","verbrannten","aussprechen","sogenannten","vergewissern","Hoffnungen","Schicksals","Erfindungen","Geschworenen","erstaunliche",
+  "schwieriges","ausgesprochen","Professoren","Krankheiten","vorenthalten","kooperativ","freigelassen","beunruhigend","Sonnenschein","verheirateten",
+  "Investitionen"
+],
 };
 // vom Nutzer per Datei geladene Zusatzwoerter
 const ZUSATZ = {3:[],4:[],5:[],6:[],7:[],8:[]};
@@ -917,9 +1895,15 @@ function ladeWortdatei(input){
     const vorhanden = new Set();
     for (let k=3;k<=8;k++)
       for (const w of [...RUNDENWOERTER[k], ...ZUSATZ[k]]) vorhanden.add(normalize(w));
-    for (const zeile of String(leser.result).split(/\r?\n/)){
-      const wort = zeile.trim();
+    const zeilen = String(leser.result).split(/\r?\n/);
+    for (let zeilenNr=0; zeilenNr<zeilen.length; zeilenNr++){
+      let wort = zeilen[zeilenNr].trim();
       if (!wort || wort.startsWith("#")) continue;
+      if (wort.includes(";")){
+        const spalten = wort.split(";");
+        if (zeilenNr===0 && /^wort$/i.test(spalten[0].trim())) continue;
+        wort = spalten[0].trim();
+      }
       const norm = normalize(wort);
       const m = minSymbole(norm);
       if (m && m>=3 && m<=8 && !vorhanden.has(norm)){
@@ -1244,15 +2228,15 @@ function macheFrage(sym, schwer){
 let state = {
   phase: "setup", names: ["Spieler 1","Spieler 2"], target: 75,
   avatare: [0, 1], theme: "papier", niveau: "k9",
-  modus: "runden", zugNr: 0, zielwort: null, rundenWoerter: null, ladeInfo: "",
+  modus: "runden", zugNr: 0, zielwort: null, rundenWoerter: null, rundenSets: null, ladeInfo: "",
   drum: [], hands: [], scores: [], current: 0,
   word: "", swapSel: [], log: [], message: "", winner: null,
-  quiz: null, // { sym, frage, gewaehlt, art }
+  quiz: null, // { sym, frage, gewaehlt, art, kosten?, hinweisNr? }
   draw: null, // { needed, maxPick, picked, swapBack, logEntry }
-  doubler: false, // Startfrage richtig -> Wortpunkte x2
+  doubler: false, // Alltagschemie-Frage richtig -> Wortpunkte x2
   hatGelegt: false, // im Rundenmodus: Zielwort in diesem Zug gelegt?
   hinweise: 0, aufgeloest: false,
-  klangAn: true, klangFuer: "", lob: "", bildFenster: null,
+  klangAn: true, klangFuer: "", lob: "", bildFenster: null, siegSpruch: "",
   wortWahl: [], steckbrief: null,
   bonus: null, // { symbols, idx, extra, needed, entryBase }
 };
@@ -1263,14 +2247,16 @@ function startGame(){
   state.hands = state.names.map(()=>d.splice(0,HAND_SIZE));
   state.drum = d;
   state.scores = state.names.map(()=> state.modus==="runden" ? 10 : 0);
-  state.current = 0; state.log = []; state.winner = null;
+  state.current = 0; state.log = []; state.winner = null; state.siegSpruch = "";
   state.word=""; state.swapSel=[]; state.message=""; state.quiz=null;
   state.wortWahl=[]; state.steckbrief=null;
   state.zugNr = 0; state.zielwort = null;
   state.rundenWoerter = {};
+  state.rundenSets = {};
   state.rundenGewichtet = {};
   for (let k=3;k<=8;k++){
     state.rundenWoerter[k] = [...RUNDENWOERTER[k], ...ZUSATZ[k]];
+    state.rundenSets[k] = new Set(state.rundenWoerter[k].map(normalize));
     // eigene Woerter doppelt im Lostopf -> doppelte Ziehungschance
     state.rundenGewichtet[k] = [...RUNDENWOERTER[k], ...ZUSATZ[k], ...ZUSATZ[k]];
   }
@@ -1281,7 +2267,7 @@ function startGame(){
 function nextPlayer(entry){
   if (entry) state.log = [entry, ...state.log].slice(0,12);
   const w = state.scores.findIndex(s=>s>=state.target);
-  if (w>=0){ state.winner=w; state.phase="won"; render(); return; }
+  if (w>=0){ state.winner=w; state.siegSpruch=siegText(state.names[w]); state.phase="won"; render(); klangSieg(); startKonfetti(); return; }
   const vorheriger = state.current;
   state.zugNr++;
   if (state.modus==="runden" && state.rundenWoerter && state.hatGelegt){
@@ -1300,7 +2286,7 @@ function nextPlayer(entry){
 
 function listenStufe(norm){
   for (let k=3;k<=8;k++)
-    if ((state.rundenWoerter[k]||[]).some(w => normalize(w) === norm)) return k;
+    if (state.rundenSets && state.rundenSets[k] && state.rundenSets[k].has(norm)) return k;
   return null;
 }
 function istRundenwort(norm){
@@ -1320,7 +2306,7 @@ function playWord(){
       klangFalsch();
       state.wortWahl = [];
       state.word = "";
-      state.message = "Dieses Wort wird nicht gesucht \u2013 es steht nicht in der Rundenliste. Auswahl geleert, such weiter!";
+      state.message = ungueltigText();
       render();
       return;
     }
@@ -1345,7 +2331,7 @@ function playWord(){
   }
   let pts = res.score, teile=[];
   if (res.symbols.length>=8){ pts+=15; teile.push("+15 Langwort-Bonus"); }
-  if (state.doubler){ pts*=2; teile.push("x2 Startfrage"); }
+  if (state.doubler){ pts*=2; teile.push("x2 Alltagschemie"); }
   if (kosten){ teile.push(`Zukauf ${gekauft.join(",")} = -${kosten}`); }
   state.scores[state.current] += pts - kosten;
   state.hatGelegt = true;
@@ -1373,36 +2359,25 @@ function naechsteBonusFrage(){
     return;
   }
   const sym = b.symbols[b.idx];
-  state.quiz = { sym, frage: macheFrage(sym), gewaehlt: null, art: "bonus" };
+  state.quiz = { sym, frage: macheAlltagsZusatzfrage(sym), gewaehlt: null, art: "bonus" };
   state.phase = "quiz"; render();
 }
 
 function beginStartQuiz(){
   if (state.modus === "runden") waehleZielwort();
-  // ueberwiegend Reaktionsfragen (Lehrplan-gestaffelt), gelegentlich
-  // eine schwere Elementfrage zu einem Hauptgruppenelement aus der Hand
-  if (Math.random() < 0.7){
-    state.quiz = { sym: null, frage: macheReaktionsfrage(), gewaehlt: null, art: "start" };
-    state.phase = "quiz"; render();
-    return;
-  }
-  const hand = state.hands[state.current];
-  // bevorzugt Hauptgruppenelemente aus der Hand
-  const hg = hand.filter(s => HAUPTGRUPPEN.has(BY_SYMBOL[s][4]));
-  const pool = hg.length ? hg : hand;
-  const sym = pool[Math.floor(Math.random()*pool.length)];
-  state.quiz = { sym, frage: macheFrage(sym, true), gewaehlt: null, art: "start" };
-  state.phase = "quiz"; render();
+  state.quiz = { sym:null, frage:macheAlltagsfrage(), gewaehlt:null, art:"start" };
+  state.phase = "quiz";
+  render();
 }
 
 function swapTiles(){
-  if (!state.swapSel.length){ state.message="Waehle 1-3 Kaertchen zum Tauschen aus."; render(); return; }
+  if (!state.swapSel.length){ state.message=kommentarOhneWiederholung("tauschLeer", ["Waehle zuerst 1–3 Kaertchen aus – Gedankenlesen ist noch nicht eingebaut.","Ohne ausgewaehlte Kaertchen kann selbst Mendelejew nichts tauschen.","Erst Kaertchen antippen, dann tauschen. Die Reihenfolge ist chemisch wichtig."]); render(); return; }
   const normS = normalize(state.word);
   const res = normS.length >= 2 ? bestDecomposition(normS, state.hands[state.current]) : null;
   const resK = (!res && normS.length >= 2)
     ? bestDecompositionMitKauf(normS, state.hands[state.current], 3, state.scores[state.current]) : null;
   if (res || resK){
-    state.message="Du kannst ein Wort legen \u2013 Tauschen ist nur erlaubt, wenn kein Wort moeglich ist.";
+    state.message=kommentarOhneWiederholung("tauschNein", ["Du kannst ein Wort legen – Tauschen waere jetzt ein bisschen geschummelt.","Da geht noch ein Wort! Die Tauschmaschine bleibt zu.","Erst das moegliche Wort legen, dann darf das Periodensystem wieder mischen."]);
     render(); return;
   }
   if (!confirm("Tauschen ist nur erlaubt, wenn du wirklich KEIN Wort legen kannst.\nDeine Mitspieler duerfen das anzweifeln. Trotzdem tauschen?")) return;
@@ -1503,7 +2478,15 @@ function quizAntwort(idx){
   const richtig = idx === state.quiz.frage.richtig;
   if (state.quiz.art === "bonus")
     state.quiz.feedback = bonusFeedback(state.quiz.sym, richtig);
-  if (richtig) klangRichtig(); else klangFalsch();
+  else if (state.quiz.art === "start")
+    state.quiz.feedback = startFeedback(richtig);
+  else if (state.quiz.art === "hinweis")
+    state.quiz.feedback = hinweisFeedback(richtig, state.quiz.kosten);
+  if (state.quiz.art === "hinweis") {
+    if (richtig) klangTippGerettet(); else klangTippAbzug();
+  } else {
+    if (richtig) klangRichtig(); else klangFalsch();
+  }
   render();
 }
 
@@ -1568,19 +2551,26 @@ function weiterNachAufloesen(){
   nextPlayer(`${state.names[state.current]} loest auf \u2013 gesucht war: ${state.zielwort.wort} (0 Punkte)`);
 }
 
-// Hinweiskosten steigen pro Tipp: 1. Tipp -2, 2. Tipp -4, 3. Tipp -6 usw.
+// Tipp-Challenge: richtige Chemieantwort verhindert den Abzug.
+// Bei falscher Antwort steigen die Kosten weiterhin: 2, 4, 6, 8 ... Punkte.
 function naechsteHinweisKosten(){
   return (state.hinweise + 1) * 2;
 }
 function hinweisGeben(){
   if (state.hinweise >= state.zielwort.wort.length) return;
+  const hinweisNr = state.hinweise + 1;
   const kosten = naechsteHinweisKosten();
   if (state.scores[state.current] < kosten){
-    state.message = `Nicht genug Punkte \u2013 der ${state.hinweise+1}. Hinweis kostet ${kosten} Punkte.`;
+    state.message = `Fuer diese Tipp-Challenge brauchst du mindestens ${kosten} Punkte als Einsatz. Dein Konto hat gerade ${state.scores[state.current]}.`;
     render(); return;
   }
-  state.scores[state.current] -= kosten;
-  state.hinweise++;
+  state.message = "";
+  state.quiz = {
+    sym:null, frage:macheHinweisfrage(hinweisNr), gewaehlt:null,
+    art:"hinweis", kosten, hinweisNr
+  };
+  state.phase = "quiz";
+  klangTippStart();
   render();
 }
 
@@ -1591,6 +2581,16 @@ function quizWeiter(){
     state.doubler = richtig;
     state.quiz = null;
     state.phase = "turn"; render();
+  } else if (art === "hinweis") {
+    const kosten = state.quiz.kosten;
+    if (!richtig) state.scores[state.current] -= kosten;
+    state.hinweise++;
+    state.message = richtig
+      ? `Tipp ${state.hinweise} freigeschaltet – kein Punktabzug.`
+      : `Tipp ${state.hinweise} freigeschaltet – ${kosten} Punkte abgezogen.`;
+    state.quiz = null;
+    state.phase = "turn";
+    render();
   } else { // bonus
     if (richtig) state.bonus.extra++;
     state.bonus.idx++;
@@ -1790,20 +2790,28 @@ function render(){
 
   if (state.phase==="setup"){
     app.innerHTML = `
-    <div class="card">
-      <h1>WORTSTOFF</h1>
-      <div class="sub">Das Periodensystem-Wortspiel &middot; Version 28</div>
-      <p style="font-size:14px;line-height:1.5">Jeder Zug beginnt mit einer <b>Startfrage</b> zu
-      einem deiner Elemente — richtig beantwortet zaehlen deine Wortpunkte diese Runde doppelt.
-      Dann legst du ein Wort, das sich vollstaendig aus deinen Elementkaertchen zusammensetzt
-      (wie PoSiTiVISmUS); seltene Symbole bringen mehr Punkte. Fehlen dir Elemente, kannst du
-      <b>bis zu 3 zukaufen</b> — der Punktwert wird vom Konto abgezogen, sofern es reicht.
-      Zu jedem Element im gelegten Wort folgt eine <b>Zusatzfrage</b> fuer je einen Extrapunkt.
-      Tauschen ist nur erlaubt, wenn du kein Wort legen kannst. Ob ein Wort wirklich existiert,
-      entscheiden die Mitspieler. Wer zuerst die Zielpunktzahl erreicht, gewinnt.</p>
-      <div style="font-weight:700;margin-bottom:6px">Spieler &amp; Avatare</div>
+    <div class="card setup-card">
+      <div class="brand-hero">
+        <div class="brand-atom">⚛</div>
+        <div>
+          <h1>WORTSTOFF</h1>
+          <div class="sub">Das Periodensystem-Wortspiel · Version 34 · Tipp-Challenge · Alltagschemie · Chemie-Beat · Schülerwortschatz</div>
+          <div class="hero-badges">
+            <span class="hero-badge">🧪 Chemie</span><span class="hero-badge">🔤 Wortspiel</span>
+            <span class="hero-badge">🏆 2–4 Spieler</span><span class="hero-badge">📚 ${EINGEBAUTE_WORTZAHL_GESAMT.toLocaleString("de-DE")} Wörter</span><span class="hero-badge">😄 mit Laborhumor</span>
+          </div>
+        </div>
+      </div>
+      <div class="spielidee">
+        <div class="idee"><b>1 · Frage knacken</b>Richtig? Dann zaehlen deine Wortpunkte doppelt.</div>
+        <div class="idee"><b>2 · Wort bauen</b>Setze ein Wort aus deinen Elementsymbolen zusammen.</div>
+        <div class="idee"><b>3 · Tipp retten</b>Beantworte eine Chemiefrage und vermeide den Punktabzug.</div>
+        <div class="idee"><b>4 · Ziel erreichen</b>Wer zuerst die Zielpunktzahl schafft, gewinnt.</div>
+      </div>
+      <div class="hint" style="font-size:13px;line-height:1.5">Beispiel: <b>PoSiTiVISmUS</b>. Seltene Symbole bringen mehr Punkte. Bis zu drei fehlende Elemente koennen gegen Punkte zugekauft werden. Tauschen ist nur erlaubt, wenn wirklich kein Wort moeglich ist.</div>
+      <div class="section-title">Spieler &amp; Avatare</div>
       <div id="players">${state.names.map((n,i)=>`
-        <div style="margin-bottom:12px;padding:10px;border:1.5px solid var(--line);border-radius:8px">
+        <div class="player-panel">
           <div class="row" style="margin-bottom:6px;align-items:center">
             ${avatarKreis(state.avatare[i])}
             <input type="text" value="${esc(n)}" onchange="state.names[${i}]=this.value">
@@ -1819,27 +2827,32 @@ function render(){
         </div>`).join("")}
       </div>
       ${state.names.length<4?`<button onclick="state.names.push('Spieler '+(state.names.length+1));state.avatare.push(CHEMIKER.findIndex((c,ci)=>!state.avatare.includes(ci)));render()">+ Spieler hinzufuegen</button>`:""}
-      <div style="font-weight:700;margin:16px 0 6px">Aussehen &amp; Ton</div>
+      <div class="section-title">Aussehen &amp; Ton</div>
       <div class="row">${THEMES.map(([id,label])=>
         `<button style="flex:1" class="${state.theme===id?'primary':''}"
           onclick="state.theme='${id}';document.body.dataset.theme='${id}';render()">${label}</button>`).join("")}
-        <button style="flex:1" class="${state.klangAn?'primary':''}"
-          onclick="state.klangAn=!state.klangAn;render()">Ton: ${state.klangAn?"an":"aus"}</button>
       </div>
-      <div style="font-weight:700;margin:16px 0 6px">Spielmodus</div>
+      <div class="row" style="margin-top:8px">
+        <button style="flex:1" class="${state.klangAn?'primary':''}"
+          onclick="state.klangAn=!state.klangAn;render()">🎧 Chemie-Beat: ${state.klangAn?"an":"aus"}</button>
+        <button style="flex:1" onclick="klangDemo();render()">▶ Sound testen</button>
+      </div>
+      <div class="hint">Eigene kurze Labor-Pop-Sounds fuer richtige und falsche Antworten, Tipp-Challenges, Worterfolge und Sieg. Keine Musikdateien und keine bekannten Melodien.</div>
+      <div class="section-title">Spielmodus</div>
       <div class="row">${[["runden","Rundenwoerter (3 \u2192 8, aufsteigend)"],["frei","Freies Spiel"]].map(([id,label])=>
         `<button style="flex:1" class="${state.modus===id?'primary':''}"
           onclick="state.modus='${id}';render()">${label}</button>`).join("")}
       </div>
       <div class="hint">Rundenwoerter: Das Spiel versteckt ein geheimes Wort aus der Wortliste
       vollstaendig in deinen Kaertchen \u2013 erst 3 Symbole, dann pro Runde eines mehr bis 8.
-      Finde es! Jeder startet mit 10 Punkten Kapital. Freies Spiel: eigene Woerter eintippen wie bisher.</div>
+      Finde es! Jeder startet mit 10 Punkten Kapital. Tipps starten eine Chemie-Challenge: richtig = kostenlos, falsch = steigender Abzug. Freies Spiel: eigene Woerter eintippen wie bisher.</div>
+      <div class="hint" style="margin-top:10px;color:var(--good)"><b>${EINGEBAUTE_WORTZAHL_GESAMT.toLocaleString("de-DE")}</b> häufige, schulgerecht gefilterte deutsche Rundenwörter der Stufen 3 bis 8 sind fest eingebaut. Englische Fremdeinträge, ungeeignete Eigennamen und klar nicht schulgerechte Wörter wurden entfernt.</div>
       <div style="margin-top:10px">
-        <label style="font-size:13px;font-weight:700">Eigene Wortliste laden (.txt, ein Wort pro Zeile):</label><br>
-        <input type="file" accept=".txt,.dic,text/plain" onchange="ladeWortdatei(this)" style="margin-top:4px;font-size:13px">
+        <label style="font-size:13px;font-weight:700">Eigene Wortliste ergänzen (.txt oder .csv):</label><br>
+        <input type="file" accept=".txt,.dic,.csv,text/plain,text/csv" onchange="ladeWortdatei(this)" style="margin-top:4px;font-size:13px">
         ${state.ladeInfo?`<div class="hint" style="color:var(--good)">${esc(state.ladeInfo)}</div>`:""}
       </div>
-      <div style="font-weight:700;margin:16px 0 6px">Fragenniveau (Rahmenlehrplan Berlin, Chemie am Gymnasium)</div>
+      <div class="section-title">Fragenniveau</div>
       <div class="row">${[["k78","Klasse 7/8"],["k9","Klasse 9"],["alles","Mit Oberstufe"]].map(([id,label])=>
         `<button style="flex:1" class="${state.niveau===id?'primary':''}"
           onclick="state.niveau='${id}';render()">${label}</button>`).join("")}
@@ -1847,12 +2860,12 @@ function render(){
       <div class="hint">7/8: Stoffeigenschaften (Aggregatzustand, Dichte, Metall/Nichtmetall).
       Klasse 9 zusaetzlich: Atombau &amp; Schalenmodell, Periodensystem, Ionen, Wertigkeit,
       Verbindungsformeln, Flammenfaerbung. Oberstufe: auch s/p/d-Elektronenkonfiguration.</div>
-      <div style="font-weight:700;margin:16px 0 6px">Zielpunktzahl</div>
+      <div class="section-title">Zielpunktzahl</div>
       <div class="row">${[50,75,100].map(t=>
         `<button style="flex:1" class="${state.target===t?'primary':''}" onclick="state.target=${t};render()">${t}</button>`).join("")}
       </div>
       <button class="primary" style="width:100%;margin-top:18px;font-size:17px" onclick="startGame()">
-        Lostrommel fuellen und starten</button>
+        🧪 Lostrommel fuellen und Spiel starten</button>
     </div>
     <div class="card">
       <div style="font-weight:700;margin-bottom:8px">Punktwerte (nach Seltenheit)</div>
@@ -1866,16 +2879,17 @@ function render(){
 
   if (state.phase==="handoff"){
     app.innerHTML = `
-    <div class="card center" style="margin-top:80px">
-      <div style="font-size:13px;color:var(--grey);letter-spacing:1px">GERAET WEITERGEBEN AN</div>
-      <div style="margin:14px 0 4px;display:flex;justify-content:center">${avatarKreis(state.avatare[state.current], true)}</div>
-      <h1 style="font-size:32px;margin:6px 0 2px">${esc(state.names[state.current])}</h1>
-      <div style="font-size:13px;color:var(--grey);margin-bottom:10px">
-        spielt als ${esc(CHEMIKER[state.avatare[state.current]].name)}</div>
-      <div style="font-size:14px;color:var(--grey);margin-bottom:16px">
-        ${state.scores.map((s,i)=>`${esc(state.names[i])}: ${s}`).join(" &middot; ")} — Ziel: ${state.target}
+    <div class="card center handoff-card">
+      <div style="font-size:12px;color:var(--grey);letter-spacing:2px;font-weight:800">NAECHSTER LABORZUG</div>
+      <div style="margin:15px 0 4px;display:flex;justify-content:center">${avatarKreis(state.avatare[state.current], true)}</div>
+      <h1 style="font-size:36px;margin:7px 0 2px">${esc(state.names[state.current])}</h1>
+      <div style="font-size:13px;color:var(--grey)">spielt als ${esc(CHEMIKER[state.avatare[state.current]].name)} · ${esc(CHEMIKER[state.avatare[state.current]].gebiet)}</div>
+      <div class="handoff-note">💬 ${esc(handoffText())}</div>
+      <div class="status-strip" style="justify-content:center;margin-bottom:17px">
+        ${state.scores.map((s,i)=>`<span class="status-chip">${chip(state.avatare[i])}${esc(state.names[i])}: <b>${s}</b></span>`).join("")}
+        <span class="status-chip">🎯 Ziel: <b>${state.target}</b></span>
       </div>
-      <button class="primary" style="font-size:17px" onclick="state.phase='turn';beginStartQuiz()">Meine Kaertchen zeigen</button>
+      <button class="primary" style="font-size:17px;padding:13px 25px" onclick="state.phase='turn';beginStartQuiz()">🔬 Meine Kaertchen zeigen</button>
     </div>`;
     return;
   }
@@ -1903,57 +2917,92 @@ function render(){
     const fertig = gewaehlt !== null;
     const richtig = fertig && gewaehlt === frage.richtig;
     const kopf = art==="start"
-      ? "STARTFRAGE — richtig beantwortet: Wortpunkte dieser Runde x2"
-      : `ZUSATZFRAGE ${state.bonus.idx+1} von ${state.bonus.symbols.length} — je +1 Punkt`;
+      ? "ALLTAGSCHEMIE — richtig beantwortet: Wortpunkte dieser Runde x2"
+      : art==="hinweis"
+        ? `TIPP-CHALLENGE ${state.quiz.hinweisNr} — ${frage.schwierigkeitsname}`
+        : `ALLTAGSCHEMIE-ZUSATZFRAGE ${state.bonus.idx+1} von ${state.bonus.symbols.length} — je +1 Punkt`;
     let feedback = "";
     if (fertig){
       if (art==="start")
-        feedback = richtig ? "Richtig! Deine Wortpunkte zaehlen diese Runde doppelt."
-                           : "Leider falsch — keine Verdopplung diese Runde.";
+        feedback = state.quiz.feedback || startFeedback(richtig);
+      else if (art==="hinweis")
+        feedback = state.quiz.feedback || hinweisFeedback(richtig, state.quiz.kosten);
       else
         feedback = state.quiz.feedback ||
           (richtig ? "Richtig! +1 Extrapunkt." : "Leider falsch — kein Extrapunkt.");
     }
+    const schwierigkeitsHtml = art==="hinweis" ? `
+      <div class="risk-panel">
+        <div class="risk-title"><span>🧠 Rette deine Punkte mit Chemiewissen</span>
+          <span class="risk-stake">Risiko −${state.quiz.kosten} P.</span></div>
+        <div class="difficulty"><span>Schwierigkeit:</span><b>${esc(frage.schwierigkeitsname)}</b>
+          <span class="difficulty-dots">${[1,2,3,4,5].map(i=>`<span class="difficulty-dot ${i<=frage.schwierigkeitsgrad?'on':''}"></span>`).join("")}</span></div>
+        <div class="hint-rule"><b>Richtig:</b> kein Abzug · <b>Falsch:</b> −${state.quiz.kosten} Punkte · der Tipp erscheint in beiden Faellen.</div>
+      </div>` : "";
     app.innerHTML = `
-    <div class="card center">
-      ${state.lob && art==="bonus" && state.bonus.idx===0 ? `<div style="font-weight:700;color:var(--good);margin-bottom:8px;font-size:15px">&#10024; ${esc(state.lob)}</div>` : ""}
+    <div class="card center quiz-card">
+      ${state.lob && art==="bonus" && state.bonus.idx===0 ? `<div class="speech good" style="margin-top:0">✨ ${esc(state.lob)}</div>` : ""}
       <div style="font-size:13px;color:var(--grey);letter-spacing:1px">${kopf}</div>
+      ${schwierigkeitsHtml}
       <div style="margin:14px 0">${sym
         ? tileHtml(sym,{big:true, verdeckt: !!frage.verdeckt && !fertig, zahlVerdeckt: !fertig})
-        : '<div style="font-size:54px">\u2697\ufe0f</div><div class="hint">Reaktionsfrage</div>'}</div>
+          + (art==="bonus" ? '<div class="hint">Anwendung des Elements oder Chemie aus dem Alltag</div>' : "")
+        : art==="hinweis"
+          ? '<div class="quiz-icon">🧪</div><div class="hint">Chemische Rettungsfrage</div>'
+          : '<div class="quiz-icon">🪥</div><div class="hint">Chemie aus dem Alltag</div>'}</div>
       <div style="font-size:17px;font-weight:700;margin-bottom:14px">${esc(frage.text)}</div>
       <div style="max-width:420px;margin:0 auto;text-align:left">
         ${frage.optionen.map((o,i)=>{
           let cls = "answer";
           if (fertig && i===frage.richtig) cls += " correct";
           else if (fertig && i===gewaehlt) cls += " wrong";
-          return `<button class="${cls}" ${fertig?"disabled":""} onclick="quizAntwort(${i})">${esc(o)}</button>`;
+          return `<button class="${cls}" data-letter="${String.fromCharCode(65+i)}" ${fertig?"disabled":""} onclick="quizAntwort(${i})">${esc(o)}</button>`;
         }).join("")}
       </div>
       ${fertig ? `
-        <div style="margin:10px 0;font-weight:700;color:${richtig?"var(--good)":"var(--bad)"}">${feedback}</div>
+        <div class="speech ${richtig?"good":"bad"}">${esc(feedback)}</div>
         ${frage.hinweis?`<div class="hint" style="margin-bottom:10px">${esc(frage.hinweis)}</div>`:""}
-        ${INFO[sym] ? `<div class="hint" style="max-width:440px;margin:0 auto 10px;text-align:left;
+        ${sym && INFO[sym] ? `<div class="hint" style="max-width:440px;margin:0 auto 10px;text-align:left;
           padding:8px;border:1.5px dashed var(--line);border-radius:8px">
           &#128161; <b>${esc(BY_SYMBOL[sym][1])}:</b> ${esc(INFO[sym])}
           <button style="display:block;margin-top:6px;padding:4px 10px;font-size:12px"
             onclick="state.steckbrief='${sym}';render()">Steckbrief mit Bild anzeigen</button></div>` : ""}
-        <button class="primary" onclick="quizWeiter()">Weiter</button>
+        <button class="primary" onclick="quizWeiter()">${art==="hinweis"?"Tipp anzeigen":"Weiter"}</button>
       ` : `<div class="hint">Antippen zum Antworten.</div>`}
     </div>` + logHtml() + steckbriefHtml();
     return;
   }
 
   if (state.phase==="won"){
+    const wi = state.winner;
+    const wFarbe = CHEMIKER[state.avatare[wi]].farbe;
+    const rangliste = state.scores.map((s,i)=>({s,i})).sort((a,b)=>b.s-a.s);
+    const maxP = Math.max(1, rangliste[0].s);
+    const medaillen = ["\ud83e\udd47","\ud83e\udd48","\ud83e\udd49","\u2004"];
     app.innerHTML = `
-    <div class="card center" style="margin-top:80px">
-      <div style="display:flex;justify-content:center;margin-bottom:6px">${avatarKreis(state.avatare[state.winner], true)}</div>
-      <h1>${esc(state.names[state.winner])} gewinnt!</h1>
-      <div style="font-size:13px;color:var(--grey)">als ${esc(CHEMIKER[state.avatare[state.winner]].name)}</div>
-      <div style="margin:12px 0;font-size:15px">
-        ${state.scores.map((s,i)=>`<div>${chip(state.avatare[i])}${esc(state.names[i])}: <b>${s} Punkte</b></div>`).join("")}
+    <div class="card center siegkarte" style="margin-top:60px;border-color:${wFarbe};
+      box-shadow:0 0 0 3px ${wFarbe}33, 0 10px 40px ${wFarbe}44">
+      <div class="pokal">\ud83c\udfc6</div>
+      <div style="display:flex;justify-content:center;margin:8px 0">
+        <span class="siegring" style="--sf:${wFarbe}">${avatarKreis(state.avatare[wi], true)}</span></div>
+      <h1 style="font-size:34px">${esc(state.names[wi])} gewinnt!</h1>
+      <div style="font-size:14px;color:var(--grey);margin-bottom:8px">
+        ✨ als ${esc(CHEMIKER[state.avatare[wi]].name)} – ${esc(CHEMIKER[state.avatare[wi]].gebiet)} ✨</div>
+      <div class="victory-quote">🧪 ${esc(state.siegSpruch || siegText(state.names[wi]))}</div>
+      <div style="max-width:400px;margin:0 auto 14px;text-align:left">
+        ${rangliste.map((r,platz)=>`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="font-size:22px;width:28px">${medaillen[Math.min(platz,3)]}</span>
+            <span style="width:120px;overflow:hidden;text-overflow:ellipsis">${chip(state.avatare[r.i])}${esc(state.names[r.i])}</span>
+            <span style="flex:1;height:18px;background:var(--grid);border-radius:9px;overflow:hidden">
+              <span class="siegbalken" style="display:block;height:100%;border-radius:9px;
+                width:${Math.round(100*r.s/maxP)}%;background:${CHEMIKER[state.avatare[r.i]].farbe}"></span></span>
+            <b style="width:44px;text-align:right">${r.s}</b>
+          </div>`).join("")}
       </div>
-      <button class="primary" onclick="state.phase='setup';render()">Neue Runde</button>
+      <div class="hint" style="margin-bottom:14px">${state.zugNr} Z\u00fcge gespielt \u00b7 Zielpunktzahl ${state.target}
+        \u00b7 ${state.modus==="runden"?"Rundenwort-Modus":"Freies Spiel"}</div>
+      <button class="primary" style="font-size:17px;padding:12px 28px" onclick="stopKonfetti();state.phase='setup';render()">Neue Runde</button>
     </div>` + logHtml() + steckbriefHtml();
     return;
   }
@@ -2008,11 +3057,11 @@ function render(){
   const total = aktiv ? basis - (resKauf ? resKauf.kosten : 0) : 0;
 
   app.innerHTML = `
-  <div class="card row" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
+  <div class="card row game-header" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
     <h1 style="font-size:20px">WORTSTOFF</h1>
     <div class="scorebar">${scorebarHtml()}</div>
   </div>
-  <div class="card">
+  <div class="card hand-card">
     <div style="font-weight:700;margin-bottom:8px">${esc(state.names[state.current])}, deine Kaertchen (${hand.length}):
       ${state.doubler?'<span style="color:var(--good);margin-left:8px">&#10024; Verdoppler aktiv!</span>':""}</div>
     <div class="tiles">${hand.map((s,i)=>{
@@ -2043,15 +3092,15 @@ function render(){
         <button style="flex:1;padding:6px" onclick="wahlLeeren()">Leeren</button>
       </div>` : ""}
     <div style="min-height:90px;margin-top:10px">${resultHtml}${nebenfundHinweis}</div>
-    ${state.message?`<div class="err" style="font-size:13px;margin-bottom:6px">${esc(state.message)}</div>`:""}
+    ${state.message?`<div class="message-box">💬 ${esc(state.message)}</div>`:""}
     <div class="row" style="flex-wrap:wrap">
       ${state.aufgeloest ? `
         <button class="primary" style="flex:1" onclick="weiterNachAufloesen()">Weiter (0 Punkte)</button>
       ` : `
         <button class="primary" style="flex:2;min-width:150px" ${aktiv?"":"disabled"} onclick="playWord()">
-          Wort legen${aktiv?` (${total>=0?"+":""}${total})`:""}</button>
+          ⚗️ Wort legen${aktiv?` (${total>=0?"+":""}${total})`:""}</button>
         ${state.modus==="runden"
-          ? `<button style="flex:1;min-width:120px" onclick="hinweisGeben()">Hinweis (\u2212${naechsteHinweisKosten()} P.)</button>
+          ? `<button class="hint-button" style="flex:1;min-width:165px" onclick="hinweisGeben()">🧠 Tipp-Challenge<br><span style="font-size:11px;font-weight:600">richtig: gratis · falsch: −${naechsteHinweisKosten()} P.</span></button>
              <button style="flex:1;min-width:110px" onclick="aufloesen()">Aufloesen</button>`
           : `<button style="flex:1;min-width:110px" ${aktiv?"disabled":""} onclick="swapTiles()">Tauschen (${state.swapSel.length})</button>`}
       `}
