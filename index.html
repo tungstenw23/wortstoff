@@ -633,6 +633,7 @@ const THEMES = [["papier","Laborpapier"],["tafel","Tafel"],["poster","Vintage"]]
 
 // ---------------- Online-Spielerprofile, Highscore und Suchbonus ----------------
 const SUPABASE_URL = "https://tcobolbwkmvlfjinelsu.supabase.co";
+const WORTSTOFF_APP_URL = "https://tungstenw23.github.io/wortstoff/";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_DYpVDxbcOgYst7wkYL2sbQ_B1GWS735";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
@@ -856,7 +857,7 @@ async function authRegistrieren(){
   if (pass.length < 6){ authFehler="Das Passwort muss mindestens 6 Zeichen lang sein."; render(); return; }
   authBusy=true; authFehler=""; authInfo=""; render();
   const { data, error } = await supabaseClient.auth.signUp({
-    email, password:pass, options:{data:{username}}
+    email, password:pass, options:{data:{username}, emailRedirectTo:WORTSTOFF_APP_URL}
   });
   authBusy=false;
   if (error){ authFehler=error.message; render(); return; }
@@ -868,6 +869,26 @@ async function authRegistrieren(){
   }
   render();
 }
+
+async function authBestaetigungErneut(){
+  if (authBusy) return;
+  const email = String(document.getElementById("authEmail")?.value || "").trim();
+  if (!email){ authFehler="Bitte zuerst die E-Mail-Adresse eingeben."; render(); return; }
+  authBusy=true; authFehler=""; authInfo=""; render();
+  const { error } = await supabaseClient.auth.resend({
+    type:"signup",
+    email,
+    options:{ emailRedirectTo:WORTSTOFF_APP_URL }
+  });
+  authBusy=false;
+  if (error){
+    authFehler = error.message;
+  } else {
+    authInfo = "Bestätigungs-E-Mail erneut angefordert. Beim eingebauten Supabase-Mailversand gilt ein sehr niedriges Versandlimit.";
+  }
+  render();
+}
+
 async function authAbmelden(){
   await supabaseClient.auth.signOut();
   onlineSession=null; onlineProfile=null; ONLINE_HIGHSCORE=[]; SPIELER_DB={};
@@ -4002,6 +4023,7 @@ function render(){
       <div class="row" style="margin-top:10px;flex-wrap:wrap">
         <button class="primary" style="flex:1;min-width:180px" ${authBusy?"disabled":""} onclick="authAnmelden()">🔐 Anmelden</button>
         <button style="flex:1;min-width:180px" ${authBusy?"disabled":""} onclick="authRegistrieren()">✨ Neues Konto</button>
+        <button style="flex:1;min-width:180px" ${authBusy?"disabled":""} onclick="authBestaetigungErneut()">📧 Bestätigung erneut senden</button>
       </div>
       <div class="hint" style="margin-top:12px">Bei aktivierter E-Mail-Bestätigung musst du nach der Registrierung zuerst den Link in der Supabase-Mail anklicken.</div>
     </div>`;
