@@ -322,6 +322,49 @@
     .highscore-row .bestgame { display:none; }
   }
 
+
+  /* ---------- Verbesserte Eingabemaske (Anmeldung / Registrierung) ---------- */
+  .auth-tabs { display:flex; gap:5px; padding:4px; border-radius:15px; background:var(--grid);
+    margin:8px 0 16px; }
+  .auth-tab { flex:1; border:none; background:transparent; border-radius:12px; padding:11px 8px;
+    font-size:14px; font-weight:800; color:var(--grey); }
+  .auth-tab[aria-selected="true"] { background:var(--card); color:var(--ink);
+    box-shadow:0 3px 10px rgba(30,58,76,.15); }
+  .auth-tab:hover:not([aria-selected="true"]) { transform:none; box-shadow:none; color:var(--ink); }
+  .feld { margin-bottom:11px; }
+  .feld > label { display:block; font-size:13px; font-weight:800; margin-bottom:4px; }
+  .feld input { width:100%; }
+  .feld input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--soft); }
+  .feld input.ok { border-color:var(--good); }
+  .feld input.fehler { border-color:var(--bad); }
+  .feld-hinweis { font-size:12px; color:var(--grey); margin-top:4px; min-height:16px; line-height:1.35; }
+  .feld-hinweis.fehler { color:var(--bad); font-weight:700; }
+  .feld-hinweis.ok { color:var(--good); }
+  .pass-wrap { position:relative; }
+  .pass-wrap input { padding-right:48px; }
+  .pass-auge { position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none;
+    background:none; font-size:17px; padding:6px 9px; line-height:1; }
+  .pass-auge:hover:not(:disabled) { transform:translateY(-50%); box-shadow:none; }
+  .pw-meter { display:flex; gap:4px; margin-top:6px; }
+  .pw-meter span { flex:1; height:5px; border-radius:999px; background:var(--grid); transition:background .2s; }
+  .pw-meter.s1 span:nth-child(1) { background:var(--bad); }
+  .pw-meter.s2 span:nth-child(-n+2) { background:var(--sun); }
+  .pw-meter.s3 span:nth-child(-n+3) { background:var(--accent); }
+  .pw-meter.s4 span { background:var(--good); }
+  .auth-caps { display:none; margin-top:6px; font-size:12px; font-weight:800; color:var(--bad); }
+  .auth-links { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .auth-link { border:none; background:none; color:var(--accent); text-decoration:underline;
+    padding:4px 0; font-size:13px; font-weight:700; }
+  .auth-link:hover:not(:disabled) { transform:none; box-shadow:none; }
+  .auth-msg { margin:11px 0; padding:10px 13px; border-radius:13px; font-size:13px; font-weight:700;
+    border:1px solid var(--line); line-height:1.4; }
+  .auth-msg.fehler { color:var(--bad); border-color:var(--bad);
+    background:color-mix(in srgb,var(--bad) 9%,var(--card)); }
+  .auth-msg.info { color:var(--good); border-color:var(--good);
+    background:color-mix(in srgb,var(--good) 9%,var(--card)); }
+  .lade-punkt { display:inline-block; animation:ladePuls 1s ease-in-out infinite; }
+  @keyframes ladePuls { 0%,100% { opacity:.3; } 50% { opacity:1; } }
+
 </style>
 </head>
 <body>
@@ -571,6 +614,45 @@ const VERBINDUNG = {
   Zn:["Sauerstoff",[["Zn",1],["O",1]]],Ti:["Sauerstoff",[["Ti",1],["O",2]]],
   Ag:["Chlor",[["Ag",1],["Cl",1]]],   Mn:["Sauerstoff",[["Mn",1],["O",2]]],
 };
+// Weitere typische Verbindungen je Element. Dadurch wird im Quiz nicht immer
+// dieselbe Kombination gefragt (z.B. nicht staendig "Magnesium mit Sauerstoff").
+const VERBINDUNG_EXTRA = {
+  H:[["Chlor",[["H",1],["Cl",1]]],["Stickstoff",[["N",1],["H",3]]],["Schwefel",[["H",2],["S",1]]],
+     ["Kohlenstoff",[["C",1],["H",4]]]],
+  Li:[["Chlor",[["Li",1],["Cl",1]]],["Fluor",[["Li",1],["F",1]]],["Stickstoff",[["Li",3],["N",1]]]],
+  Be:[["Fluor",[["Be",1],["F",2]]],["Sauerstoff",[["Be",1],["O",1]]]],
+  B:[["Sauerstoff",[["B",2],["O",3]]],["Chlor",[["B",1],["Cl",3]]]],
+  C:[["Sauerstoff",[["C",1],["O",2]]],["Chlor",[["C",1],["Cl",4]]],["Schwefel",[["C",1],["S",2]]]],
+  N:[["Sauerstoff",[["N",1],["O",2]]],["Chlor",[["N",1],["Cl",3]]]],
+  O:[["Schwefel",[["S",1],["O",2]]],["Kohlenstoff",[["C",1],["O",2]]],["Calcium",[["Ca",1],["O",1]]],
+     ["Aluminium",[["Al",2],["O",3]]]],
+  F:[["Calcium",[["Ca",1],["F",2]]],["Natrium",[["Na",1],["F",1]]]],
+  Na:[["Sauerstoff",[["Na",2],["O",1]]],["Schwefel",[["Na",2],["S",1]]],["Brom",[["Na",1],["Br",1]]],
+      ["Fluor",[["Na",1],["F",1]]]],
+  Mg:[["Chlor",[["Mg",1],["Cl",2]]],["Schwefel",[["Mg",1],["S",1]]],["Stickstoff",[["Mg",3],["N",2]]],
+      ["Brom",[["Mg",1],["Br",2]]],["Fluor",[["Mg",1],["F",2]]]],
+  Al:[["Chlor",[["Al",1],["Cl",3]]],["Schwefel",[["Al",2],["S",3]]],["Fluor",[["Al",1],["F",3]]]],
+  Si:[["Wasserstoff",[["Si",1],["H",4]]],["Kohlenstoff",[["Si",1],["C",1]]]],
+  P:[["Sauerstoff",[["P",4],["O",10]]],["Chlor",[["P",1],["Cl",3]]]],
+  S:[["Sauerstoff",[["S",1],["O",2]]],["Eisen",[["Fe",1],["S",1]]],["Natrium",[["Na",2],["S",1]]]],
+  Cl:[["Natrium",[["Na",1],["Cl",1]]],["Calcium",[["Ca",1],["Cl",2]]],["Magnesium",[["Mg",1],["Cl",2]]]],
+  K:[["Sauerstoff",[["K",2],["O",1]]],["Brom",[["K",1],["Br",1]]],["Iod",[["K",1],["I",1]]],
+     ["Schwefel",[["K",2],["S",1]]]],
+  Ca:[["Chlor",[["Ca",1],["Cl",2]]],["Fluor",[["Ca",1],["F",2]]],["Schwefel",[["Ca",1],["S",1]]],
+      ["Stickstoff",[["Ca",3],["N",2]]]],
+  Ti:[["Chlor",[["Ti",1],["Cl",4]]]],
+  Mn:[["Chlor",[["Mn",1],["Cl",2]]],["Schwefel",[["Mn",1],["S",1]]]],
+  Fe:[["Schwefel",[["Fe",1],["S",1]]],["Chlor",[["Fe",1],["Cl",3]]]],
+  Cu:[["Schwefel",[["Cu",2],["S",1]]],["Chlor",[["Cu",1],["Cl",2]]]],
+  Zn:[["Schwefel",[["Zn",1],["S",1]]],["Chlor",[["Zn",1],["Cl",2]]]],
+  Br:[["Natrium",[["Na",1],["Br",1]]],["Kalium",[["K",1],["Br",1]]]],
+  Sr:[["Chlor",[["Sr",1],["Cl",2]]]],
+  Ag:[["Brom",[["Ag",1],["Br",1]]],["Iod",[["Ag",1],["I",1]]]],
+  Sn:[["Chlor",[["Sn",1],["Cl",2]]]],
+  I:[["Kalium",[["K",1],["I",1]]],["Silber",[["Ag",1],["I",1]]]],
+  Ba:[["Chlor",[["Ba",1],["Cl",2]]],["Schwefel",[["Ba",1],["S",1]]]],
+  Pb:[["Schwefel",[["Pb",1],["S",1]]],["Iod",[["Pb",1],["I",2]]]],
+};
 // Alltagsnamen bekannter Verbindungen (fuer den Steckbrief)
 const VERBINDUNG_NAME = {
   H:"Wasser", O:"Wasser", Na:"Kochsalz", C:"Methan (Erdgas)", N:"Ammoniak",
@@ -579,8 +661,12 @@ const VERBINDUNG_NAME = {
   Mn:"Braunstein", Al:"Korund/Tonerde", Mg:"Magnesia", K:"Kaliumchlorid (Duengersalz)",
 };
 const TIEF = {1:"",2:"\u2082",3:"\u2083",4:"\u2084",5:"\u2085",6:"\u2086",7:"\u2087"};
+const TIEF_ZIFFER = {"0":"\u2080","1":"\u2081","2":"\u2082","3":"\u2083","4":"\u2084",
+                     "5":"\u2085","6":"\u2086","7":"\u2087","8":"\u2088","9":"\u2089"};
+// auch zweistellige Indizes werden korrekt tiefgestellt (z.B. P\u2084O\u2081\u2080)
+function tief(n){ return String(n).split("").map(d => TIEF_ZIFFER[d] || d).join(""); }
 function formel(teile){
-  return teile.map(([e,n]) => e + (TIEF[n] ?? n)).join("");
+  return teile.map(([e,n]) => e + (n === 1 ? "" : tief(n))).join("");
 }
 function formelVarianten(teile){
   // plausible falsche Formeln durch veraenderte Indizes
@@ -646,6 +732,13 @@ let ONLINE_HIGHSCORE = [];
 let authInfo = "";
 let authFehler = "";
 let authBusy = false;
+// ---- Eingabemaske: Zustand bleibt beim Neuzeichnen erhalten ----
+let authModus = "login";                        // "login" | "register"
+let authFelder = { name:"", email:"", pass:"" };
+let authZeigePass = false;
+let authResend = false;                         // Link "Mail erneut senden" einblenden
+let authFokusFeld = "";
+try { authFelder.email = localStorage.getItem("wortstoff_letzte_mail") || ""; } catch(e) {}
 let SPIELER_DB = {};
 
 function heutigesDatum(){
@@ -834,65 +927,279 @@ function registrierePunkte(index, delta){
 function ziehePunkteAb(index, delta){ state.scores[index] -= Math.max(0, delta); }
 function finalisiereSpiel(){ state.gameFinalized = true; }
 
-async function authAnmelden(){
-  if (authBusy) return;
-  const email = String(document.getElementById("authEmail")?.value || "").trim();
-  const pass = String(document.getElementById("authPass")?.value || "");
-  if (!email || !pass){ authFehler="Bitte E-Mail-Adresse und Passwort eingeben."; render(); return; }
-  authBusy=true; authFehler=""; authInfo=""; render();
-  const { data, error } = await supabaseClient.auth.signInWithPassword({email, password:pass});
-  authBusy=false;
-  if (error){ authFehler=error.message; render(); return; }
-  onlineSession=data.session;
-  if (await ladeOnlineProfil()) { state.phase="setup"; authInfo=""; }
+// ---------------------------------------------------------------
+// Eingabemaske: Pruefung, verstaendliche Fehlertexte, Bedienhilfen
+// ---------------------------------------------------------------
+const AUTH_FEHLERTEXTE = [
+  [/invalid login credentials|invalid credentials/i,
+   "E-Mail-Adresse oder Passwort stimmt nicht. Bitte noch einmal versuchen."],
+  [/email not confirmed|not confirmed/i,
+   "Dieses Konto ist noch gesperrt, weil im Supabase-Projekt die E-Mail-Bestaetigung aktiv ist. Sie laesst sich dort unter Authentication \u2192 Sign In / Providers \u2192 Email abschalten."],
+  [/already registered|already exists|duplicate key/i,
+   "Zu dieser E-Mail-Adresse gibt es schon ein Konto. Bitte oben auf \u201eAnmelden\u201c wechseln."],
+  [/password should be at least|password is too short/i,
+   "Das Passwort ist zu kurz \u2013 es braucht mindestens 6 Zeichen."],
+  [/unable to validate email|invalid email|email address .* invalid/i,
+   "Die E-Mail-Adresse sieht nicht gueltig aus. Bitte pruefen."],
+  [/rate limit|too many requests|for security purposes|after \d+ seconds/i,
+   "Zu viele Versuche in kurzer Zeit. Bitte eine Minute warten und es dann noch einmal probieren."],
+  [/failed to fetch|networkerror|network request failed/i,
+   "Keine Verbindung zum Server. Bitte die Internetverbindung pruefen."],
+  [/user not found/i,
+   "Zu dieser E-Mail-Adresse gibt es noch kein Konto. Lege oben ein neues Konto an."]
+];
+function authFehlerText(err){
+  const roh = String((err && err.message) || err || "Unbekannter Fehler");
+  for (const [muster, text] of AUTH_FEHLERTEXTE) if (muster.test(roh)) return text;
+  return roh;
+}
+function authEmailOk(v){ return /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(String(v).trim()); }
+function authNameOk(v){ return /^[A-Za-z0-9\u00c0-\u024f _.\-]{3,24}$/.test(String(v).trim()); }
+function authPassStaerke(v){
+  const pw = String(v);
+  if (!pw) return 0;
+  let s = 0;
+  if (pw.length >= 6) s++;
+  if (pw.length >= 10) s++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) s++;
+  if (/\d/.test(pw)) s++;
+  if (/[^\w\s]/.test(pw)) s++;
+  return Math.max(1, Math.min(4, s));
+}
+
+// Werte aus den Eingabefeldern uebernehmen (auch bei Browser-Autofill)
+function authFelderEinlesen(){
+  const hole = id => { const el = document.getElementById(id); return el ? el.value : null; };
+  const n = hole("authName"), e = hole("authEmail"), pw = hole("authPass");
+  if (n !== null) authFelder.name = n;
+  if (e !== null) authFelder.email = e;
+  if (pw !== null) authFelder.pass = pw;
+}
+function authFeld(feld, wert){
+  authFelder[feld] = wert;
+  authPruefungAnzeigen();
+}
+function authWechsle(modus){
+  if (authModus === modus) return;
+  authFelderEinlesen();
+  authModus = modus;
+  authFehler = ""; authInfo = "";
+  authFokusFeld = modus === "register" ? "authName" : "authEmail";
   render();
 }
+function authPassToggle(){
+  authZeigePass = !authZeigePass;
+  const el = document.getElementById("authPass");
+  const btn = document.getElementById("authPassBtn");
+  if (el){
+    const pos = el.value.length;
+    el.type = authZeigePass ? "text" : "password";
+    try { el.focus(); el.setSelectionRange(pos,pos); } catch(e) {}
+  }
+  if (btn){
+    btn.textContent = authZeigePass ? "\ud83d\ude48" : "\ud83d\udc41";
+    btn.setAttribute("aria-label", authZeigePass ? "Passwort verbergen" : "Passwort anzeigen");
+  }
+}
+function authCaps(ev){
+  const box = document.getElementById("authCaps");
+  if (!box) return;
+  let an = false;
+  try { an = !!(ev && ev.getModifierState && ev.getModifierState("CapsLock")); } catch(e) {}
+  box.style.display = an ? "block" : "none";
+}
+
+// Live-Rueckmeldung direkt am Feld, ohne die Maske neu zu zeichnen
+function authPruefungAnzeigen(){
+  const reg = authModus === "register";
+  const setzText = (id, text, klasse) => {
+    const el = document.getElementById(id);
+    if (el){ el.textContent = text; el.className = "feld-hinweis" + (klasse ? " " + klasse : ""); }
+  };
+  const markiere = (id, ok, leer) => {
+    const el = document.getElementById(id);
+    if (el){ el.classList.toggle("ok", !!ok && !leer); el.classList.toggle("fehler", !ok && !leer); }
+  };
+
+  if (reg){
+    const v = authFelder.name.trim(), leer = !v, ok = authNameOk(v);
+    setzText("hintName",
+      leer ? "3 bis 24 Zeichen \u2013 dieser Name steht spaeter in der Rangliste."
+           : ok ? "Guter Name!" : "3 bis 24 Zeichen. Erlaubt: Buchstaben, Ziffern, Leerzeichen, . _ -",
+      leer ? "" : (ok ? "ok" : "fehler"));
+    markiere("authName", ok, leer);
+  }
+
+  const eLeer = !authFelder.email.trim(), eOk = authEmailOk(authFelder.email);
+  setzText("hintEmail",
+    eLeer ? "Damit meldest du dich spaeter auf jedem Geraet wieder an."
+          : eOk ? "Sieht gut aus." : "Da fehlt noch etwas \u2013 zum Beispiel das @ oder die Endung.",
+    eLeer ? "" : (eOk ? "ok" : "fehler"));
+  markiere("authEmail", eOk, eLeer);
+
+  const pw = authFelder.pass, pLeer = !pw, staerke = authPassStaerke(pw);
+  const meter = document.getElementById("pwMeter");
+  if (meter) meter.className = "pw-meter s" + staerke;
+  if (reg){
+    setzText("hintPass",
+      pLeer ? "Mindestens 6 Zeichen."
+      : pw.length < 6 ? "Noch " + (6 - pw.length) + " Zeichen bis zum Minimum."
+      : ["", "kurz \u2013 laenger waere sicherer", "brauchbar", "gut", "stark"][staerke],
+      pLeer ? "" : (pw.length < 6 ? "fehler" : (staerke >= 3 ? "ok" : "")));
+    markiere("authPass", pw.length >= 6, pLeer);
+  } else {
+    setzText("hintPass", "", "");
+    markiere("authPass", !pLeer, pLeer);
+  }
+}
+
+// nach jedem Neuzeichnen: Werte zuruecksetzen und Fokus sinnvoll setzen
+function authNachRender(){
+  const pwFeld = document.getElementById("authPass");
+  if (pwFeld) pwFeld.value = authFelder.pass;
+  authPruefungAnzeigen();
+  if (authBusy) return;
+  let ziel = authFokusFeld && document.getElementById(authFokusFeld);
+  authFokusFeld = "";
+  if (!ziel){
+    const grosserBildschirm = !window.matchMedia || window.matchMedia("(min-width:700px)").matches;
+    if (!grosserBildschirm) return;
+    const erstesLeeres = (authModus === "register" && !authFelder.name.trim()) ? "authName"
+      : !authFelder.email.trim() ? "authEmail"
+      : !authFelder.pass ? "authPass" : "";
+    ziel = erstesLeeres && document.getElementById(erstesLeeres);
+  }
+  if (ziel){
+    try { ziel.focus(); const n = ziel.value.length; ziel.setSelectionRange(n, n); } catch(e) {}
+  }
+}
+
+function authAbsenden(ev){
+  if (ev && ev.preventDefault) ev.preventDefault();
+  authFelderEinlesen();
+  if (authModus === "register") authRegistrieren(); else authAnmelden();
+  return false;
+}
+
+async function authAnmelden(){
+  if (authBusy) return;
+  authFelderEinlesen();
+  const email = authFelder.email.trim(), pass = authFelder.pass;
+  if (!authEmailOk(email)){
+    authFehler = "Bitte eine gueltige E-Mail-Adresse eingeben."; authFokusFeld = "authEmail"; render(); return;
+  }
+  if (!pass){
+    authFehler = "Bitte das Passwort eingeben."; authFokusFeld = "authPass"; render(); return;
+  }
+  authBusy = true; authFehler = ""; authInfo = ""; render();
+  let data = null, error = null;
+  try {
+    ({ data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass }));
+  } catch(e){ error = e; }
+  authBusy = false;
+  if (error){
+    authFehler = authFehlerText(error);
+    if (/not confirmed/i.test(String(error.message || ""))) authResend = true;
+    authFelder.pass = "";                 // Passwort leeren, E-Mail bleibt stehen
+    authFokusFeld = "authPass";
+    render(); return;
+  }
+  try { localStorage.setItem("wortstoff_letzte_mail", email); } catch(e) {}
+  authFelder.pass = "";
+  authResend = false;
+  onlineSession = data.session;
+  if (await ladeOnlineProfil()){ state.phase = "setup"; authInfo = ""; }
+  render();
+}
+
 async function authRegistrieren(){
   if (authBusy) return;
-  const username = String(document.getElementById("authName")?.value || "").trim();
-  const email = String(document.getElementById("authEmail")?.value || "").trim();
-  const pass = String(document.getElementById("authPass")?.value || "");
-  if (username.length < 3 || username.length > 24){ authFehler="Der Spielername muss 3 bis 24 Zeichen lang sein."; render(); return; }
-  if (!email){ authFehler="Bitte eine E-Mail-Adresse eingeben."; render(); return; }
-  if (pass.length < 6){ authFehler="Das Passwort muss mindestens 6 Zeichen lang sein."; render(); return; }
-  authBusy=true; authFehler=""; authInfo=""; render();
-  const { data, error } = await supabaseClient.auth.signUp({
-    email, password:pass, options:{data:{username}, emailRedirectTo:WORTSTOFF_APP_URL}
-  });
-  authBusy=false;
-  if (error){ authFehler=error.message; render(); return; }
-  if (data.session){
-    onlineSession=data.session;
-    if (await ladeOnlineProfil()) state.phase="setup";
-  } else {
-    authInfo="Konto angelegt. Bitte die Bestätigungs-E-Mail öffnen und danach hier anmelden.";
+  authFelderEinlesen();
+  const username = authFelder.name.trim();
+  const email = authFelder.email.trim();
+  const pass = authFelder.pass;
+  if (!authNameOk(username)){
+    authFehler = "Der Spielername muss 3 bis 24 Zeichen lang sein (Buchstaben, Ziffern, Leerzeichen, . _ -).";
+    authFokusFeld = "authName"; render(); return;
   }
+  if (!authEmailOk(email)){
+    authFehler = "Bitte eine gueltige E-Mail-Adresse eingeben."; authFokusFeld = "authEmail"; render(); return;
+  }
+  if (pass.length < 6){
+    authFehler = "Das Passwort muss mindestens 6 Zeichen lang sein."; authFokusFeld = "authPass"; render(); return;
+  }
+  authBusy = true; authFehler = ""; authInfo = ""; render();
+  let data = null, error = null;
+  try {
+    ({ data, error } = await supabaseClient.auth.signUp({
+      email, password: pass, options:{ data:{ username }, emailRedirectTo: WORTSTOFF_APP_URL }
+    }));
+  } catch(e){ error = e; }
+  authBusy = false;
+  if (error){ authFehler = authFehlerText(error); render(); return; }
+  try { localStorage.setItem("wortstoff_letzte_mail", email); } catch(e) {}
+  if (data && data.session){
+    authFelder.pass = "";
+    onlineSession = data.session;
+    if (await ladeOnlineProfil()) state.phase = "setup";
+  } else {
+    // Normalfall: In den Supabase-Einstellungen ist "Confirm email" ausgeschaltet,
+    // dann kommt oben direkt eine Session zurueck und es geht sofort weiter.
+    // Dieser Zweig greift nur, wenn die Bestaetigungspflicht doch noch aktiv ist.
+    authFelder.pass = "";
+    authModus = "login";
+    authResend = true;
+    authInfo = "Das Konto wurde angelegt, ist aber noch gesperrt: Im Supabase-Projekt ist die "
+      + "E-Mail-Bestaetigung noch eingeschaltet (Authentication \u2192 Sign In / Providers \u2192 Email "
+      + "\u2192 \u201eConfirm email\u201c ausschalten). Danach kannst du dich sofort anmelden.";
+  }
+  render();
+}
+
+async function authPasswortVergessen(){
+  if (authBusy) return;
+  authFelderEinlesen();
+  const email = authFelder.email.trim();
+  if (!authEmailOk(email)){
+    authFehler = "Bitte zuerst die E-Mail-Adresse eintragen \u2013 dorthin geht der Link zum Zuruecksetzen.";
+    authFokusFeld = "authEmail"; render(); return;
+  }
+  authBusy = true; authFehler = ""; authInfo = ""; render();
+  let error = null;
+  try {
+    ({ error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: WORTSTOFF_APP_URL }));
+  } catch(e){ error = e; }
+  authBusy = false;
+  if (error) authFehler = authFehlerText(error);
+  else authInfo = "Wenn es zu dieser Adresse ein Konto gibt, ist gerade eine E-Mail zum Zuruecksetzen unterwegs.";
   render();
 }
 
 async function authBestaetigungErneut(){
   if (authBusy) return;
-  const email = String(document.getElementById("authEmail")?.value || "").trim();
-  if (!email){ authFehler="Bitte zuerst die E-Mail-Adresse eingeben."; render(); return; }
-  authBusy=true; authFehler=""; authInfo=""; render();
-  const { error } = await supabaseClient.auth.resend({
-    type:"signup",
-    email,
-    options:{ emailRedirectTo:WORTSTOFF_APP_URL }
-  });
-  authBusy=false;
-  if (error){
-    authFehler = error.message;
-  } else {
-    authInfo = "Bestätigungs-E-Mail erneut angefordert. Beim eingebauten Supabase-Mailversand gilt ein sehr niedriges Versandlimit.";
+  authFelderEinlesen();
+  const email = authFelder.email.trim();
+  if (!authEmailOk(email)){
+    authFehler = "Bitte zuerst die E-Mail-Adresse eingeben."; authFokusFeld = "authEmail"; render(); return;
   }
+  authBusy = true; authFehler = ""; authInfo = ""; render();
+  let error = null;
+  try {
+    ({ error } = await supabaseClient.auth.resend({
+      type:"signup", email, options:{ emailRedirectTo: WORTSTOFF_APP_URL }
+    }));
+  } catch(e){ error = e; }
+  authBusy = false;
+  if (error) authFehler = authFehlerText(error);
+  else authInfo = "Bestaetigungs-E-Mail erneut angefordert. Der eingebaute Supabase-Mailversand hat ein sehr niedriges Limit \u2013 bitte etwas Geduld.";
   render();
 }
 
 async function authAbmelden(){
   await supabaseClient.auth.signOut();
   onlineSession=null; onlineProfile=null; ONLINE_HIGHSCORE=[]; SPIELER_DB={};
-  state.names=[]; state.phase="auth"; authInfo="Du wurdest abgemeldet."; authFehler="";
+  state.names=[]; state.phase="auth"; authInfo="Du wurdest abgemeldet. Bis zum naechsten Versuch!"; authFehler="";
+  authModus="login"; authFelder.pass=""; authFelder.name=""; authResend=false; authZeigePass=false;
   render();
 }
 async function initOnlineAuth(){
@@ -1415,19 +1722,106 @@ const HINWEISFRAGEN = [
   {grad:5,min:3,t:"4 Al + 3 O₂ → 2 Al₂O₃. Es liegen 4 mol Al und 2 mol O₂ vor. Wie viel Al₂O₃ kann maximal entstehen?",r:"4/3 mol",f:["1 mol","2 mol","8/3 mol"],h:"Sauerstoff ist der limitierende Stoff."},
   {grad:5,min:3,t:"Wie lautet der Konzentrationsterm fuer N₂ + 3 H₂ ⇌ 2 NH₃?",r:"Kc = [NH₃]² / ([N₂] · [H₂]³)",f:["Kc = [N₂] · [H₂]³ / [NH₃]²","Kc = 2[NH₃] / ([N₂] + 3[H₂])","Kc = [NH₃] / ([N₂] · [H₂])"]},
   {grad:5,min:3,t:"In einer galvanischen Zelle ist die Anode ...",r:"der Ort der Oxidation und bei der galvanischen Zelle der Minuspol",f:["der Ort der Reduktion und immer der Pluspol","nur die Elektrode mit der groesseren Masse","der Ort, an dem Elektronen verbraucht werden"]},
-  {grad:5,min:3,t:"100 mL 0,10-molare HCl werden mit 50 mL 0,10-molarer NaOH gemischt. Welche Aussage stimmt?",r:"Es bleiben 0,005 mol H₃O⁺ im Ueberschuss",f:["Die Loesung ist neutral","Es bleiben 0,005 mol OH⁻ im Ueberschuss","Es entstehen 0,015 mol H₃O⁺"]}
+  {grad:5,min:3,t:"100 mL 0,10-molare HCl werden mit 50 mL 0,10-molarer NaOH gemischt. Welche Aussage stimmt?",r:"Es bleiben 0,005 mol H₃O⁺ im Ueberschuss",f:["Die Loesung ist neutral","Es bleiben 0,005 mol OH⁻ im Ueberschuss","Es entstehen 0,015 mol H₃O⁺"]},
+
+  // ---- Erweiterung: deutlich groesserer Pool gegen Wiederholungen ----
+  {grad:1,min:1,t:"Welche Reaktionsgleichung für die Verbrennung von Kohlenstoff ist richtig ausgeglichen?",r:"C + O₂ → CO₂",f:["2 C + O₂ → CO₂","C + 2 O₂ → CO₂","C + O₂ → 2 CO"],h:"Links und rechts müssen gleich viele Atome stehen."},
+  {grad:1,min:1,t:"Eisen und Schwefel reagieren zu Eisensulfid. Welche Aussage stimmt?",r:"Es entsteht ein neuer Stoff mit ganz anderen Eigenschaften als Eisen und Schwefel",f:["Das Produkt bleibt magnetisch wie das Eisen vorher","Eisen und Schwefel behalten ihre Eigenschaften","Der Schwefel verdampft dabei vollständig"]},
+  {grad:1,min:1,t:"Welches Gas macht Kalkwasser trüb?",r:"Kohlenstoffdioxid",f:["Sauerstoff","Wasserstoff","Stickstoff"]},
+  {grad:1,min:1,t:"Warum erlischt eine Kerze in einem geschlossenen Glas nach kurzer Zeit?",r:"Der Sauerstoff im Glas ist verbraucht",f:["Das Wachs ist aufgebraucht","Der Docht wird zu heiß","Es entsteht zu viel Stickstoff"]},
+  {grad:1,min:1,t:"Zink wird in Salzsäure gegeben. Welches Gas entsteht?",r:"Wasserstoff",f:["Sauerstoff","Chlor","Kohlenstoffdioxid"],h:"Unedles Metall + Säure → Salz + Wasserstoff."},
+  {grad:1,min:1,t:"Welche Aussage über ein Stoffgemisch stimmt?",r:"Die Bestandteile behalten ihre Eigenschaften und lassen sich physikalisch trennen",f:["Es entsteht immer ein neuer Stoff","Es lässt sich nur durch eine chemische Reaktion trennen","Ein Gemisch hat immer einen festen Schmelzpunkt"]},
+  {grad:1,min:2,t:"Ein Natriumatom gibt ein Elektron ab. Welches Teilchen entsteht?",r:"Na⁺ mit 11 Protonen und 10 Elektronen",f:["Na⁻ mit 11 Protonen und 12 Elektronen","Na⁺ mit 10 Protonen und 11 Elektronen","Ein Natriumatom mit 10 Protonen"]},
+  {grad:1,min:2,t:"Warum zählt Helium zu den Edelgasen, obwohl es nur 2 Außenelektronen hat?",r:"Seine einzige Schale ist mit 2 Elektronen bereits voll besetzt",f:["Es hat in Wirklichkeit 8 Außenelektronen","Es ist eigentlich ein Metall","Alle Edelgase haben genau 2 Außenelektronen"]},
+  {grad:1,min:2,t:"Aus welchen Ionen ist Calciumchlorid aufgebaut?",r:"Ca²⁺ und 2 Cl⁻",f:["Ca⁺ und Cl⁻","Ca²⁺ und Cl²⁻","2 Ca²⁺ und Cl⁻"]},
+  {grad:1,min:2,t:"Warum leitet festes Kochsalz keinen Strom, geschmolzenes aber schon?",r:"Erst in der Schmelze sind die Ionen frei beweglich",f:["Erst in der Schmelze entstehen Elektronen","Festes Kochsalz enthält gar keine Ionen","In der Schmelze zerfällt Kochsalz zu Metall"]},
+
+  {grad:2,min:1,t:"12 g Kohlenstoff verbrennen vollständig mit 32 g Sauerstoff. Welche Masse Kohlenstoffdioxid entsteht?",r:"44 g",f:["20 g","32 g","56 g"],h:"Massenerhaltung: Masse der Edukte = Masse der Produkte."},
+  {grad:2,min:1,t:"Aus 24 g Magnesium entstehen 40 g Magnesiumoxid. Wie viel Sauerstoff hat reagiert?",r:"16 g",f:["8 g","24 g","64 g"]},
+  {grad:2,min:1,t:"Ein Reinstoff schmilzt bei 0 °C und siedet bei 100 °C. Um welchen Stoff handelt es sich?",r:"Wasser",f:["Ethanol","Kochsalz","Sauerstoff"]},
+  {grad:2,min:2,t:"Wie viele Atome enthält eine Formeleinheit Calciumnitrat Ca(NO₃)₂?",r:"9",f:["6","7","11"],h:"1 Ca + 2 N + 6 O."},
+  {grad:2,min:2,t:"Welche Formel hat Aluminiumsulfid?",r:"Al₂S₃",f:["AlS","Al₃S₂","AlS₃"],h:"Al³⁺ und S²⁻ gleichen sich im Verhältnis 2:3 aus."},
+  {grad:2,min:2,t:"Wie viele Neutronen hat das Isotop C-13 (Kohlenstoff, Ordnungszahl 6)?",r:"7",f:["6","12","13"]},
+  {grad:2,min:2,t:"Welche Aussage über Isotope stimmt?",r:"Sie haben gleich viele Protonen, aber unterschiedlich viele Neutronen",f:["Sie haben gleich viele Neutronen, aber unterschiedlich viele Protonen","Sie unterscheiden sich in der Elektronenzahl","Sie gehören zu verschiedenen Elementen"]},
+
+  {grad:3,min:2,t:"Welche Oxidationszahl hat Stickstoff in Salpetersäure HNO₃?",r:"+V",f:["+III","−III","+IV"]},
+  {grad:3,min:2,t:"Ein Kupferblech wird in Silbernitratlösung getaucht. Was passiert?",r:"Silber scheidet sich ab und die Lösung färbt sich blau",f:["Kupfer scheidet sich ab","Nichts, denn Kupfer ist edler als Silber","Es entsteht Wasserstoffgas"],h:"Silber ist edler als Kupfer."},
+  {grad:3,min:2,t:"Was gibt der pH-Wert an?",r:"Wie hoch die Konzentration der Oxonium-Ionen in der Lösung ist",f:["Wie viel Salz gelöst ist","Wie stark eine Lösung gefärbt ist","Wie hoch die Temperatur der Lösung ist"]},
+  {grad:3,min:2,t:"Welches Teilchen geben Säuren nach Brønsted ab?",r:"Protonen (H⁺)",f:["Elektronen","Hydroxid-Ionen","Neutronen"]},
+  {grad:3,min:3,t:"Wie viel wiegt 1 mol Wasser ungefähr? (H: 1 g/mol, O: 16 g/mol)",r:"18 g",f:["10 g","16 g","36 g"]},
+  {grad:3,min:3,t:"Welcher Stoffmenge entsprechen 5,6 g Eisen? (M = 56 g/mol)",r:"0,1 mol",f:["0,01 mol","1 mol","10 mol"]},
+  {grad:3,min:3,t:"Warum ist Wasser trotz kleiner Molekülmasse bei Raumtemperatur flüssig?",r:"Zwischen den Molekülen wirken Wasserstoffbrücken",f:["Die O–H-Bindungen sind besonders schwach","Wasser besteht aus Ionen","Wassermoleküle sind unpolar"]},
+
+  {grad:4,min:2,t:"Welches Volumen nimmt 1 mol eines Gases unter Normbedingungen ein?",r:"22,4 L",f:["1 L","11,2 L","44,8 L"]},
+  {grad:4,min:2,t:"In welchem Massenverhältnis reagieren Wasserstoff und Sauerstoff zu Wasser?",r:"1 : 8",f:["1 : 1","2 : 1","8 : 1"],h:"4 g H₂ und 32 g O₂ ergeben 36 g Wasser."},
+  {grad:4,min:2,t:"Welche Aussage zur Elektrolyse stimmt?",r:"An der Kathode werden Teilchen reduziert",f:["An der Kathode werden Teilchen oxidiert","Die Anode ist immer der Minuspol","Durch die Lösung fließen ausschließlich Elektronen"]},
+  {grad:4,min:3,t:"Welche Konzentration hat eine Lösung mit 0,5 mol Stoff in 250 mL?",r:"2 mol/L",f:["0,125 mol/L","0,5 mol/L","5 mol/L"]},
+  {grad:4,min:3,t:"Welchen pH-Wert hat Salzsäure mit c(HCl) = 0,01 mol/L?",r:"pH 2",f:["pH 1","pH 3","pH 12"]},
+  {grad:4,min:3,t:"Was bewirkt eine Druckerhöhung beim Gleichgewicht N₂ + 3 H₂ ⇌ 2 NH₃?",r:"Das Gleichgewicht verschiebt sich zur Seite mit weniger Gasteilchen, also zu NH₃",f:["Es verschiebt sich zu N₂ und H₂","Der Druck hat keinen Einfluss","Die Reaktion wird dadurch endotherm"]},
+  {grad:4,min:3,t:"Welche Masse Natriumchlorid entsteht aus 2 mol Natrium mit ausreichend Chlor? (M(NaCl) = 58,5 g/mol)",r:"117 g",f:["29,25 g","58,5 g","234 g"]},
+
+  {grad:5,min:2,t:"Warum entsteht bei der Elektrolyse einer Kochsalzlösung an der Kathode Wasserstoff und nicht Natrium?",r:"Wasser wird leichter reduziert als Natrium-Ionen",f:["Natrium-Ionen sind nicht beweglich","Natrium entsteht, verdampft aber sofort","Kochsalzlösung enthält keine Natrium-Ionen"]},
+  {grad:5,min:2,t:"Ein Alkan besitzt 5 Kohlenstoffatome. Wie lautet die Summenformel?",r:"C₅H₁₂",f:["C₅H₁₀","C₅H₁₁","C₅H₈"],h:"Alkane: CₙH₂ₙ₊₂."},
+  {grad:5,min:3,t:"Welche funktionelle Gruppe kennzeichnet Carbonsäuren?",r:"–COOH",f:["–OH","–CHO","–NH₂"]},
+  {grad:5,min:3,t:"Was geschieht bei einer Veresterung?",r:"Eine Carbonsäure und ein Alkohol reagieren unter Abspaltung von Wasser",f:["Zwei Alkohole reagieren unter Abspaltung von Wasserstoff","Eine Säure und eine Lauge reagieren zu Salz und Wasser","Ein Alkohol und ein Aldehyd reagieren zu einem Keton"]},
+  {grad:5,min:3,t:"Welchen pH-Wert hat eine Natronlauge mit c(OH⁻) = 0,001 mol/L?",r:"pH 11",f:["pH 3","pH 10","pH 13"]},
+  {grad:5,min:3,t:"Welche Aussage zur Aktivierungsenergie stimmt?",r:"Auch exotherme Reaktionen brauchen zuerst eine Aktivierungsenergie",f:["Exotherme Reaktionen brauchen keine Aktivierungsenergie","Ein Katalysator erhöht die Aktivierungsenergie","Die Aktivierungsenergie ist gleich der Reaktionsenthalpie"]}
 ];
-let letzteHinweisFrage = "";
+// Merkspeicher gegen Wiederholungen bei den Elementfragen
+let letzteElementfragen = [];      // Eintraege der Form "Mg|verbindung"
+
+// Aus der eigenen Hand ein Element ziehen und daraus eine Frage bauen.
+// Dadurch entstehen aus 118 Elementen x vielen Fragetypen praktisch
+// unbegrenzt viele verschiedene Fragen.
+function macheElementfrage(grad){
+  const hand = (state.hands && state.hands[state.current]) || [];
+  const ausHand = [...new Set(hand)].filter(sy => BY_SYMBOL[sy]);
+  // Schulrelevante Reserve, falls die eigene Hand zu wenig Auswahl bietet
+  const reserve = ELEMENTS.slice(0, 54).map(e => e[0]);
+  for (let versuch = 0; versuch < 20; versuch++){
+    const vorrat = (versuch < 8 && ausHand.length) ? ausHand : reserve;
+    const sym = zufall(vorrat);
+    const frage = macheFrage(sym, grad >= 3);
+    if (!frage) continue;
+    const schluessel = sym + "|" + (frage.typ || "");
+    if (letzteElementfragen.indexOf(schluessel) >= 0) continue;
+    if (warKuerzlich(frage.text)) continue;
+    letzteElementfragen.push(schluessel);
+    while (letzteElementfragen.length > 24) letzteElementfragen.shift();
+    merkeZuletzt(frage.text);
+    frage.sym = sym;
+    frage.schwierigkeitsgrad = grad;
+    frage.schwierigkeitsname = HINWEIS_SCHWIERIGKEIT[grad];
+    return frage;
+  }
+  return null;
+}
+
 function macheHinweisfrage(nummer){
   const grad = Math.min(5, Math.max(1, nummer));
   const basis = ({k78:1,k9:2,ober:3})[state.niveau || "k9"] || 2;
   const maxMin = Math.min(3, basis + (nummer >= 3 ? 1 : 0));
   let pool = HINWEISFRAGEN.filter(q => q.grad === grad && q.min <= maxMin);
   if (!pool.length) pool = HINWEISFRAGEN.filter(q => q.grad === grad);
-  let kandidaten = pool.filter(q => q.t !== letzteHinweisFrage);
-  if (!kandidaten.length) kandidaten = pool;
-  const q = zufall(kandidaten);
-  letzteHinweisFrage = q.t;
+
+  // 1. In knapp der Haelfte der Faelle eine frisch erzeugte Elementfrage
+  if (Math.random() < 0.45){
+    const ef = macheElementfrage(grad);
+    if (ef) return ef;
+  }
+  // 2. Eine feste Frage, die in diesem Fach noch nie gestellt wurde
+  let q = waehleFrage(pool, "hinweis", true);
+  // 3. Ist der feste Pool leer, lieber eine neue Elementfrage als eine Wiederholung
+  if (!q){
+    const ef = macheElementfrage(grad);
+    if (ef) return ef;
+    q = waehleFrage(pool, "hinweis", false);
+  }
+  if (!q){
+    return { text:"Welches Gas macht Kalkwasser trueb?",
+      optionen:["Kohlenstoffdioxid","Sauerstoff","Wasserstoff","Stickstoff"], richtig:0,
+      schwierigkeitsgrad:grad, schwierigkeitsname:HINWEIS_SCHWIERIGKEIT[grad] };
+  }
   const optionen = mischen([q.r, ...q.f]);
   return {
     text:q.t, optionen, richtig:optionen.indexOf(q.r), hinweis:q.h,
@@ -2596,23 +2990,36 @@ const ALLTAG_ZUSATZFRAGEN = [
 // Bereits gestellte Fragen werden im Browser gespeichert. Erst wenn alle für
 // die gewählte Klassenstufe geeigneten Fragen verbraucht sind, beginnt die
 // Kartei neu. Dadurch kann nicht schon in Runde 2 dieselbe Frage erscheinen.
-const FRAGENKARTEI_KEY = "wortstoff_v41_fragenkartei";
-let FRAGENKARTEI = { start: new Set(), bonus: new Set() };
+const FRAGENKARTEI_KEY = "wortstoff_v42_fragenkartei";
+let FRAGENKARTEI = { start: new Set(), bonus: new Set(), hinweis: new Set() };
+
+// Zusaetzliches Kurzzeitgedaechtnis: die zuletzt gestellten Fragen werden
+// unabhaengig vom Fach gesperrt. So kann keine Frage in derselben Sitzung
+// kurz hintereinander noch einmal auftauchen.
+const LETZTE_FRAGEN_MAX = 40;
+let LETZTE_FRAGEN = [];
+function warKuerzlich(text){ return LETZTE_FRAGEN.indexOf(text) >= 0; }
+function merkeZuletzt(text){
+  LETZTE_FRAGEN.push(text);
+  while (LETZTE_FRAGEN.length > LETZTE_FRAGEN_MAX) LETZTE_FRAGEN.shift();
+}
 
 function ladeFragenkartei(){
   try {
     const gespeichert = JSON.parse(localStorage.getItem(FRAGENKARTEI_KEY) || "{}");
-    FRAGENKARTEI.start = new Set(Array.isArray(gespeichert.start) ? gespeichert.start : []);
-    FRAGENKARTEI.bonus = new Set(Array.isArray(gespeichert.bonus) ? gespeichert.bonus : []);
+    FRAGENKARTEI.start   = new Set(Array.isArray(gespeichert.start)   ? gespeichert.start   : []);
+    FRAGENKARTEI.bonus   = new Set(Array.isArray(gespeichert.bonus)   ? gespeichert.bonus   : []);
+    FRAGENKARTEI.hinweis = new Set(Array.isArray(gespeichert.hinweis) ? gespeichert.hinweis : []);
   } catch(e) {
-    FRAGENKARTEI = { start:new Set(), bonus:new Set() };
+    FRAGENKARTEI = { start:new Set(), bonus:new Set(), hinweis:new Set() };
   }
 }
 function speichereFragenkartei(){
   try {
     localStorage.setItem(FRAGENKARTEI_KEY, JSON.stringify({
       start:[...FRAGENKARTEI.start],
-      bonus:[...FRAGENKARTEI.bonus]
+      bonus:[...FRAGENKARTEI.bonus],
+      hinweis:[...FRAGENKARTEI.hinweis]
     }));
   } catch(e) {}
 }
@@ -2632,6 +3039,28 @@ function resetFragenFuerPool(pool, art){
   for (const q of eindeutigeFragen(pool)) FRAGENKARTEI[art].delete(q.t);
 }
 
+// Zentrale Fragenauswahl:
+// 1. bevorzugt Fragen, die in diesem Fach noch nie gestellt wurden
+// 2. davon bevorzugt solche, die nicht in den letzten 40 Fragen vorkamen
+// 3. erst wenn der ganze Pool durch ist, beginnt er von vorn
+// nurUnbenutzt=true liefert null, statt den Pool zurueckzusetzen.
+function waehleFrage(pool, art, nurUnbenutzt){
+  const alle = eindeutigeFragen(pool);
+  if (!alle.length) return null;
+  let kandidaten = alle.filter(q => !FRAGENKARTEI[art].has(q.t));
+  if (!kandidaten.length){
+    if (nurUnbenutzt) return null;
+    resetFragenFuerPool(alle, art);
+    kandidaten = alle.slice();
+  }
+  const frisch = kandidaten.filter(q => !warKuerzlich(q.t));
+  if (frisch.length) kandidaten = frisch;
+  const q = zufall(kandidaten);
+  merkeFrage(q, art);
+  merkeZuletzt(q.t);
+  return q;
+}
+
 ladeFragenkartei();
 
 function macheAlltagsZusatzfrage(sym){
@@ -2645,36 +3074,14 @@ function macheAlltagsZusatzfrage(sym){
   // 1. noch nicht gestellte Frage zum aktuellen Element
   // 2. noch nicht gestellte allgemeine Alltagsfrage
   // 3. irgendeine noch nicht gestellte Frage der Klassenstufe
-  let kandidaten = unbenutzteFragen(passend, "bonus");
-  let elementbezug = kandidaten.length > 0;
+  // 4. erst dann faengt der Pool dieser Klassenstufe von vorn an
+  let q = waehleFrage(passend, "bonus", true);
+  let elementbezug = !!q;
+  if (!q) q = waehleFrage(allgemein, "bonus", true);
+  if (!q) q = waehleFrage(erlaubt, "bonus", true);
+  if (!q) q = waehleFrage(erlaubt, "bonus", false);
+  if (!q) return macheAlltagsfrage();
 
-  if (!kandidaten.length) {
-    kandidaten = unbenutzteFragen(allgemein, "bonus");
-    elementbezug = false;
-  }
-  if (!kandidaten.length) {
-    kandidaten = unbenutzteFragen(erlaubt, "bonus");
-    elementbezug = false;
-  }
-
-  // Erst wenn wirklich alle geeigneten Zusatzfragen gestellt wurden,
-  // wird ausschließlich dieser Klassenstufen-Pool zurückgesetzt.
-  if (!kandidaten.length) {
-    resetFragenFuerPool(erlaubt, "bonus");
-    kandidaten = unbenutzteFragen(passend, "bonus");
-    elementbezug = kandidaten.length > 0;
-    if (!kandidaten.length) {
-      kandidaten = unbenutzteFragen(allgemein, "bonus");
-      elementbezug = false;
-    }
-    if (!kandidaten.length) {
-      kandidaten = unbenutzteFragen(erlaubt, "bonus");
-      elementbezug = false;
-    }
-  }
-
-  const q = zufall(kandidaten);
-  merkeFrage(q, "bonus");
   const optionen = mischen([q.r, ...q.f]);
   return {
     text:q.t,
@@ -2694,18 +3101,7 @@ function macheAlltagsfrage(){
   else if (niveau === "k9") pool = [...ALLTAGSCHEMIE_FRAGEN.k78, ...ALLTAGSCHEMIE_FRAGEN.k9];
   else pool = [...ALLTAGSCHEMIE_FRAGEN.k78, ...ALLTAGSCHEMIE_FRAGEN.k9, ...ALLTAGSCHEMIE_FRAGEN.ober];
 
-  pool = eindeutigeFragen(pool);
-  let kandidaten = unbenutzteFragen(pool, "start");
-
-  // Ein neuer Durchlauf beginnt erst, wenn jede geeignete Eingangsfrage
-  // mindestens einmal gestellt wurde.
-  if (!kandidaten.length) {
-    resetFragenFuerPool(pool, "start");
-    kandidaten = unbenutzteFragen(pool, "start");
-  }
-
-  const q = zufall(kandidaten);
-  merkeFrage(q, "start");
+  const q = waehleFrage(pool, "start", false);
   const optionen = mischen([q.r, ...q.f]);
   return { text:q.t, optionen, richtig:optionen.indexOf(q.r), hinweis:q.h };
 }
@@ -2714,10 +3110,9 @@ function macheReaktionsfrage(){
   const niveau = state.niveau || "k9";
   let pool;
   if (niveau === "k78") pool = REAKTIONSFRAGEN.k78;
-  else if (niveau === "k9") pool = [...REAKTIONSFRAGEN.k78, ...REAKTIONSFRAGEN.k9, ...REAKTIONSFRAGEN.k9];
-  else pool = [...REAKTIONSFRAGEN.k78, ...REAKTIONSFRAGEN.k9, ...REAKTIONSFRAGEN.k9,
-               ...REAKTIONSFRAGEN.ober, ...REAKTIONSFRAGEN.ober];
-  const q = zufall(pool);
+  else if (niveau === "k9") pool = [...REAKTIONSFRAGEN.k78, ...REAKTIONSFRAGEN.k9];
+  else pool = [...REAKTIONSFRAGEN.k78, ...REAKTIONSFRAGEN.k9, ...REAKTIONSFRAGEN.ober];
+  const q = waehleFrage(pool, "hinweis", false);
   const optionen = mischen([q.r, ...q.f]);
   return { text: q.t, optionen, richtig: optionen.indexOf(q.r), hinweis: q.h };
 }
@@ -3200,6 +3595,9 @@ function mischen(arr){
   return a;
 }
 
+let LETZTER_FRAGETYP = "";
+let letzteVerbindungen = [];
+
 function macheFrage(sym, schwer){
   const [symbol,name,z,,kat,zustand] = BY_SYMBOL[sym];
   const istHG = HAUPTGRUPPEN.has(kat);
@@ -3214,9 +3612,9 @@ function macheFrage(sym, schwer){
   const t9 = ["ordnungszahl","kategorie","radioaktiv"];
   if (z <= 20) t9.push("schalen","schalen");
   if (istHG && z <= 86) t9.push("valenz","wertigkeit","hauptgruppe","periode");
-  if (ION[sym] !== undefined) t9.push("ion","ion");
-  if (VERBINDUNG[sym]) t9.push("verbindung","verbindung");
-  if (FLAMME[sym]) t9.push("flamme","flamme");
+  if (ION[sym] !== undefined) t9.push("ion");
+  if (VERBINDUNG[sym] || VERBINDUNG_EXTRA[sym]) t9.push("verbindung");
+  if (FLAMME[sym]) t9.push("flamme");
   if (kat==="ALK" || HALOGEN_RANG[sym]) t9.push("reaktiv");
 
   const tOber = (z <= 103) ? ["konfig"] : [];
@@ -3233,12 +3631,15 @@ function macheFrage(sym, schwer){
     if (schwere.length) typen = schwere;
   }
   if (!typen.length) typen = ["name","ordnungszahl"];
-  const typ = zufall(typen);
+  // denselben Fragetyp nicht zweimal direkt hintereinander stellen
+  const ohneLetzten = typen.filter(t => t !== LETZTER_FRAGETYP);
+  const typ = zufall(ohneLetzten.length ? ohneLetzten : typen);
+  LETZTER_FRAGETYP = typ;
 
   if (typ==="metallart"){
     const richtig = metallart(kat);
     const optionen = mischen(["Metall","Halbmetall","Nichtmetall"]);
-    return { text:`Ist ${name} ein Metall, ein Halbmetall oder ein Nichtmetall?`,
+    return { typ, text:`Ist ${name} ein Metall, ein Halbmetall oder ein Nichtmetall?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
 
@@ -3253,7 +3654,7 @@ function macheFrage(sym, schwer){
       if (falsch.length===3) break;
     }
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`Wie verteilen sich die Elektronen von ${name} auf die Schalen (K, L, M, \u2026)?`,
+    return { typ, text:`Wie verteilen sich die Elektronen von ${name} auf die Schalen (K, L, M, \u2026)?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
 
@@ -3261,7 +3662,7 @@ function macheFrage(sym, schwer){
     const richtig = hauptgruppeVon(sym);
     const falsch = mischen(ROEMISCH.filter(r=>r!==richtig)).slice(0,3);
     const optionen = mischen([richtig, ...falsch]).map(r=>r+". Hauptgruppe");
-    return { text:`In welcher Hauptgruppe des Periodensystems steht ${name}?`,
+    return { typ, text:`In welcher Hauptgruppe des Periodensystems steht ${name}?`,
       optionen, richtig: optionen.indexOf(richtig+". Hauptgruppe") };
   }
 
@@ -3269,7 +3670,7 @@ function macheFrage(sym, schwer){
     const richtig = periodeVon(z, sym);
     const falsch = mischen([1,2,3,4,5,6,7].filter(p=>p!==richtig)).slice(0,3);
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`In welcher Periode des Periodensystems steht ${name}?`,
+    return { typ, text:`In welcher Periode des Periodensystems steht ${name}?`,
       optionen: optionen.map(String), richtig: optionen.indexOf(richtig) };
   }
 
@@ -3279,7 +3680,7 @@ function macheFrage(sym, schwer){
     const falsch = mischen([1,2,3,-1,-2,-3].filter(l=>l!==ladung)).slice(0,3)
       .map(l=>ionText(sym, l));
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`Welches Ion bildet ${name} typischerweise?`,
+    return { typ, text:`Welches Ion bildet ${name} typischerweise?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
 
@@ -3287,15 +3688,21 @@ function macheFrage(sym, schwer){
     const richtig = wertigkeit(z, sym);
     const falsch = mischen([0,1,2,3,4].filter(v=>v!==richtig)).slice(0,3);
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`Welche Wertigkeit hat ${name} ueblicherweise in Verbindungen (z.B. gegenueber Wasserstoff)?`,
+    return { typ, text:`Welche Wertigkeit hat ${name} ueblicherweise in Verbindungen (z.B. gegenueber Wasserstoff)?`,
       optionen: optionen.map(String), richtig: optionen.indexOf(richtig) };
   }
 
   if (typ==="verbindung"){
-    const [partner, teile] = VERBINDUNG[sym];
+    // aus allen bekannten Verbindungen dieses Elements auswaehlen und die
+    // zuletzt gefragten Partner meiden -> nicht staendig "Magnesium mit Sauerstoff"
+    const liste = [VERBINDUNG[sym], ...(VERBINDUNG_EXTRA[sym] || [])].filter(Boolean);
+    const frisch = liste.filter(v => letzteVerbindungen.indexOf(sym + "|" + v[0]) < 0);
+    const [partner, teile] = zufall(frisch.length ? frisch : liste);
+    letzteVerbindungen.push(sym + "|" + partner);
+    while (letzteVerbindungen.length > 30) letzteVerbindungen.shift();
     const richtig = formel(teile);
     const optionen = mischen([richtig, ...formelVarianten(teile)]);
-    return { text:`Welche Formel hat die typische Verbindung von ${name} mit ${partner}?`,
+    return { typ, text:`Welche Formel hat die typische Verbindung von ${name} mit ${partner}?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
 
@@ -3312,7 +3719,7 @@ function macheFrage(sym, schwer){
       if (falsch.length===3) break;
     }
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`Wie lautet die Elektronenkonfiguration von ${name}?`,
+    return { typ, text:`Wie lautet die Elektronenkonfiguration von ${name}?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
 
@@ -3320,7 +3727,7 @@ function macheFrage(sym, schwer){
     const richtig = valenzelektronen(z, sym);
     const falsch = mischen([1,2,3,4,5,6,7,8].filter(v=>v!==richtig)).slice(0,3);
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`Wie viele Valenzelektronen (Aussenelektronen) hat ${name}?`,
+    return { typ, text:`Wie viele Valenzelektronen (Aussenelektronen) hat ${name}?`,
       optionen: optionen.map(String), richtig: optionen.indexOf(richtig) };
   }
 
@@ -3328,7 +3735,7 @@ function macheFrage(sym, schwer){
     const richtig = FLAMME[sym];
     const falsch = mischen(FLAMMEN_FARBEN.filter(f=>f!==richtig)).slice(0,3);
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`Welche Flammenfaerbung zeigt ${name}?`,
+    return { typ, text:`Welche Flammenfaerbung zeigt ${name}?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
 
@@ -3345,7 +3752,7 @@ function macheFrage(sym, schwer){
     while (falsch.length<3) falsch.push(d * [0.3,2.5,6][falsch.length]);
     const fmt = x => x.toFixed(x<3?2:1).replace(".",",");
     const optionen = mischen([d, ...falsch]);
-    return { text:`Welche Dichte hat ${name} ungefaehr (in g/cm\u00b3)?`,
+    return { typ, text:`Welche Dichte hat ${name} ungefaehr (in g/cm\u00b3)?`,
       optionen: optionen.map(fmt), richtig: optionen.indexOf(d) };
   }
 
@@ -3356,7 +3763,7 @@ function macheFrage(sym, schwer){
         "Nichts \u2013 es sinkt einfach zu Boden",
         "Es loest sich langsam ohne Gasbildung",
         "Es reagiert nur mit heissem Wasserdampf"]);
-      return { text:`Was passiert, wenn man ${name} in Wasser gibt?`,
+      return { typ, text:`Was passiert, wenn man ${name} in Wasser gibt?`,
         optionen, richtig: optionen.indexOf(richtig) };
     }
     if (kat==="EDG"){
@@ -3365,14 +3772,14 @@ function macheFrage(sym, schwer){
         "Es reagiert heftig mit Wasser",
         "Es verbrennt an der Luft",
         "Es reagiert stark mit Metallen"]);
-      return { text:`Wie reaktionsfreudig ist das Edelgas ${name}?`,
+      return { typ, text:`Wie reaktionsfreudig ist das Edelgas ${name}?`,
         optionen, richtig: optionen.indexOf(richtig) };
     }
     if (HALOGEN_RANG[sym]){
       const andere = zufall(Object.keys(HALOGEN_RANG).filter(h=>h!==sym));
       const richtig = HALOGEN_RANG[sym] > HALOGEN_RANG[andere] ? "Ja" : "Nein";
       const optionen = ["Ja","Nein"];
-      return { text:`Ist ${name} reaktionsfreudiger als ${BY_SYMBOL[andere][1]}?`,
+      return { typ, text:`Ist ${name} reaktionsfreudiger als ${BY_SYMBOL[andere][1]}?`,
         optionen, richtig: optionen.indexOf(richtig),
         hinweis:"Bei den Halogenen nimmt die Reaktivitaet von Fluor zu Astat ab." };
     }
@@ -3382,7 +3789,7 @@ function macheFrage(sym, schwer){
       "Sehr hoch \u2013 es reagiert schon mit Luftfeuchtigkeit",
       "Es reagiert heftig mit Wasser",
       "Es entzuendet sich von selbst an der Luft"]);
-    return { text:`Wie reaktionsfreudig ist ${name}?`,
+    return { typ, text:`Wie reaktionsfreudig ist ${name}?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
 
@@ -3390,13 +3797,13 @@ function macheFrage(sym, schwer){
     const richtig = KAT_NAMEN[kat];
     const falsch = mischen(Object.values(KAT_NAMEN).filter(k=>k!==richtig)).slice(0,3);
     const optionen = mischen([richtig, ...falsch]);
-    return { text:`Zu welcher Kategorie gehoert ${name}?`,
+    return { typ, text:`Zu welcher Kategorie gehoert ${name}?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
   if (typ==="zustand"){
     const richtig = ZUSTAND_NAMEN[zustand];
     const optionen = mischen(Object.values(ZUSTAND_NAMEN));
-    return { text:`Welchen Aggregatzustand hat ${name} bei Raumtemperatur?`,
+    return { typ, text:`Welchen Aggregatzustand hat ${name} bei Raumtemperatur?`,
       optionen, richtig: optionen.indexOf(richtig) };
   }
   if (typ==="ordnungszahl"){
@@ -3409,18 +3816,18 @@ function macheFrage(sym, schwer){
     const optionen = mischen([z, ...falsch]);
     const text = zufall([`Welche Ordnungszahl hat ${name}?`,
       `Wie viele Protonen enthaelt der Atomkern von ${name}?`]);
-    return { text, optionen: optionen.map(String), richtig: optionen.indexOf(z), zahlVerdeckt:true };
+    return { typ, text, optionen: optionen.map(String), richtig: optionen.indexOf(z), zahlVerdeckt:true };
   }
   if (typ==="name"){
     const falsch = mischen(ELEMENTS.filter(e=>e[0]!==symbol)).slice(0,3).map(e=>e[1]);
     const optionen = mischen([name, ...falsch]);
-    return { text:`Wie heisst das Element mit dem Symbol ${symbol}?`,
+    return { typ, text:`Wie heisst das Element mit dem Symbol ${symbol}?`,
       optionen, richtig: optionen.indexOf(name), verdeckt:true };
   }
   // radioaktiv
   const richtig = istRadioaktiv(sym) ? "Ja" : "Nein";
   const optionen = ["Ja","Nein"];
-  return { text:`Ist ${name} radioaktiv (kein stabiles Isotop)?`,
+  return { typ, text:`Ist ${name} radioaktiv (kein stabiles Isotop)?`,
     optionen, richtig: optionen.indexOf(richtig) };
 }
 
@@ -3770,8 +4177,9 @@ function hinweisGeben(){
     render(); return;
   }
   state.message = "";
+  const hFrage = macheHinweisfrage(hinweisNr);
   state.quiz = {
-    sym:null, frage:macheHinweisfrage(hinweisNr), gewaehlt:null,
+    sym: hFrage.sym || null, frage: hFrage, gewaehlt:null,
     art:"hinweis", kosten, hinweisNr
   };
   state.phase = "quiz";
@@ -3992,41 +4400,94 @@ function render(){
   const app = document.getElementById("app");
 
   if (state.phase==="auth"){
+    const reg = authModus === "register";
     app.innerHTML = `
-    <div class="card setup-card" style="max-width:620px;margin-top:35px">
+    <div class="card setup-card" style="max-width:560px;margin-top:30px">
       <div class="brand-hero">
-        <div class="brand-atom">⚛</div>
+        <div class="brand-atom">\u269b</div>
         <div>
           <h1>WORTSTOFF ONLINE</h1>
-          <div class="sub">Das Chemie-Wortspiel · Benutzerkonto · Online-Highscore</div>
+          <div class="sub">Das Chemie-Wortspiel \u00b7 Konto \u00b7 Online-Highscore</div>
           <div class="hero-badges">
-            <span class="hero-badge">🧪 Chemie</span><span class="hero-badge">🔤 Wortspiel</span>
-            <span class="hero-badge">☁️ Punkte online gespeichert</span>
+            <span class="hero-badge">\ud83e\uddea Chemie</span>
+            <span class="hero-badge">\ud83d\udd24 Wortspiel</span>
+            <span class="hero-badge">\u2601\ufe0f Punkte online gespeichert</span>
           </div>
         </div>
       </div>
-      <div class="spielidee">
-        <div class="idee"><b>1 · Konto erstellen</b>Spielername, E-Mail und Passwort festlegen.</div>
-        <div class="idee"><b>2 · Überall anmelden</b>Auf jedem Gerät mit demselben Konto weiterspielen.</div>
-        <div class="idee"><b>3 · Punkte sammeln</b>Gesamt- und Tagespunkte werden bei Supabase gespeichert.</div>
-        <div class="idee"><b>4 · Highscore</b>Dein Punktestand erscheint in der Online-Rangliste.</div>
+
+      <div class="auth-tabs" role="tablist" aria-label="Anmelden oder neues Konto">
+        <button type="button" class="auth-tab" role="tab" aria-selected="${!reg}"
+          ${authBusy?"disabled":""} onclick="authWechsle('login')">\ud83d\udd10 Anmelden</button>
+        <button type="button" class="auth-tab" role="tab" aria-selected="${reg}"
+          ${authBusy?"disabled":""} onclick="authWechsle('register')">\u2728 Neues Konto</button>
       </div>
-      <div class="section-title">Anmelden oder registrieren</div>
-      <label style="font-size:13px;font-weight:700">Spielername <span class="hint">(nur beim Registrieren)</span></label>
-      <input id="authName" type="text" maxlength="24" autocomplete="username" placeholder="z. B. ChemieWolf" style="margin:4px 0 10px">
-      <label style="font-size:13px;font-weight:700">E-Mail</label>
-      <input id="authEmail" type="email" autocomplete="email" placeholder="name@example.de" style="margin:4px 0 10px">
-      <label style="font-size:13px;font-weight:700">Passwort</label>
-      <input id="authPass" type="password" minlength="6" autocomplete="current-password" placeholder="mindestens 6 Zeichen" style="margin:4px 0 10px">
-      ${authFehler?`<div class="message-box" style="margin:8px 0;border-color:var(--bad)">⚠️ ${esc(authFehler)}</div>`:""}
-      ${authInfo?`<div class="message-box" style="margin:8px 0;border-color:var(--good)">✅ ${esc(authInfo)}</div>`:""}
-      <div class="row" style="margin-top:10px;flex-wrap:wrap">
-        <button class="primary" style="flex:1;min-width:180px" ${authBusy?"disabled":""} onclick="authAnmelden()">🔐 Anmelden</button>
-        <button style="flex:1;min-width:180px" ${authBusy?"disabled":""} onclick="authRegistrieren()">✨ Neues Konto</button>
-        <button style="flex:1;min-width:180px" ${authBusy?"disabled":""} onclick="authBestaetigungErneut()">📧 Bestätigung erneut senden</button>
+
+      <form onsubmit="return authAbsenden(event)" novalidate>
+        ${reg ? `
+        <div class="feld">
+          <label for="authName">Spielername</label>
+          <input id="authName" type="text" maxlength="24" autocomplete="nickname"
+            spellcheck="false" placeholder="z.\u202fB. ChemieWolf" value="${esc(authFelder.name)}"
+            aria-describedby="hintName" ${authBusy?"disabled":""}
+            oninput="authFeld('name',this.value)">
+          <div class="feld-hinweis" id="hintName"></div>
+        </div>` : ""}
+
+        <div class="feld">
+          <label for="authEmail">E-Mail-Adresse</label>
+          <input id="authEmail" type="email" inputmode="email" autocomplete="email"
+            spellcheck="false" autocapitalize="off" placeholder="name@example.de"
+            value="${esc(authFelder.email)}" aria-describedby="hintEmail" ${authBusy?"disabled":""}
+            oninput="authFeld('email',this.value)">
+          <div class="feld-hinweis" id="hintEmail"></div>
+        </div>
+
+        <div class="feld">
+          <label for="authPass">Passwort</label>
+          <div class="pass-wrap">
+            <input id="authPass" type="${authZeigePass?"text":"password"}" minlength="6"
+              autocomplete="${reg?"new-password":"current-password"}"
+              placeholder="${reg?"mindestens 6 Zeichen":"dein Passwort"}"
+              aria-describedby="hintPass" ${authBusy?"disabled":""}
+              oninput="authFeld('pass',this.value)"
+              onkeyup="authCaps(event)" onkeydown="authCaps(event)">
+            <button type="button" class="pass-auge" id="authPassBtn" ${authBusy?"disabled":""}
+              onclick="authPassToggle()"
+              aria-label="${authZeigePass?"Passwort verbergen":"Passwort anzeigen"}"
+              >${authZeigePass?"\ud83d\ude48":"\ud83d\udc41"}</button>
+          </div>
+          ${reg?`<div class="pw-meter" id="pwMeter"><span></span><span></span><span></span><span></span></div>`:""}
+          <div class="feld-hinweis" id="hintPass"></div>
+          <div class="auth-caps" id="authCaps">\u26a0\ufe0f Die Feststelltaste (Caps Lock) ist an.</div>
+        </div>
+
+        ${authFehler?`<div class="auth-msg fehler" role="alert">\u26a0\ufe0f ${esc(authFehler)}</div>`:""}
+        ${authInfo?`<div class="auth-msg info" role="status">\u2705 ${esc(authInfo)}</div>`:""}
+
+        <button class="primary" type="submit" style="width:100%;font-size:16px;padding:14px;margin-top:4px"
+          ${authBusy?"disabled":""}>${authBusy
+            ? `<span class="lade-punkt">\u23f3</span> ${reg?"Konto wird angelegt":"Anmeldung l\u00e4uft"} \u2026`
+            : (reg ? "\u2728 Konto anlegen und loslegen" : "\ud83d\udd10 Anmelden")}</button>
+      </form>
+
+      <div class="auth-links">
+        ${reg
+          ? `<button type="button" class="auth-link" ${authBusy?"disabled":""}
+               onclick="authWechsle('login')">Ich habe schon ein Konto</button>`
+          : `<button type="button" class="auth-link" ${authBusy?"disabled":""}
+               onclick="authPasswortVergessen()">Passwort vergessen?</button>`}
+        ${authResend?`<button type="button" class="auth-link" ${authBusy?"disabled":""}
+            onclick="authBestaetigungErneut()">\ud83d\udce7 Best\u00e4tigungs-Mail erneut senden</button>`:""}
       </div>
-      <div class="hint" style="margin-top:12px">Bei aktivierter E-Mail-Bestätigung musst du nach der Registrierung zuerst den Link in der Supabase-Mail anklicken.</div>
+
+      <div class="hint" style="margin-top:14px;border-top:1px solid var(--line);padding-top:11px">
+        ${reg
+          ? "Name, E-Mail und Passwort eintragen \u2013 danach geht es sofort los. Die E-Mail-Adresse brauchst du nur, um dich sp\u00e4ter auf einem anderen Ger\u00e4t wieder anzumelden. Dein Spielername erscheint in der Online-Rangliste."
+          : "Mit demselben Konto kannst du auf Handy, Tablet und PC weiterspielen \u2013 deine Punkte wandern mit."}
+      </div>
     </div>`;
+    authNachRender();
     return;
   }
 
