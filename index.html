@@ -294,14 +294,6 @@
     display:block; height:100%; border-radius:999px;
     background:linear-gradient(90deg,var(--accent),var(--accent2),var(--sun));
   }
-  .bonus-mark {
-    box-shadow:0 0 0 3px var(--sun),0 9px 22px rgba(255,183,3,.28) !important;
-  }
-  .bonus-mark::after {
-    content:"🔎"; position:absolute; left:-7px; top:-10px; width:22px; height:22px;
-    display:grid; place-items:center; border-radius:50%; background:var(--sun);
-    font-size:12px; box-shadow:0 3px 8px rgba(0,0,0,.18);
-  }
   .commentator {
     display:flex; gap:9px; align-items:center; justify-content:center;
     margin:8px auto; font-size:12px; color:var(--grey);
@@ -791,15 +783,15 @@ function suchbonusFuerName(name){
   const tagesbonus = p.heute >= 200;
   return {
     buchstaben:Math.min(3, stufe + (tagesbonus ? 1 : 0)),
-    kartenMarkieren:p.total >= 1000,
+    kartenMarkieren:false,
     tagesbonus, stufe, profil:p
   };
 }
 function bonusBezeichnung(name){
   const b = suchbonusFuerName(name);
   const teile = [];
-  if (b.stufe===1) teile.push("500-Punkte-Lupe");
-  if (b.stufe===2) teile.push("1000-Punkte-Scanner");
+  if (b.stufe===1) teile.push("500-Punkte-Hinweis");
+  if (b.stufe===2) teile.push("1000-Punkte-Doppelhinweis");
   if (b.tagesbonus) teile.push("Tages-Turbo");
   return teile.length ? teile.join(" + ") : "noch kein Suchbonus";
 }
@@ -821,7 +813,7 @@ function bonusStatusHtml(name, kompakt=false){
   return `<div class="bonus-panel">
     <b>🔎 Suchbonus für ${esc(name)}</b>
     <div class="hint" style="margin-top:4px">
-      500 Gesamtpunkte: 1 zufällige Elementposition · 1000: 2 zufällige Elementpositionen und passende Karten markiert ·
+      500 Gesamtpunkte: 1 zufällige Elementposition · 1000: 2 zufällige Elementpositionen ·
       200 Tagespunkte: 1 zusätzlicher Elementhinweis.
     </div>
     <div style="margin-top:9px;font-size:12px">Heute: <b>${p.heute}/200</b>
@@ -916,9 +908,9 @@ function registrierePunkte(index, delta){
   p.aktualisiert = Date.now();
   const meldungen = [];
   if (vorherGesamt < 500 && p.total >= 500)
-    meldungen.push("500 Gesamtpunkte erreicht: Die Wort-Lupe verrät ab jetzt ein zufällig platziertes Element im Zielwort.");
+    meldungen.push("500 Gesamtpunkte erreicht: Ab jetzt wird ein zufällig platziertes Element im Zielwort verraten.");
   if (vorherGesamt < 1000 && p.total >= 1000)
-    meldungen.push("1000 Gesamtpunkte erreicht: Zwei zufällige Elementpositionen werden verraten und passende Karten markiert.");
+    meldungen.push("1000 Gesamtpunkte erreicht: Zwei zufällige Elementpositionen werden verraten. Die Handkarten bleiben unmarkiert.");
   if (vorherHeute < 200 && p.heute >= 200){
     meldungen.push("Tagesziel 200 erreicht: Heute gibt es einen zusätzlichen Gratis-Elementhinweis.");
     setTimeout(()=>startKonfetti(7000, false), 80);
@@ -1236,18 +1228,8 @@ function kommentarAvatarHtml(){
   return `<div class="commentator">${avatarKreis(idx)}<span><b>${esc(c.name)}</b><br>${esc(c.gebiet)} · kommentiert</span></div>`;
 }
 function markierteBonusKarten(){
-  const out = new Set();
-  if (state.modus!=="runden" || !state.zielwort) return out;
-  const b = suchbonusFuerName(state.names[state.current]);
-  if (!b.kartenMarkieren) return out;
-  const gebraucht = minZerlegung(normalize(state.zielwort.wort)) || [];
-  const rest = [...gebraucht];
-  const hand = state.hands[state.current] || [];
-  hand.forEach((sym,i)=>{
-    const pos = rest.indexOf(sym);
-    if (pos>=0){ out.add(i); rest.splice(pos,1); }
-  });
-  return out;
+  // Keine Kandidatenkarten markieren: Die Wortsuche soll eine echte Suchaufgabe bleiben.
+  return new Set();
 }
 
 // ---------------- Eigene Chemie-Beat-Sounds (Web Audio, keine Dateien noetig) ----------------
@@ -4322,7 +4304,7 @@ function tileHtml(sym, opts={}){
   const [,name,num,val] = BY_SYMBOL[sym];
   const cls = "tile" + (opts.small?" small":"") + (opts.big?" big":"")
     + (opts.selected?" selected":"") + (opts.onclick?" clickable":"") + (opts.kauf?" kauf":"")
-    + (opts.bonusMark?" bonus-mark":"");
+;
   const click = opts.onclick ? ` onclick="${opts.onclick}"` : "";
   const zeigName = opts.verdeckt ? "???" : name;
   const badge = opts.ordnung ? `<div style="position:absolute;top:-7px;right:-7px;width:18px;height:18px;
@@ -4602,7 +4584,7 @@ function render(){
         <div class="brand-atom">⚛</div>
         <div>
           <h1>WORTSTOFF ONLINE</h1>
-          <div class="sub">Online-Version · Benutzerkonto · Highscore · Suchbonus · Alltagschemie</div>
+          <div class="sub">Version 45 · Benutzerkonto · Highscore · Elementhinweise · Alltagschemie</div>
           <div class="hero-badges">
             <span class="hero-badge">🧪 Chemie</span><span class="hero-badge">🔤 Wortspiel</span>
             <span class="hero-badge">🏆 Online-Highscore</span>
@@ -4847,14 +4829,11 @@ function render(){
     <div style="margin-bottom:10px">${bonusStatusHtml(state.names[state.current], true)}</div>
     <div style="font-weight:700;margin-bottom:8px">${esc(state.names[state.current])}, deine Kaertchen (${hand.length}):
       ${state.doubler?'<span style="color:var(--good);margin-left:8px">&#10024; Verdoppler aktiv!</span>':""}</div>
-    <div class="tiles">${(()=>{
-      const markiert = markierteBonusKarten();
-      return hand.map((s,i)=>{
-        const gewaehlt = state.modus==="runden" ? state.wortWahl.includes(i) : state.swapSel.includes(i);
-        const ordnung = state.modus==="runden" && gewaehlt ? state.wortWahl.indexOf(i)+1 : null;
-        return tileHtml(s,{selected:gewaehlt, ordnung, bonusMark:markiert.has(i), onclick:`toggleSwap(${i})`});
-      }).join("");
-    })()}</div>
+    <div class="tiles">${hand.map((s,i)=>{
+      const gewaehlt = state.modus==="runden" ? state.wortWahl.includes(i) : state.swapSel.includes(i);
+      const ordnung = state.modus==="runden" && gewaehlt ? state.wortWahl.indexOf(i)+1 : null;
+      return tileHtml(s,{selected:gewaehlt, ordnung, onclick:`toggleSwap(${i})`});
+    }).join("")}</div>
     <div class="hint">${state.modus==="runden"
       ? "Das geheime Rundenwort steckt vollstaendig in diesen Kaertchen \u2013 tippe die Symbole in der richtigen Reihenfolge an! Nochmal antippen entfernt ein Symbol."
       : "Lege ein Wort. Nur wenn wirklich keins moeglich ist, darfst du bis zu 3 Kaertchen antippen und tauschen."}</div>
