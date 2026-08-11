@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wortstoff Online – Chemie-Wortspiel</title>
+<title>Wortstoff Online – Chemie-Wortspiel · V43</title>
 <style>
   :root {
     --ink: #1E3A4C; --grey: #7A8B94; --line: #C9D4D9;
@@ -372,6 +372,7 @@
 <script src="elementbilder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// Version 43: sichtbarer 200-Punkte-Bonus, Stufenzyklus 3-12, neue Wortlisten 9-12
 // ---------------- Elementdaten ----------------
 // [Symbol, Name, Ordnungszahl, Punktwert, Kategorie, Zustand]
 // Kategorie: ALK EAK UEB LAN ACT MET HME NME HAL EDG
@@ -689,6 +690,7 @@ const BY_SYMBOL = {}, BY_LOWER = {}, BY_NAME = {};
 for (const e of ELEMENTS) { BY_SYMBOL[e[0]] = e; BY_LOWER[e[0].toLowerCase()] = e[0]; BY_NAME[e[1]] = e; }
 
 const HAND_SIZE = 10;
+const MIN_STUFE = 3, MAX_STUFE = 12;
 
 // Beruehmte Chemikerinnen und Chemiker als Avatare
 const CHEMIKER = [
@@ -3394,12 +3396,12 @@ function zeichneSynthese(sym){
 
 // ------------------------------------------------------------------
 // Schulgerecht gefilterte Rundenwortliste.
-// Grundlage: nur die häufigsten Wörter der Gruppen 3–8 aus der
+// Grundlage: gefilterte Wörter der Gruppen 3–8 plus geprüfte Erweiterung 9–12;
 // Begleitdatei; englische Fremdeinträge, Eigennamen/Fehlformen und
 // klar ungeeignete Erwachseneninhalte wurden entfernt.
 // ------------------------------------------------------------------
 const EINGEBAUTE_WORTZAHL_CSV = 483;
-const EINGEBAUTE_WORTZAHL_GESAMT = 483;
+const EINGEBAUTE_WORTZAHL_GESAMT = 597;
 const RUNDENWOERTER = {
 3: [
   "ich","warte","lasse","hier","essen","tagen","von","getan","halte","noch",
@@ -3464,9 +3466,42 @@ const RUNDENWOERTER = {
   "schwieriges","ausgesprochen","Professoren","Krankheiten","vorenthalten","kooperativ","freigelassen","beunruhigend","Sonnenschein","verheirateten",
   "Investitionen"
 ],
+9: [
+  "Katalysatoren","Taschenrechner","Bunsenbrenner","unfreundlichen","unfreundlicher",
+  "unfreundliches","schrecklichen","schrecklicher","schreckliches","psychischen",
+  "psychischer","psychisches","internationaler","internationales","erstaunlichen",
+  "erstaunlicher","erstaunliches","unberechenbare","unberechenbarer","unberechenbares",
+  "beunruhigender","beunruhigendes","kooperativer","kooperatives","unsterblichen",
+  "unsterblicher","unsterbliches","Visitenkarten","Psychiaterin","Schreibtischen",
+  "Tagebuchseite"
+],
+10: [
+  "Klassenarbeiten","unberechenbaren","Architektinnen","Hausaufgabenplan","Tagebuchseiten",
+  "Freundinnenkreis","Kinderfreundlich","Kinderfreundliche","Taschenrechners","Bunsenbrenners",
+  "internationalste","unfreundlicheren","unfreundlicherer","unfreundlicheres","unfreundlichsten",
+  "unfreundlichstes","schrecklicheren","schrecklicherer","schrecklicheres","schrecklichsten",
+  "schrecklichstes","psychischeren","psychischerer","psychischeres","psychischsten",
+  "psychischstes","erstaunlicheren","erstaunlicherer","erstaunlicheres","erstaunlichsten",
+  "erstaunlichstes","kooperativerer","kooperativeres","kooperativste","unsterblicheren",
+  "unsterblicherer","unsterblicheres","unsterblichsten","unsterblichstes","beunruhigenderer",
+  "beunruhigenderes","beunruhigendste","Bunsenbrennergas"
+],
+11: [
+  "Calciumcarbonat","Psychiaterinnen","Investitionsplan","Operationsplan","Geschichtsbuch",
+  "Hausaufgabenliste","Hausaufgabenseite","Kinderfreundlichen","internationalsten","internationalstes",
+  "unberechenbareren","unberechenbarsten","unberechenbarstes","kooperativsten","kooperativstes",
+  "beunruhigendsten","beunruhigendstes","Geschichtsbuchs","Hausaufgabenplanes","Calciumcarbonate",
+  "Calciumcarbonats"
+],
+12: [
+  "Taschenrechnertasche","Taschenrechnerkauf","Katalysatorenliste","Investitionsplans","Investitionsplaner",
+  "Operationsplans","Operationsplaner","Geschichtsbuches","Hausaufgabenlisten","Hausaufgabenseiten",
+  "Kinderfreundlichsten","Kinderfreundlichstes","Kinderfreundlicheren","Calciumcarbonaten","Visitenkartenliste",
+  "Visitenkartenseite","Klassenarbeitenplan","Klassenarbeitsplan","Klassenarbeitsliste"
+],
 };
 // vom Nutzer per Datei geladene Zusatzwoerter
-const ZUSATZ = {3:[],4:[],5:[],6:[],7:[],8:[]};
+const ZUSATZ = {3:[],4:[],5:[],6:[],7:[],8:[],9:[],10:[],11:[],12:[]};
 
 // minimale Symbolanzahl einer Zerlegung (fuer die Stufen-Einordnung)
 function minSymbole(w){
@@ -3488,7 +3523,7 @@ function ladeWortdatei(input){
     let neu = 0, abgelehnt = 0;
     // vorhandene Woerter normalisiert erfassen (Gross-/Kleinschreibung egal)
     const vorhanden = new Set();
-    for (let k=3;k<=8;k++)
+    for (let k=MIN_STUFE;k<=MAX_STUFE;k++)
       for (const w of [...RUNDENWOERTER[k], ...ZUSATZ[k]]) vorhanden.add(normalize(w));
     const zeilen = String(leser.result).split(/\r?\n/);
     for (let zeilenNr=0; zeilenNr<zeilen.length; zeilenNr++){
@@ -3501,11 +3536,11 @@ function ladeWortdatei(input){
       }
       const norm = normalize(wort);
       const m = minSymbole(norm);
-      if (m && m>=3 && m<=8 && !vorhanden.has(norm)){
+      if (m && m>=MIN_STUFE && m<=MAX_STUFE && !vorhanden.has(norm)){
         ZUSATZ[m].push(wort); vorhanden.add(norm); neu++;
       } else abgelehnt++;
     }
-    state.ladeInfo = `${neu} Woerter uebernommen` + (abgelehnt?`, ${abgelehnt} nicht zerlegbar/doppelt/ausserhalb Stufe 3-8`:"") + ` [${datei.name}]`;
+    state.ladeInfo = `${neu} Woerter uebernommen` + (abgelehnt?`, ${abgelehnt} nicht zerlegbar/doppelt/ausserhalb Stufe 3-12`:"") + ` [${datei.name}]`;
     render();
   };
   leser.readAsText(datei);
@@ -3865,7 +3900,7 @@ function startGame(){
   state.rundenWoerter = {};
   state.rundenSets = {};
   state.rundenGewichtet = {};
-  for (let k=3;k<=8;k++){
+  for (let k=MIN_STUFE;k<=MAX_STUFE;k++){
     state.rundenWoerter[k] = [...RUNDENWOERTER[k], ...ZUSATZ[k]];
     state.rundenSets[k] = new Set(state.rundenWoerter[k].map(normalize));
     // eigene Woerter doppelt im Lostopf -> doppelte Ziehungschance
@@ -3897,7 +3932,7 @@ function nextPlayer(entry){
 }
 
 function listenStufe(norm){
-  for (let k=3;k<=8;k++)
+  for (let k=MIN_STUFE;k<=MAX_STUFE;k++)
     if (state.rundenSets && state.rundenSets[k] && state.rundenSets[k].has(norm)) return k;
   return null;
 }
@@ -4102,7 +4137,10 @@ function quizAntwort(idx){
 }
 
 function stufeFuer(zugNr){
-  return Math.min(3 + Math.floor(zugNr / state.names.length), 8);
+  const spieler = Math.max(1, state.names.length);
+  const runde = Math.floor(zugNr / spieler);
+  const anzahlStufen = MAX_STUFE - MIN_STUFE + 1;
+  return MIN_STUFE + (runde % anzahlStufen);
 }
 function aktuelleStufe(){
   return stufeFuer(state.zugNr);
@@ -4525,6 +4563,11 @@ function render(){
         <div class="hint">Die Punkte werden online deinem Benutzerkonto zugeordnet.</div>
       </div>
 
+      <div class="section-title">Rundenstufen</div>
+      <div class="bonus-panel">
+        Die Wortstufen laufen von <b>3 bis 12 Elementsymbolen</b>. Nach Stufe 12 beginnt der Zyklus wieder bei Stufe 3.
+      </div>
+
       <div class="section-title">Aussehen &amp; Ton</div>
       <div class="row">${THEMES.map(([id,label])=>
         `<button style="flex:1" class="${state.theme===id?'primary':''}"
@@ -4756,8 +4799,11 @@ function render(){
     ${state.modus==="runden" ? `
       <div class="hint" style="margin-bottom:8px">In deinen Kaertchen steckt ein geheimes Wort aus
         <b>${state.zielwort.stufe} Elementsymbolen</b> \u2013 vollstaendig! Finde und tippe es.</div>
-      ${state.hinweise>0 && !state.aufgeloest ? `<div style="text-align:center;font-family:ui-monospace,monospace;
-        font-size:20px;letter-spacing:4px;margin-bottom:8px">${esc(state.zielwort.wort.slice(0,state.hinweise))}${"\u2022".repeat(Math.max(0,state.zielwort.wort.length-state.hinweise))}</div>` : ""}
+      ${(state.hinweise + state.bonusHinweise)>0 && !state.aufgeloest ? (()=>{
+        const sichtbar = Math.min(state.zielwort.wort.length, state.hinweise + state.bonusHinweise);
+        return `<div style="text-align:center;font-family:ui-monospace,monospace;font-size:20px;letter-spacing:4px;margin-bottom:4px">${esc(state.zielwort.wort.slice(0,sichtbar))}${"\u2022".repeat(Math.max(0,state.zielwort.wort.length-sichtbar))}</div>
+        ${state.bonusHinweise ? `<div class="hint" style="text-align:center;margin-bottom:8px">🔎 ${state.bonusHinweise} Gratis-Buchstabe${state.bonusHinweise===1?"":"n"} aus deinem Suchbonus sichtbar</div>` : ""}`;
+      })() : ""}
       ${state.aufgeloest ? `<div style="text-align:center;color:var(--bad);font-weight:700;margin-bottom:6px">Aufgeloest \u2013 das gesuchte Wort war:</div>` : ""}
     ` : ""}
     <input type="text" id="wordinput" ${state.aufgeloest||state.modus==="runden"?"readonly":""}
