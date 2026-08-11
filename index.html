@@ -807,7 +807,7 @@ function profilKurzHtml(name){
   const p = profilFuerName(name, false);
   if (!p) return `<span>Online-Profil wird geladen …</span>`;
   const b = suchbonusFuerName(name);
-  return `<span><b>${p.total}</b> Gesamtpunkte · heute <b>${p.heute}/200</b>${b.buchstaben ? ` · 🔎 ${b.buchstaben} Gratis-Buchstabe${b.buchstaben===1?"":"n"}` : ""}</span>`;
+  return `<span><b>${p.total}</b> Gesamtpunkte · heute <b>${p.heute}/200</b>${b.buchstaben ? ` · 🔎 ${b.buchstaben} Gratis-Elementhinweis${b.buchstaben===1?"":"e"}` : ""}</span>`;
 }
 function bonusStatusHtml(name, kompakt=false){
   const b = suchbonusFuerName(name), p = b.profil;
@@ -821,8 +821,8 @@ function bonusStatusHtml(name, kompakt=false){
   return `<div class="bonus-panel">
     <b>🔎 Suchbonus für ${esc(name)}</b>
     <div class="hint" style="margin-top:4px">
-      500 Gesamtpunkte: 1 Startbuchstabe · 1000: 2 Startbuchstaben und passende Karten markiert ·
-      200 Tagespunkte: 1 zusätzlicher Startbuchstabe.
+      500 Gesamtpunkte: 1 zufällige Elementposition · 1000: 2 zufällige Elementpositionen und passende Karten markiert ·
+      200 Tagespunkte: 1 zusätzlicher Elementhinweis.
     </div>
     <div style="margin-top:9px;font-size:12px">Heute: <b>${p.heute}/200</b>
       ${b.tagesbonus ? "· Tages-Turbo aktiv" : ""}</div>
@@ -916,11 +916,11 @@ function registrierePunkte(index, delta){
   p.aktualisiert = Date.now();
   const meldungen = [];
   if (vorherGesamt < 500 && p.total >= 500)
-    meldungen.push("500 Gesamtpunkte erreicht: Die Wort-Lupe zeigt ab jetzt einen Startbuchstaben.");
+    meldungen.push("500 Gesamtpunkte erreicht: Die Wort-Lupe verrät ab jetzt ein zufällig platziertes Element im Zielwort.");
   if (vorherGesamt < 1000 && p.total >= 1000)
-    meldungen.push("1000 Gesamtpunkte erreicht: Zwei Startbuchstaben und passende Karten werden markiert.");
+    meldungen.push("1000 Gesamtpunkte erreicht: Zwei zufällige Elementpositionen werden verraten und passende Karten markiert.");
   if (vorherHeute < 200 && p.heute >= 200){
-    meldungen.push("Tagesziel 200 erreicht: Heute gibt es einen zusätzlichen Gratis-Buchstaben.");
+    meldungen.push("Tagesziel 200 erreicht: Heute gibt es einen zusätzlichen Gratis-Elementhinweis.");
     setTimeout(()=>startKonfetti(7000, false), 80);
   }
   if (meldungen.length) state.bonusNachricht = `${name}: ${meldungen.join(" ")}`;
@@ -3877,7 +3877,7 @@ let state = {
   draw: null, // { needed, maxPick, picked, swapBack, logEntry }
   doubler: false, // Alltagschemie-Frage richtig -> Wortpunkte x2
   hatGelegt: false, // im Rundenmodus: Zielwort in diesem Zug gelegt?
-  hinweise: 0, bonusHinweise: 0, aufgeloest: false,
+  hinweise: 0, bonusHinweise: 0, hinweisPositionen: [], bonusHinweisPositionen: [], aufgeloest: false,
   klangAn: true, klangFuer: "", lob: "", bildFenster: null, siegSpruch: "",
   wortWahl: [], steckbrief: null,
   bonus: null, // { symbols, idx, extra, needed, entryBase }
@@ -3926,7 +3926,7 @@ function nextPlayer(entry){
   state.word=""; state.swapSel=[]; state.message=""; state.quiz=null;
   state.doubler=false; state.bonus=null; state.zielwort=null;
   state.wortWahl=[]; state.steckbrief=null; state.klangFuer=""; state.lob=""; state.bildFenster=null;
-  state.bonusHinweise=0;
+  state.bonusHinweise=0; state.hinweisPositionen=[]; state.bonusHinweisPositionen=[];
   waehleKommentarAvatar();
   state.phase="handoff"; render();
 }
@@ -4164,6 +4164,61 @@ function minZerlegung(w){
   return syms;
 }
 
+// Hinweise verraten ganze Elementsymbole an wechselnden Positionen im Zielwort.
+// Beispiel: "3. Elementbaustein: Selen (Se)" statt immer nur den ersten Buchstaben.
+function zielSymbole(){
+  if (!state.zielwort) return [];
+  if (Array.isArray(state.zielwort.symbole) && state.zielwort.symbole.length) return state.zielwort.symbole;
+  return minZerlegung(normalize(state.zielwort.wort)) || [];
+}
+function belegteHinweisPositionen(){
+  return new Set([...(state.bonusHinweisPositionen || []), ...(state.hinweisPositionen || [])]);
+}
+function freieHinweisPositionen(){
+  const n = zielSymbole().length, belegt = belegteHinweisPositionen();
+  return Array.from({length:n}, (_,i)=>i).filter(i=>!belegt.has(i));
+}
+function zufaelligeFreieHinweisPosition(){
+  let frei = freieHinweisPositionen();
+  if (!frei.length) return null;
+  // Der allererste Hinweis soll, wenn moeglich, gerade NICHT wieder am Wortanfang liegen.
+  if (belegteHinweisPositionen().size===0 && frei.length>1){
+    const innen = frei.filter(i=>i!==0);
+    if (innen.length) frei = innen;
+  }
+  return frei[Math.floor(Math.random()*frei.length)];
+}
+function setzeBonusHinweisPositionen(anzahl){
+  state.bonusHinweisPositionen = [];
+  for (let k=0; k<anzahl; k++){
+    const pos = zufaelligeFreieHinweisPosition();
+    if (pos===null) break;
+    state.bonusHinweisPositionen.push(pos);
+  }
+  state.bonusHinweise = state.bonusHinweisPositionen.length;
+}
+function hinweisAnzeigeHtml(){
+  if (!state.zielwort || state.aufgeloest) return "";
+  const syms = zielSymbole();
+  const bonus = new Set(state.bonusHinweisPositionen || []);
+  const bezahlt = new Set(state.hinweisPositionen || []);
+  const sichtbar = new Set([...bonus, ...bezahlt]);
+  if (!sichtbar.size) return "";
+
+  const muster = syms.map((sym,i)=> sichtbar.has(i)
+    ? `<span style="display:inline-block;min-width:28px;padding:2px 5px;border:1px solid var(--line);border-radius:6px;background:var(--card)" title="${esc(BY_SYMBOL[sym][1])}">${esc(sym)}</span>`
+    : `<span style="display:inline-block;min-width:28px">•</span>`).join(" ");
+
+  const zeilen = [...sichtbar].sort((a,b)=>a-b).map(pos=>{
+    const sym = syms[pos], name = BY_SYMBOL[sym] ? BY_SYMBOL[sym][1] : sym;
+    const art = bonus.has(pos) ? "🔎 Gratis-Hinweis" : "💡 Tipp";
+    return `<div>${art}: <b>${pos+1}. Elementbaustein im Wort</b> ist <b>${esc(name)} (${esc(sym)})</b>.</div>`;
+  }).join("");
+
+  return `<div style="text-align:center;font-family:ui-monospace,monospace;font-size:20px;letter-spacing:2px;margin-bottom:7px">${muster}</div>
+    <div class="hint" style="text-align:center;margin-bottom:8px;line-height:1.55">${zeilen}</div>`;
+}
+
 function waehleZielwort(){
   // Rundenmodus: geheimes Wort waehlen und seine Symbole vollstaendig
   // in der Hand verstecken (Rest mit Zufallskaertchen auffuellen)
@@ -4181,11 +4236,14 @@ function waehleZielwort(){
   while (hand.length < HAND_SIZE && state.drum.length) hand.push(state.drum.pop());
   // mischen, damit die gesuchten Symbole nicht vorn stehen
   for (let i=hand.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [hand[i],hand[j]]=[hand[j],hand[i]]; }
-  state.zielwort = { wort: ziel.wort, stufe: ziel.stufe, legbar: true };
+  state.zielwort = { wort: ziel.wort, stufe: ziel.stufe, legbar: true, symbole: [...noetig] };
   state.word = "";
   state.wortWahl = [];
   state.hinweise = 0;
-  state.bonusHinweise = suchbonusFuerName(state.names[state.current]).buchstaben;
+  state.hinweisPositionen = [];
+  state.bonusHinweisPositionen = [];
+  const bonusAnzahl = Math.min(suchbonusFuerName(state.names[state.current]).buchstaben, noetig.length);
+  setzeBonusHinweisPositionen(bonusAnzahl);
   state.aufgeloest = false;
 }
 
@@ -4207,7 +4265,10 @@ function naechsteHinweisKosten(){
   return (state.hinweise + 1) * 2;
 }
 function hinweisGeben(){
-  if (state.hinweise + state.bonusHinweise >= state.zielwort.wort.length) return;
+  if (!freieHinweisPositionen().length){
+    state.message = "Alle Elementpositionen des Zielworts sind bereits als Hinweis sichtbar.";
+    render(); return;
+  }
   const hinweisNr = state.hinweise + 1;
   const kosten = naechsteHinweisKosten();
   if (state.scores[state.current] < kosten){
@@ -4235,10 +4296,14 @@ function quizWeiter(){
   } else if (art === "hinweis") {
     const kosten = state.quiz.kosten;
     if (!richtig) ziehePunkteAb(state.current, kosten);
+    const pos = zufaelligeFreieHinweisPosition();
+    if (pos !== null) state.hinweisPositionen.push(pos);
     state.hinweise++;
+    const sym = pos !== null ? zielSymbole()[pos] : null;
+    const elementText = sym && BY_SYMBOL[sym] ? `${pos+1}. Elementbaustein: ${BY_SYMBOL[sym][1]} (${sym})` : "Elementhinweis";
     state.message = richtig
-      ? `Tipp ${state.hinweise} freigeschaltet – kein Punktabzug.`
-      : `Tipp ${state.hinweise} freigeschaltet – ${kosten} Punkte abgezogen.`;
+      ? `Tipp ${state.hinweise} freigeschaltet – ${elementText}. Kein Punktabzug.`
+      : `Tipp ${state.hinweise} freigeschaltet – ${elementText}. ${kosten} Punkte abgezogen.`;
     state.quiz = null;
     state.phase = "turn";
     render();
@@ -4557,9 +4622,9 @@ function render(){
 
       <div class="section-title">Suchbonus</div>
       <div class="bonus-panel">
-        <b>500 Gesamtpunkte:</b> Ein Anfangsbuchstabe wird kostenlos gezeigt.<br>
-        <b>1000 Gesamtpunkte:</b> Zwei Anfangsbuchstaben werden gezeigt und passende Elementkarten markiert.<br>
-        <b>Tagesziel 200 Punkte:</b> Ein zusätzlicher Anfangsbuchstabe und Konfettiregen beim Erreichen des Tagesziels.
+        <b>500 Gesamtpunkte:</b> Ein Element an einer zufälligen Position im Zielwort wird kostenlos verraten.<br>
+        <b>1000 Gesamtpunkte:</b> Zwei Elemente an zufälligen Positionen werden verraten und passende Elementkarten markiert.<br>
+        <b>Tagesziel 200 Punkte:</b> Ein zusätzlicher Elementhinweis und Konfettiregen beim Erreichen des Tagesziels.
         <div class="hint">Die Punkte werden online deinem Benutzerkonto zugeordnet.</div>
       </div>
 
@@ -4798,12 +4863,8 @@ function render(){
     <div style="font-weight:700;margin-bottom:8px">${state.modus==="runden"?`Rundenwort finden (Stufe ${state.zielwort.stufe})`:"Wort legen"}</div>
     ${state.modus==="runden" ? `
       <div class="hint" style="margin-bottom:8px">In deinen Kaertchen steckt ein geheimes Wort aus
-        <b>${state.zielwort.stufe} Elementsymbolen</b> \u2013 vollstaendig! Finde und tippe es.</div>
-      ${(state.hinweise + state.bonusHinweise)>0 && !state.aufgeloest ? (()=>{
-        const sichtbar = Math.min(state.zielwort.wort.length, state.hinweise + state.bonusHinweise);
-        return `<div style="text-align:center;font-family:ui-monospace,monospace;font-size:20px;letter-spacing:4px;margin-bottom:4px">${esc(state.zielwort.wort.slice(0,sichtbar))}${"\u2022".repeat(Math.max(0,state.zielwort.wort.length-sichtbar))}</div>
-        ${state.bonusHinweise ? `<div class="hint" style="text-align:center;margin-bottom:8px">🔎 ${state.bonusHinweise} Gratis-Buchstabe${state.bonusHinweise===1?"":"n"} aus deinem Suchbonus sichtbar</div>` : ""}`;
-      })() : ""}
+        <b>${state.zielwort.stufe} Elementsymbolen</b> \u2013 vollstaendig! Hinweise verraten ganze Elementsymbole an wechselnden Positionen. Finde und tippe das Wort.</div>
+      ${hinweisAnzeigeHtml()}
       ${state.aufgeloest ? `<div style="text-align:center;color:var(--bad);font-weight:700;margin-bottom:6px">Aufgeloest \u2013 das gesuchte Wort war:</div>` : ""}
     ` : ""}
     <input type="text" id="wordinput" ${state.aufgeloest||state.modus==="runden"?"readonly":""}
