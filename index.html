@@ -364,7 +364,7 @@
 <script src="elementbilder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Version 46: maximal 3 sichtbare Tipps/Hinweise pro Zielwort (inkl. Suchbonus)
+// Version 47: hartes Limit von maximal 3 angeforderten Tipps pro Zielwort; zusaetzlich max. 3 sichtbare Hinweise insgesamt
 // ---------------- Elementdaten ----------------
 // [Symbol, Name, Ordnungszahl, Punktwert, Kategorie, Zustand]
 // Kategorie: ALK EAK UEB LAN ACT MET HME NME HAL EDG
@@ -3859,7 +3859,7 @@ let state = {
   draw: null, // { needed, maxPick, picked, swapBack, logEntry }
   doubler: false, // Alltagschemie-Frage richtig -> Wortpunkte x2
   hatGelegt: false, // im Rundenmodus: Zielwort in diesem Zug gelegt?
-  hinweise: 0, bonusHinweise: 0, hinweisPositionen: [], bonusHinweisPositionen: [], aufgeloest: false,
+  hinweise: 0, tippsGenutzt: 0, bonusHinweise: 0, hinweisPositionen: [], bonusHinweisPositionen: [], aufgeloest: false,
   klangAn: true, klangFuer: "", lob: "", bildFenster: null, siegSpruch: "",
   wortWahl: [], steckbrief: null,
   bonus: null, // { symbols, idx, extra, needed, entryBase }
@@ -3908,7 +3908,7 @@ function nextPlayer(entry){
   state.word=""; state.swapSel=[]; state.message=""; state.quiz=null;
   state.doubler=false; state.bonus=null; state.zielwort=null;
   state.wortWahl=[]; state.steckbrief=null; state.klangFuer=""; state.lob=""; state.bildFenster=null;
-  state.bonusHinweise=0; state.hinweisPositionen=[]; state.bonusHinweisPositionen=[];
+  state.bonusHinweise=0; state.tippsGenutzt=0; state.hinweise=0; state.hinweisPositionen=[]; state.bonusHinweisPositionen=[];
   waehleKommentarAvatar();
   state.phase="handoff"; render();
 }
@@ -4226,6 +4226,7 @@ function waehleZielwort(){
   state.word = "";
   state.wortWahl = [];
   state.hinweise = 0;
+  state.tippsGenutzt = 0;
   state.hinweisPositionen = [];
   state.bonusHinweisPositionen = [];
   const bonusAnzahl = Math.min(suchbonusFuerName(state.names[state.current]).buchstaben, noetig.length);
@@ -4248,19 +4249,27 @@ function weiterNachAufloesen(){
 // Tipp-Challenge: richtige Chemieantwort verhindert den Abzug.
 // Bei falscher Antwort steigen die Kosten weiterhin: 2, 4, 6, 8 ... Punkte.
 function naechsteHinweisKosten(){
-  return (state.hinweise + 1) * 2;
+  return (state.tippsGenutzt + 1) * 2;
 }
 function hinweisGeben(){
   const sichtbar = belegteHinweisPositionen().size;
+  // Hartes Limit: unabhaengig davon, wie viele Hinweispositionen gerade sichtbar sind,
+  // darf die Tipp-Challenge fuer ein Zielwort hoechstens dreimal gestartet werden.
+  if (state.tippsGenutzt >= MAX_HINWEISE_PRO_WORT){
+    state.message = `Du hast bereits ${MAX_HINWEISE_PRO_WORT} Tipps fuer dieses Wort benutzt. Weitere Tipps sind gesperrt.`;
+    render(); return;
+  }
+  // Zweite Sicherung: Auch Gratis-/Bonushinweise duerfen zusammen mit Tipps
+  // niemals mehr als drei Elementpositionen des Zielworts sichtbar machen.
   if (sichtbar >= MAX_HINWEISE_PRO_WORT){
-    state.message = `Maximal ${MAX_HINWEISE_PRO_WORT} Tipps/Hinweise pro Wort sind erlaubt. Jetzt musst du das Wort selbst knacken!`;
+    state.message = `Maximal ${MAX_HINWEISE_PRO_WORT} sichtbare Tipps/Hinweise pro Wort sind erlaubt. Jetzt musst du das Wort selbst knacken!`;
     render(); return;
   }
   if (!freieHinweisPositionen().length){
     state.message = "Alle Elementpositionen des Zielworts sind bereits als Hinweis sichtbar.";
     render(); return;
   }
-  const hinweisNr = state.hinweise + 1;
+  const hinweisNr = state.tippsGenutzt + 1;
   const kosten = naechsteHinweisKosten();
   if (state.scores[state.current] < kosten){
     state.message = `Fuer diese Tipp-Challenge brauchst du mindestens ${kosten} Punkte als Einsatz. Dein Konto hat gerade ${state.scores[state.current]}.`;
@@ -4268,6 +4277,7 @@ function hinweisGeben(){
   }
   state.message = "";
   const hFrage = macheHinweisfrage(hinweisNr);
+  state.tippsGenutzt++;
   state.quiz = {
     sym: hFrage.sym || null, frage: hFrage, gewaehlt:null,
     art:"hinweis", kosten, hinweisNr
@@ -4287,7 +4297,8 @@ function quizWeiter(){
   } else if (art === "hinweis") {
     const kosten = state.quiz.kosten;
     if (!richtig) ziehePunkteAb(state.current, kosten);
-    const darfNoch = belegteHinweisPositionen().size < MAX_HINWEISE_PRO_WORT;
+    const darfNoch = state.tippsGenutzt <= MAX_HINWEISE_PRO_WORT
+      && belegteHinweisPositionen().size < MAX_HINWEISE_PRO_WORT;
     const pos = darfNoch ? zufaelligeFreieHinweisPosition() : null;
     if (pos !== null) {
       state.hinweisPositionen.push(pos);
@@ -4296,8 +4307,8 @@ function quizWeiter(){
     const sym = pos !== null ? zielSymbole()[pos] : null;
     const elementText = sym && BY_SYMBOL[sym] ? `${pos+1}. Elementbaustein: ${BY_SYMBOL[sym][1]} (${sym})` : "Elementhinweis";
     state.message = richtig
-      ? `Tipp ${state.hinweise} freigeschaltet – ${elementText}. Kein Punktabzug.`
-      : `Tipp ${state.hinweise} freigeschaltet – ${elementText}. ${kosten} Punkte abgezogen.`;
+      ? `Tipp ${state.tippsGenutzt} von ${MAX_HINWEISE_PRO_WORT} freigeschaltet – ${elementText}. Kein Punktabzug.`
+      : `Tipp ${state.tippsGenutzt} von ${MAX_HINWEISE_PRO_WORT} freigeschaltet – ${elementText}. ${kosten} Punkte abgezogen.`;
     state.quiz = null;
     state.phase = "turn";
     render();
@@ -4596,7 +4607,7 @@ function render(){
         <div class="brand-atom">⚛</div>
         <div>
           <h1>WORTSTOFF ONLINE</h1>
-          <div class="sub">Version 45 · Benutzerkonto · Highscore · Elementhinweise · Alltagschemie</div>
+          <div class="sub">Version 47 · Benutzerkonto · Highscore · hartes 3-Tipps-Limit · Elementhinweise · Alltagschemie</div>
           <div class="hero-badges">
             <span class="hero-badge">🧪 Chemie</span><span class="hero-badge">🔤 Wortspiel</span>
             <span class="hero-badge">🏆 Online-Highscore</span>
@@ -4877,10 +4888,10 @@ function render(){
         <button class="primary" style="flex:2;min-width:150px" ${aktiv?"":"disabled"} onclick="playWord()">
           ⚗️ Wort legen${aktiv?` (${total>=0?"+":""}${total})`:""}</button>
         ${state.modus==="runden"
-          ? (belegteHinweisPositionen().size >= MAX_HINWEISE_PRO_WORT
-              ? `<button class="hint-button" style="flex:1;min-width:165px" disabled>🧠 Tipp-Limit erreicht<br><span style="font-size:11px;font-weight:600">${MAX_HINWEISE_PRO_WORT}/${MAX_HINWEISE_PRO_WORT} Hinweise sichtbar</span></button>
+          ? ((state.tippsGenutzt >= MAX_HINWEISE_PRO_WORT || belegteHinweisPositionen().size >= MAX_HINWEISE_PRO_WORT)
+              ? `<button class="hint-button" style="flex:1;min-width:165px" disabled>🧠 Tipp-Limit erreicht<br><span style="font-size:11px;font-weight:600">${state.tippsGenutzt}/${MAX_HINWEISE_PRO_WORT} Tipps benutzt · ${belegteHinweisPositionen().size}/${MAX_HINWEISE_PRO_WORT} Hinweise sichtbar</span></button>
                  <button style="flex:1;min-width:110px" onclick="aufloesen()">Aufloesen</button>`
-              : `<button class="hint-button" style="flex:1;min-width:165px" onclick="hinweisGeben()">🧠 Tipp-Challenge<br><span style="font-size:11px;font-weight:600">${belegteHinweisPositionen().size}/${MAX_HINWEISE_PRO_WORT} sichtbar · richtig: gratis · falsch: −${naechsteHinweisKosten()} P.</span></button>
+              : `<button class="hint-button" style="flex:1;min-width:165px" onclick="hinweisGeben()">🧠 Tipp-Challenge<br><span style="font-size:11px;font-weight:600">Tipp ${state.tippsGenutzt+1}/${MAX_HINWEISE_PRO_WORT} · ${belegteHinweisPositionen().size}/${MAX_HINWEISE_PRO_WORT} sichtbar · richtig: gratis · falsch: −${naechsteHinweisKosten()} P.</span></button>
                  <button style="flex:1;min-width:110px" onclick="aufloesen()">Aufloesen</button>`)
           : `<button style="flex:1;min-width:110px" ${aktiv?"disabled":""} onclick="swapTiles()">Tauschen (${state.swapSel.length})</button>`}
       `}
