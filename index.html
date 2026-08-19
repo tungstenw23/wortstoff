@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wortstoff Online – Chemie-Wortspiel · V43</title>
+<title>Wortstoff Online – Chemie-Wortspiel · V46</title>
 <style>
   :root {
     --ink: #1E3A4C; --grey: #7A8B94; --line: #C9D4D9;
@@ -364,7 +364,7 @@
 <script src="elementbilder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Version 43: sichtbarer 200-Punkte-Bonus, Stufenzyklus 3-12, neue Wortlisten 9-12
+// Version 46: maximal 3 sichtbare Tipps/Hinweise pro Zielwort (inkl. Suchbonus)
 // ---------------- Elementdaten ----------------
 // [Symbol, Name, Ordnungszahl, Punktwert, Kategorie, Zustand]
 // Kategorie: ALK EAK UEB LAN ACT MET HME NME HAL EDG
@@ -4148,6 +4148,9 @@ function minZerlegung(w){
 
 // Hinweise verraten ganze Elementsymbole an wechselnden Positionen im Zielwort.
 // Beispiel: "3. Elementbaustein: Selen (Se)" statt immer nur den ersten Buchstaben.
+// Pro Zielwort duerfen insgesamt hoechstens 3 Elementpositionen sichtbar sein.
+// Dazu zaehlen sowohl Suchbonus-/Gratis-Hinweise als auch Tipp-Challenges.
+const MAX_HINWEISE_PRO_WORT = 3;
 function zielSymbole(){
   if (!state.zielwort) return [];
   if (Array.isArray(state.zielwort.symbole) && state.zielwort.symbole.length) return state.zielwort.symbole;
@@ -4172,6 +4175,7 @@ function zufaelligeFreieHinweisPosition(){
 }
 function setzeBonusHinweisPositionen(anzahl){
   state.bonusHinweisPositionen = [];
+  anzahl = Math.min(anzahl, MAX_HINWEISE_PRO_WORT);
   for (let k=0; k<anzahl; k++){
     const pos = zufaelligeFreieHinweisPosition();
     if (pos===null) break;
@@ -4247,6 +4251,11 @@ function naechsteHinweisKosten(){
   return (state.hinweise + 1) * 2;
 }
 function hinweisGeben(){
+  const sichtbar = belegteHinweisPositionen().size;
+  if (sichtbar >= MAX_HINWEISE_PRO_WORT){
+    state.message = `Maximal ${MAX_HINWEISE_PRO_WORT} Tipps/Hinweise pro Wort sind erlaubt. Jetzt musst du das Wort selbst knacken!`;
+    render(); return;
+  }
   if (!freieHinweisPositionen().length){
     state.message = "Alle Elementpositionen des Zielworts sind bereits als Hinweis sichtbar.";
     render(); return;
@@ -4278,9 +4287,12 @@ function quizWeiter(){
   } else if (art === "hinweis") {
     const kosten = state.quiz.kosten;
     if (!richtig) ziehePunkteAb(state.current, kosten);
-    const pos = zufaelligeFreieHinweisPosition();
-    if (pos !== null) state.hinweisPositionen.push(pos);
-    state.hinweise++;
+    const darfNoch = belegteHinweisPositionen().size < MAX_HINWEISE_PRO_WORT;
+    const pos = darfNoch ? zufaelligeFreieHinweisPosition() : null;
+    if (pos !== null) {
+      state.hinweisPositionen.push(pos);
+      state.hinweise++;
+    }
     const sym = pos !== null ? zielSymbole()[pos] : null;
     const elementText = sym && BY_SYMBOL[sym] ? `${pos+1}. Elementbaustein: ${BY_SYMBOL[sym][1]} (${sym})` : "Elementhinweis";
     state.message = richtig
@@ -4842,7 +4854,8 @@ function render(){
     <div style="font-weight:700;margin-bottom:8px">${state.modus==="runden"?`Rundenwort finden (Stufe ${state.zielwort.stufe})`:"Wort legen"}</div>
     ${state.modus==="runden" ? `
       <div class="hint" style="margin-bottom:8px">In deinen Kaertchen steckt ein geheimes Wort aus
-        <b>${state.zielwort.stufe} Elementsymbolen</b> \u2013 vollstaendig! Hinweise verraten ganze Elementsymbole an wechselnden Positionen. Finde und tippe das Wort.</div>
+        <b>${state.zielwort.stufe} Elementsymbolen</b> \u2013 vollstaendig! Hinweise verraten ganze Elementsymbole an wechselnden Positionen.
+        <b>Maximal ${MAX_HINWEISE_PRO_WORT} Hinweise pro Wort</b> (inkl. Gratis-Hinweise). Finde und tippe das Wort.</div>
       ${hinweisAnzeigeHtml()}
       ${state.aufgeloest ? `<div style="text-align:center;color:var(--bad);font-weight:700;margin-bottom:6px">Aufgeloest \u2013 das gesuchte Wort war:</div>` : ""}
     ` : ""}
@@ -4864,8 +4877,11 @@ function render(){
         <button class="primary" style="flex:2;min-width:150px" ${aktiv?"":"disabled"} onclick="playWord()">
           ⚗️ Wort legen${aktiv?` (${total>=0?"+":""}${total})`:""}</button>
         ${state.modus==="runden"
-          ? `<button class="hint-button" style="flex:1;min-width:165px" onclick="hinweisGeben()">🧠 Tipp-Challenge<br><span style="font-size:11px;font-weight:600">richtig: gratis · falsch: −${naechsteHinweisKosten()} P.</span></button>
-             <button style="flex:1;min-width:110px" onclick="aufloesen()">Aufloesen</button>`
+          ? (belegteHinweisPositionen().size >= MAX_HINWEISE_PRO_WORT
+              ? `<button class="hint-button" style="flex:1;min-width:165px" disabled>🧠 Tipp-Limit erreicht<br><span style="font-size:11px;font-weight:600">${MAX_HINWEISE_PRO_WORT}/${MAX_HINWEISE_PRO_WORT} Hinweise sichtbar</span></button>
+                 <button style="flex:1;min-width:110px" onclick="aufloesen()">Aufloesen</button>`
+              : `<button class="hint-button" style="flex:1;min-width:165px" onclick="hinweisGeben()">🧠 Tipp-Challenge<br><span style="font-size:11px;font-weight:600">${belegteHinweisPositionen().size}/${MAX_HINWEISE_PRO_WORT} sichtbar · richtig: gratis · falsch: −${naechsteHinweisKosten()} P.</span></button>
+                 <button style="flex:1;min-width:110px" onclick="aufloesen()">Aufloesen</button>`)
           : `<button style="flex:1;min-width:110px" ${aktiv?"disabled":""} onclick="swapTiles()">Tauschen (${state.swapSel.length})</button>`}
       `}
     </div>
